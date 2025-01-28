@@ -1,23 +1,23 @@
 import unittest
 
 from mlkem.constants import n
-from mlkem.ring_nq import RingNQ
-from mlkem.z_q import Zq
+from mlkem.ring_znq import RingZnq
+from mlkem.zq import Zq
 
 
-class TestRingRq(unittest.TestCase):
+class TestRingZnq(unittest.TestCase):
     def test_init(self) -> None:
-        actual = RingNQ()
+        actual = RingZnq()
         expected = [Zq(0) for _ in range(n)]
         self.assertEqual(expected, actual.coefficients)
 
     def test_init_wrong_size(self) -> None:
         with self.assertRaises(ValueError):
-            RingNQ([Zq(0)])
+            RingZnq([Zq(0)])
 
     def test_getitem(self) -> None:
         coefficients = [Zq(i) for i in range(n)]
-        actual = RingNQ(coefficients)
+        actual = RingZnq(coefficients)
 
         for i in range(n):
             expected = Zq(i)
@@ -25,8 +25,8 @@ class TestRingRq(unittest.TestCase):
 
     def test_add(self) -> None:
         coefficients = [Zq(i) for i in range(n)]
-        f = RingNQ(coefficients)
-        g = RingNQ(coefficients)
+        f = RingZnq(coefficients)
+        g = RingZnq(coefficients)
 
         h = f + g
 
@@ -37,7 +37,7 @@ class TestRingRq(unittest.TestCase):
     def test_mul(self) -> None:
         a = Zq(100)
         coefficients = [Zq(i) for i in range(n)]
-        f = RingNQ(coefficients)
+        f = RingZnq(coefficients)
 
         h = f * a
 
