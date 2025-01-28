@@ -5,6 +5,10 @@ build/
 dist/
 wheels/
 *.egg-info
+.coverage
 
 # Virtual environments
 .venv
+
+# tooling directories
+.idea
