@@ -23,3 +23,21 @@ class TestMatrix(TestCase):
         actual = a + b
 
         self.assertEqual(expected, actual)
+
+    def test_mul(self) -> None:
+        a = Matrix(rows=4, cols=3, entries=[1, 0, 1, 2, 1, 1, 0, 1, 1, 1, 1, 2])
+        b = Matrix(rows=3, cols=3, entries=[1, 2, 1, 2, 3, 1, 4, 2, 2])
+        expected = Matrix(rows=4, cols=3, entries=[5, 4, 3, 8, 9, 5, 6, 5, 3, 11, 9, 6])
+
+        actual = a * b
+
+        self.assertEqual(expected, actual)
+
+    def test_mul_scalar(self) -> None:
+        f = 2
+        a = Matrix(rows=2, cols=2, entries=[2, 1, 4, 3])
+        expected = Matrix(rows=2, cols=2, entries=[4, 2, 8, 6])
+
+        actual = a * f
+
+        self.assertEqual(expected, actual)

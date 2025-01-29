@@ -1,9 +1,9 @@
 from __future__ import annotations
 from typing import Callable, Generic, TypeVar
 
-from mlkem.types import Addable
+from mlkem.types import Field
 
-T = TypeVar("T", bound=Addable)
+T = TypeVar("T", bound=Field)
 
 
 class Matrix(Generic[T]):
@@ -77,3 +77,39 @@ class Matrix(Generic[T]):
 
         entries = [x + y for (x, y) in zip(self.entries, other.entries)]
         return Matrix(self.rows, self.cols, entries)
+
+    def __mul__(self, g: T | Matrix[T]) -> Matrix[T]:
+        r"""Multiply a matrix.
+
+        Two versions of this algorithm exist. One is multiplication by a scalar, the other is multiplication
+        by a matrix. When multiplying by a scalar g, the multiplication is applied to each entry in the matrix
+        such that if :math:`C = A * g` then :math:`C_{i,j} = A_{i,j} * g`. For multiplication by a matrix, the
+        standard matrix multiplication algorithm is applied. If :math:`C = A * B` then :math:`C_{i,j}` is
+        calculated as the dot product of the i-th row of A and the j-th column of B.
+
+        Args:
+            g (T | :class:`Matrix`): The scalar or matrix to multiply by.
+
+        Returns:
+            :class:`Matrix`: The result of the multiplication.
+        """
+        if isinstance(g, Matrix):
+            # matrix multiplication
+            if self.cols != g.rows:
+                raise ValueError(
+                    f"Matrix multiplication requires left hand matrix cols={self.cols} equal right hand matrix rows={g.rows}"
+                )
+
+            entries: list[T] = []
+            for i in range(self.rows):
+                for j in range(g.cols):
+                    entry = self[(i, 0)] * g[(0, j)]
+                    for k in range(1, g.rows):
+                        entry += self[(i, k)] * g[(k, j)]
+                    entries.append(entry)
+
+            return Matrix(self.rows, g.cols, entries)
+        else:
+            # scalar multiplication
+            entries = [u * g for u in self.entries]
+            return Matrix(self.rows, self.cols, entries)

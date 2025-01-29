@@ -5,6 +5,9 @@ from mlkem.zq import Zq
 
 
 class RingTq(RingZnq):
+    def __init__(self, coefficients: list[Zq] | None = None):
+        super().__init__(coefficients=coefficients)
+
     def __mul__(self, g: Zq | RingTq) -> RingTq:
         if isinstance(g, Zq):
             result = super().__mul__(g)
