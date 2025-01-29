@@ -1,6 +1,6 @@
 from unittest import TestCase
 
-from mlkem.matrix import Matrix
+from mlkem.math.matrix import Matrix
 
 
 class TestMatrix(TestCase):

@@ -1,8 +1,8 @@
 from unittest import TestCase
 
-from mlkem.constants import n
-from mlkem.ring_tq import RingTq
-from mlkem.zq import Zq
+from mlkem.math.constants import n
+from mlkem.math.ring_tq import RingTq
+from mlkem.math.zq import Zq
 
 
 class TestRingTq(TestCase):

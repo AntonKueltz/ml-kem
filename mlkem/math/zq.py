@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from mlkem.constants import q
+from mlkem.math.constants import q
 
 
 class Zq:

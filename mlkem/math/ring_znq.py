@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from mlkem.constants import n
-from mlkem.zq import Zq
+from mlkem.math.constants import n
+from mlkem.math.zq import Zq
 
 
 class RingZnq:

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-from mlkem.ring_znq import RingZnq
-from mlkem.zq import Zq
+from mlkem.math.ring_znq import RingZnq
+from mlkem.math.zq import Zq
 
 
 class RingTq(RingZnq):
