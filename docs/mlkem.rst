@@ -7,16 +7,23 @@ mlkem.constants
 .. automodule:: mlkem.constants
     :members:
 
-mlkem.ring_nq
+mlkem.matrix
 ---------------
 
-.. automodule:: mlkem.ring_nq
+.. automodule:: mlkem.matrix
     :members:
     :special-members:
 
-mlkem.z_q
+mlkem.ring_znq
 ---------------
 
-.. automodule:: mlkem.z_q
+.. automodule:: mlkem.ring_znq
+    :members:
+    :special-members:
+
+mlkem.zq
+---------------
+
+.. automodule:: mlkem.zq
     :members:
     :special-members:

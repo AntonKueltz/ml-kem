@@ -1,7 +1,21 @@
-from typing import Callable
+from __future__ import annotations
+
+from abc import abstractmethod
+from typing import Callable, Generic, Protocol, Self, TypeVar
 
 
-class Matrix[T]:
+# the entries of a matrix must have a type supporting addition
+# define that interface via this protocol
+class Addable(Protocol):
+    @abstractmethod
+    def __add__(self, other: Self) -> Self:
+        pass
+
+
+T = TypeVar("T", bound=Addable)
+
+
+class Matrix(Generic[T]):
     rows: int
     cols: int
     entries: list[T]
@@ -26,11 +40,20 @@ class Matrix[T]:
         else:
             raise ValueError("Must provide either entries or constructor")
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Matrix):
+            return NotImplemented
+
+        if self.rows != other.rows or self.cols != other.cols:
+            return False
+
+        return all([x == y for (x, y) in zip(self.entries, other.entries)])
+
     def __getitem__(self, index: tuple[int, int]) -> T:
-        """Get the element at index (i, j) of the matrix.
+        r"""Get the element at index (i, j) of the matrix.
 
         The elements of the matrix are interpreted in row-major order. Since the matrix
-        is represented as a flat list, this means that row advances the index by the
+        is represented as a flat list, this means that each row advances the index by the
         amount of columns in the matrix.
 
         Args:
@@ -42,3 +65,24 @@ class Matrix[T]:
         row, col = index
         i = row * self.cols + col
         return self.entries[i]
+
+    def __add__(self, other: Matrix[T]) -> Matrix[T]:
+        r"""Add two matrices together.
+
+        The two matrices must have the same dimensions, otherwise a :class:`ValueError` is raised.
+        Addition is done by going element by element, thus for :math:`C = A + B` we would have
+        :math:`C_{i,j} = A_{i,j} + B_{i,j}` for all valid indices :math:`(i, j)`.
+
+        Args:
+            other (:class:`Matrix`): The matrix to add.
+
+        Returns:
+            :class:`Matrix`: The sum of the matrices.
+        """
+        if self.rows != other.rows or self.cols != other.cols:
+            raise ValueError(
+                f"Cannot add matrices of different sizes. {self.rows}x{self.cols} + {other.rows}x{other.cols}"
+            )
+
+        entries = [x + y for (x, y) in zip(self.entries, other.entries)]
+        return Matrix(self.rows, self.cols, entries)
