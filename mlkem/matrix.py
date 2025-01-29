@@ -1,16 +1,7 @@
 from __future__ import annotations
+from typing import Callable, Generic, TypeVar
 
-from abc import abstractmethod
-from typing import Callable, Generic, Protocol, Self, TypeVar
-
-
-# the entries of a matrix must have a type supporting addition
-# define that interface via this protocol
-class Addable(Protocol):
-    @abstractmethod
-    def __add__(self, other: Self) -> Self:
-        pass
-
+from mlkem.types import Addable
 
 T = TypeVar("T", bound=Addable)
 
