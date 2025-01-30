@@ -14,24 +14,16 @@ mlkem.math.matrix
     :members:
     :special-members:
 
-mlkem.math.ring_znq
--------------------
+mlkem.math.field
+----------------
 
-.. automodule:: mlkem.math.ring_znq
+.. automodule:: mlkem.math.field
     :members:
     :special-members:
 
-mlkem.math.z2d
---------------
+mlkem.math.polynomial_ring
+--------------------------
 
-.. automodule:: mlkem.math.z2d
-    :members:
-    :special-members:
-
-
-mlkem.math.zq
--------------
-
-.. automodule:: mlkem.math.zq
+.. automodule:: mlkem.math.polynomial_ring
     :members:
     :special-members:

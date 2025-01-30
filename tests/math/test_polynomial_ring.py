@@ -2,23 +2,22 @@ import unittest
 
 from mlkem.math.constants import n, q
 from mlkem.math.field import Zm
-
-from mlkem.math.ring import Ring
+from mlkem.math.polynomial_ring import PolynomialRing
 
 
 class TestRingZnq(unittest.TestCase):
     def test_init(self) -> None:
-        actual = Ring()
+        actual = PolynomialRing()
         expected = [Zm(0, q) for _ in range(n)]
         self.assertEqual(expected, actual.coefficients)
 
     def test_init_wrong_size(self) -> None:
         with self.assertRaises(ValueError):
-            Ring([Zm(0, q)])
+            PolynomialRing([Zm(0, q)])
 
     def test_getitem(self) -> None:
         coefficients = [Zm(i, q) for i in range(n)]
-        actual = Ring(coefficients)
+        actual = PolynomialRing(coefficients)
 
         for i in range(n):
             expected = Zm(i, q)
@@ -26,8 +25,8 @@ class TestRingZnq(unittest.TestCase):
 
     def test_add(self) -> None:
         coefficients = [Zm(i, q) for i in range(n)]
-        f = Ring(coefficients)
-        g = Ring(coefficients)
+        f = PolynomialRing(coefficients)
+        g = PolynomialRing(coefficients)
 
         h = f + g
 
@@ -38,7 +37,7 @@ class TestRingZnq(unittest.TestCase):
     def test_mul(self) -> None:
         a = Zm(100, q)
         coefficients = [Zm(i, q) for i in range(n)]
-        f = Ring(coefficients)
+        f = PolynomialRing(coefficients)
 
         h = f * a
 

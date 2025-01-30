@@ -12,3 +12,16 @@ mlkem.auxiliary.general
 
 .. automodule:: mlkem.auxiliary.general
     :members:
+
+mlkem.auxiliary.ntt
+-------------------
+
+.. automodule:: mlkem.auxiliary.ntt
+    :members:
+
+
+mlkem.auxiliary.sampling
+------------------------
+
+.. automodule:: mlkem.auxiliary.sampling
+    :members:

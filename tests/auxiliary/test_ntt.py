@@ -3,7 +3,7 @@ from unittest import TestCase
 from mlkem.auxiliary.ntt import ntt, ntt_inv
 from mlkem.math.constants import q
 from mlkem.math.field import Zm
-from mlkem.math.ring import Ring
+from mlkem.math.polynomial_ring import PolynomialRing, RingRepresentation
 
 
 # See https://github.com/C2SP/CCTV/blob/main/ML-KEM/intermediate/ML-KEM-512.txt for test case source
@@ -37,8 +37,12 @@ class TestNTT(TestCase):
             2920, 2146, 453, 1722, 1412, 1890, 3189, 52, 552, 2403, 1154, 3275, 3201, 3233, 2242, 615, 369, 366, 1350,
             725, 3307, 1950, 2849, 1806, 1805, 1532, 2553, 1027, 2607, 482, 2117
         ]  # fmt: skip
-        f = Ring([Zm(x, q) for x in rq_representation])
-        expected = Ring([Zm(x, q) for x in tq_representation])
+        f = PolynomialRing(
+            [Zm(x, q) for x in rq_representation], RingRepresentation.STANDARD
+        )
+        expected = PolynomialRing(
+            [Zm(x, q) for x in tq_representation], RingRepresentation.NTT
+        )
 
         actual = ntt(f)
 
@@ -73,8 +77,12 @@ class TestNTT(TestCase):
             0, 3, 3, 3327, 1, 3328, 3328, 0, 0, 2, 1, 3328, 0, 0, 0, 0, 0, 0, 3328, 0, 0, 1, 0, 0, 0, 3328, 3328, 3328,
             0, 3327, 0, 1, 3328, 3328, 0, 3328, 0, 2, 0, 0, 1, 3328
         ]  # fmt: skip
-        f_ = Ring([Zm(x, q) for x in tq_representation])
-        expected = Ring([Zm(x, q) for x in rq_representation])
+        f_ = PolynomialRing(
+            [Zm(x, q) for x in tq_representation], RingRepresentation.NTT
+        )
+        expected = PolynomialRing(
+            [Zm(x, q) for x in rq_representation], RingRepresentation.STANDARD
+        )
 
         actual = ntt_inv(f_)
 
