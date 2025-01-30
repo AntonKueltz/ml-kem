@@ -18,6 +18,22 @@ class Ring:
 
         self.coefficients = coefficients
 
+    def __eq__(self, other: object) -> bool:
+        if not isinstance(other, Ring):
+            return NotImplemented
+
+        if len(self.coefficients) != len(other.coefficients):
+            return False
+
+        return all(
+            [fi == gi for (fi, gi) in zip(self.coefficients, other.coefficients)]
+        )
+
+    def __repr__(self) -> str:
+        return " + ".join(
+            [f"({repr(fi)})X^{i}" for (i, fi) in enumerate(self.coefficients)]
+        )
+
     def __getitem__(self, index: int) -> Zm:
         if index >= n:
             raise IndexError(
