@@ -7,6 +7,8 @@ wheels/
 *.egg-info
 .coverage
 _build/
+_static/
+_templates/
 
 # Virtual environments
 .venv
