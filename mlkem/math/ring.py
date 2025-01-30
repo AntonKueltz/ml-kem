@@ -26,6 +26,14 @@ class Ring:
 
         return self.coefficients[index]
 
+    def __setitem__(self, index: int, value: Zm) -> None:
+        if index >= n:
+            raise IndexError(
+                f"Index for Rq coefficient must be less than {n}. Got {index}."
+            )
+
+        self.coefficients[index] = value
+
     def __add__(self, g: Ring) -> Ring:
         r"""Add two elements f and g where :math:`f, g \in \mathbb{Z}^n_m`.
 
