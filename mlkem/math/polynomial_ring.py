@@ -52,10 +52,7 @@ class PolynomialRing:
         )
 
     def __repr__(self) -> str:
-        polynomial = " + ".join(
-            [f"({repr(fi)})X^{i}" for (i, fi) in enumerate(self.coefficients)]
-        )
-        return f"{self.representation}:\n{polynomial}"
+        return "[ " + ", ".join([repr(x) for x in self.coefficients]) + " ]"
 
     def __getitem__(self, index: int) -> Zm:
         """Get the coefficient at :code:`index`."""
@@ -92,7 +89,7 @@ class PolynomialRing:
             )
 
         coefficients = [fi + gi for (fi, gi) in zip(self.coefficients, g.coefficients)]
-        return PolynomialRing(coefficients)
+        return PolynomialRing(coefficients, representation=self.representation)
 
     def __mul__(self, a: Zm | PolynomialRing) -> PolynomialRing:
         r"""Multiply by an element in :math:`\mathbb{Z}^m` or :math:`\mathbb{Z}^n_m`.
@@ -112,7 +109,7 @@ class PolynomialRing:
         # scalar multiplication
         if isinstance(a, Zm):
             coefficients = [a * fi for fi in self.coefficients]
-            return PolynomialRing(coefficients)
+            return PolynomialRing(coefficients, representation=self.representation)
 
         # polynomial multiplication
         elif isinstance(a, PolynomialRing):

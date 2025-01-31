@@ -77,8 +77,8 @@ class TestGeneral(TestCase):
         f = [Zm(3328, q), Zm(0, q), Zm(1000, q), Zm(255, q)]
 
         # Little-endian binary to bytes
-        # 00000000 = 0, 10110000 = 13, 00000000 = 0, 00010111 = 232, 11001111 = 243, 11110000 = 15
-        expected = [0, 13, 0, 232, 243, 15]
+        # 00000000 = 0x00, 10110000 = 0x0d, 00000000 = 0x00, 00010111 = 0xe8, 11001111 = 0xf3, 11110000 = 0x0f
+        expected = b"\x00\x0d\x00\xe8\xf3\x0f"
 
         actual = byte_encode(12, f)
 
@@ -89,8 +89,8 @@ class TestGeneral(TestCase):
     )  # patch n to a smaller, more manageable, size
     def test_byte_decode_zq(self) -> None:
         # bytes in little-endian binary
-        # 00000000 = 0, 10110000 = 13, 00000000 = 0, 00010111 = 232, 11001111 = 243, 11110000 = 15
-        b = [0, 13, 0, 232, 243, 15]
+        # 00000000 = 0x00, 10110000 = 0x0d, 00000000 = 0x00, 00010111 = 0xe8, 11001111 = 0xf3, 11110000 = 0x0f
+        b = b"\x00\x0d\x00\xe8\xf3\x0f"
 
         # Little-endian binary to field elements
         # [(000000001011), (000000000000), (000101111100), (111111110000)]

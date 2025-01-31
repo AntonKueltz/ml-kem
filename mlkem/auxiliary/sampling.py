@@ -2,7 +2,7 @@ from mlkem.auxiliary.crypto import XOF
 from mlkem.auxiliary.general import bytes_to_bits
 from mlkem.math.constants import n, q
 from mlkem.math.field import Zm
-from mlkem.math.polynomial_ring import PolynomialRing
+from mlkem.math.polynomial_ring import PolynomialRing, RingRepresentation
 
 
 def sample_ntt(b: bytes) -> PolynomialRing:
@@ -11,7 +11,7 @@ def sample_ntt(b: bytes) -> PolynomialRing:
             f"Input must be 34 bytes (32-byte seed and two indices). Got {len(b)}."
         )
 
-    a = PolynomialRing()
+    a = PolynomialRing(representation=RingRepresentation.NTT)
     xof = XOF()
     xof.absorb(b)
 
@@ -36,7 +36,7 @@ def sample_poly_cbd(eta: int, b: bytes) -> PolynomialRing:
     if len(b) != 64 * eta:
         raise ValueError(f"Input must be {64 * eta} bytes (got {len(b)}).")
 
-    f = PolynomialRing()
+    f = PolynomialRing(representation=RingRepresentation.STANDARD)
     bits = bytes_to_bits([x for x in b])
 
     for i in range(n):

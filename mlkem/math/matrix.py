@@ -1,7 +1,7 @@
 from __future__ import annotations
 from typing import Callable, Generic, TypeVar
 
-from mlkem.types import Field
+from mlkem.data_types import Field
 
 T = TypeVar("T", bound=Field)
 
@@ -40,6 +40,17 @@ class Matrix(Generic[T]):
 
         return all([x == y for (x, y) in zip(self.entries, other.entries)])
 
+    def __repr__(self) -> str:
+        result = "[ "
+        result += ", ".join(
+            [
+                "[ " + ", ".join([repr(self[(i, j)]) for j in range(self.cols)]) + " ]"
+                for i in range(self.rows)
+            ]
+        )
+        result += " ]"
+        return result
+
     def __getitem__(self, index: tuple[int, int]) -> T:
         r"""Get the element at index (i, j) of the matrix.
 
@@ -56,6 +67,21 @@ class Matrix(Generic[T]):
         row, col = index
         i = row * self.cols + col
         return self.entries[i]
+
+    def __setitem__(self, index: tuple[int, int], value: T) -> None:
+        r"""Set the element at index (i, j) of the matrix.
+
+        The elements of the matrix are interpreted in row-major order. Since the matrix
+        is represented as a flat list, this means that each row advances the index by the
+        amount of columns in the matrix.
+
+        Args:
+            index (tuple[int, int]): A tuple of (row index, column index).
+            value (T): The value to set at the given index.
+        """
+        row, col = index
+        i = row * self.cols + col
+        self.entries[i] = value
 
     def __add__(self, other: Matrix[T]) -> Matrix[T]:
         r"""Add two matrices together.

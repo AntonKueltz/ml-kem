@@ -17,7 +17,7 @@ class Zm:
         return self.m == other.m and self.val == other.val
 
     def __repr__(self) -> str:
-        return f"{self.val} mod {self.m}"
+        return f"{self.val}"
 
     def __add__(self, y: Zm) -> Zm:
         r"""Add two elements x and y where :math:`x, y \in \mathbb{Z}_m`.

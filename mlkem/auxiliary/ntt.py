@@ -111,7 +111,7 @@ def multiply_ntt(f_: PolynomialRing, g_: PolynomialRing) -> PolynomialRing:
             "NTT multiplication can only be applied to polynomials in NTT representation."
         )
 
-    h_ = PolynomialRing()
+    h_ = PolynomialRing(representation=RingRepresentation.NTT)
 
     for i in range(128):
         gamma = GAMMA_LOOKUP[i]

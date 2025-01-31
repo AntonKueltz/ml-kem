@@ -29,10 +29,20 @@ def g(c: bytes) -> tuple[bytes, bytes]:
 
 class XOF:
     def __init__(self) -> None:
+        # https://cryptojedi.org/papers/terminate-20230516.pdf
+        self.chunk_size = 840
         self.shake = shake_128()
+        self.data = b""
+        self.idx = 0
 
     def absorb(self, string: bytes) -> None:
         self.shake.update(string)
+        self.data += self.shake.digest(self.chunk_size)
 
     def squeeze(self, length: int) -> bytes:
-        return self.shake.digest(length)
+        while self.idx + length > len(self.data):
+            self.data += self.shake.digest(self.chunk_size)
+
+        result = self.data[self.idx : self.idx + length]
+        self.idx += length
+        return result

@@ -77,7 +77,7 @@ def decompress(d: int, y: Zm) -> Zm:
     return Zm(val, q)
 
 
-def byte_encode(d: int, f: list[Zm]) -> list[int]:
+def byte_encode(d: int, f: list[Zm]) -> bytes:
     if len(f) != n:
         raise ValueError(f"f must have {n} elements (got {len(f)}).")
 
@@ -93,15 +93,15 @@ def byte_encode(d: int, f: list[Zm]) -> list[int]:
             b[i * d + j] = x
             a = (a - x) // 2
 
-    return bits_to_bytes(b)
+    return bytes(bits_to_bytes(b))
 
 
-def byte_decode(d: int, b: list[int]) -> list[Zm]:
+def byte_decode(d: int, b: bytes) -> list[Zm]:
     if d > MAX_D or d < 1:
         raise ValueError(f"d may not be greater than {MAX_D} or less than 1 (got {d}).")
 
     m = q if d == MAX_D else 1 << d
-    bits = bytes_to_bits(b)
+    bits = bytes_to_bits([x for x in b])
 
     f = []
     for i in range(n):
