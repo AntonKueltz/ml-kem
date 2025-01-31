@@ -65,6 +65,11 @@ class Matrix(Generic[T]):
             T: The element at index (i, j) of the matrix.
         """
         row, col = index
+        if row >= self.rows or col >= self.cols:
+            raise IndexError(
+                f"{row}x{col} is not a valid index for a {self.rows}x{self.cols} matrix."
+            )
+
         i = row * self.cols + col
         return self.entries[i]
 
@@ -80,6 +85,11 @@ class Matrix(Generic[T]):
             value (T): The value to set at the given index.
         """
         row, col = index
+        if row >= self.rows or col >= self.cols:
+            raise IndexError(
+                f"{row}x{col} is not a valid index for a {self.rows}x{self.cols} matrix."
+            )
+
         i = row * self.cols + col
         self.entries[i] = value
 
@@ -139,3 +149,23 @@ class Matrix(Generic[T]):
             # scalar multiplication
             entries = [u * g for u in self.entries]
             return Matrix(self.rows, self.cols, entries)
+
+    def map(self, f: Callable[[T], T]) -> Matrix[T]:
+        return Matrix(self.rows, self.cols, [f(x) for x in self.entries])
+
+    def transpose(self) -> Matrix[T]:
+        t = Matrix(self.cols, self.rows, self.entries)
+
+        for i in range(self.rows):
+            for j in range(self.cols):
+                t[(i, j)] = self[(j, i)]
+
+        return t
+
+    def get_singleton_element(self) -> T:
+        if len(self.entries) == 1:
+            return self.entries[0]
+
+        raise ValueError(
+            f"Can only get singleton elements from 1x1 matrix (got {self.rows}x{self.cols})."
+        )
