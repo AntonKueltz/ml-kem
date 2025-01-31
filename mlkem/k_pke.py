@@ -4,7 +4,6 @@ from logging import getLogger
 
 from mlkem.auxiliary.crypto import g, prf
 from mlkem.auxiliary.general import (
-    BITS_IN_BYTE,
     byte_decode,
     byte_encode,
     compress,
@@ -12,7 +11,7 @@ from mlkem.auxiliary.general import (
 )
 from mlkem.auxiliary.ntt import ntt, ntt_inv
 from mlkem.auxiliary.sampling import sample_ntt, sample_poly_cbd
-from mlkem.math.constants import n, q
+from mlkem.math.constants import n
 from mlkem.math.field import Zm
 from mlkem.math.matrix import Matrix
 from mlkem.math.polynomial_ring import PolynomialRing, RingRepresentation
@@ -76,14 +75,14 @@ class K_PKE:
         # 4. append the bytes from encoding to the end of the byte sequence
         ek = (
             reduce(
-                lambda x, y: x + byte_encode(q.bit_length(), y.coefficients),
+                lambda x, y: x + byte_encode(12, y.coefficients),
                 t_.entries,
                 b"",
             )
             + rho
         )
         dk = reduce(
-            lambda x, y: x + byte_encode(q.bit_length(), y.coefficients),
+            lambda x, y: x + byte_encode(12, y.coefficients),
             s_.entries,
             b"",
         )
@@ -117,21 +116,10 @@ class K_PKE:
         du = self.parameters.du
         dv = self.parameters.dv
         N = 0
-        coefficient_size = n * q.bit_length() // BITS_IN_BYTE
 
         # run byte_decode k times to decode t_ and extract 32 byte seed from ek
-        t_ = Matrix(
-            rows=k,
-            cols=1,
-            entries=[
-                PolynomialRing(
-                    byte_decode(q.bit_length(), ek[i : i + coefficient_size]),
-                    RingRepresentation.NTT,
-                )
-                for i in range(0, coefficient_size * k, coefficient_size)
-            ],
-        )
-        rho = ek[coefficient_size * k : coefficient_size * k + 32]
+        t_ = self._bytes_to_column_vector(ek[: 384 * k], RingRepresentation.NTT, 12)
+        rho = ek[384 * k : 384 * k + 32]
 
         # regenerate matrix A that was sampled in key_gen
         a_ = self._generate_a(rho)
@@ -167,6 +155,36 @@ class K_PKE:
 
         return c1 + c2
 
+    def decrypt(self, dk: bytes, c: bytes) -> bytes:
+        du = self.parameters.du
+        dv = self.parameters.dv
+        k = self.parameters.k
+
+        c1 = c[: 32 * du * k]
+        c2 = c[32 * du * k : 32 * (du * k + dv)]
+
+        # decode u, v and s
+        u_decompressed = [decompress(du, x) for x in byte_decode(1, c1)]
+        u_prime = Matrix(
+            rows=k,
+            cols=1,
+            entries=[
+                PolynomialRing(u_decompressed[i : i + n], RingRepresentation.STANDARD)
+                for i in range(0, len(u_decompressed), n)
+            ],
+        )
+        v_prime = PolynomialRing(
+            [decompress(dv, x) for x in byte_decode(1, c2)], RingRepresentation.STANDARD
+        )
+        s_ = self._bytes_to_column_vector(dk, RingRepresentation.NTT, 12)
+
+        # decode plaintext m from polynomial v
+        w = v_prime - ntt_inv(
+            (s_.transpose() * u_prime.map(ntt)).get_singleton_element()
+        )
+        m = byte_encode(1, [compress(1, x) for x in w.coefficients])
+        return m
+
     def _generate_a(self, rho: bytes) -> Matrix[PolynomialRing]:
         k = self.parameters.k
         a_ = Matrix(
@@ -198,3 +216,21 @@ class K_PKE:
             N += 1
 
         return v, N
+
+    def _bytes_to_column_vector(
+        self, b: bytes, representation: RingRepresentation, d: int
+    ) -> Matrix[PolynomialRing]:
+        k = self.parameters.k
+        coefficient_size = 32 * d
+
+        return Matrix(
+            rows=k,
+            cols=1,
+            entries=[
+                PolynomialRing(
+                    byte_decode(d, b[i : i + coefficient_size]),
+                    representation,
+                )
+                for i in range(0, coefficient_size * k, coefficient_size)
+            ],
+        )

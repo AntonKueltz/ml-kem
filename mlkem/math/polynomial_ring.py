@@ -97,6 +97,25 @@ class PolynomialRing:
         coefficients = [fi + gi for (fi, gi) in zip(self.coefficients, g.coefficients)]
         return PolynomialRing(coefficients, representation=self.representation)
 
+    def __sub__(self, g: PolynomialRing) -> PolynomialRing:
+        r"""Subtract two elements f and g where :math:`f, g \in \mathbb{Z}^n_m`.
+
+        The resulting element will also be in :math:`\mathbb{Z}^n_m`.
+
+        Args:
+            | g (:class:`PolynomialRing`): The element to subtract from f (represent by self).
+
+        Returns:
+            :class:`PolynomialRing`: An element equal to :math:`f - g`.
+        """
+        if self.representation != g.representation:
+            raise ValueError(
+                "PolynomialRing representation must be the same in order to perform arithmetic."
+            )
+
+        coefficients = [fi - gi for (fi, gi) in zip(self.coefficients, g.coefficients)]
+        return PolynomialRing(coefficients, representation=self.representation)
+
     def __mul__(self, a: Zm | PolynomialRing) -> PolynomialRing:
         r"""Multiply by an element in :math:`\mathbb{Z}^m` or :math:`\mathbb{Z}^n_m`.
 

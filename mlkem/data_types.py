@@ -10,5 +10,9 @@ class Field(Protocol):
         pass
 
     @abstractmethod
+    def __sub__(self, other: Self) -> Self:
+        pass
+
+    @abstractmethod
     def __mul__(self, other: Self) -> Self:
         pass
