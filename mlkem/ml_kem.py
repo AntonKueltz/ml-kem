@@ -18,11 +18,9 @@ class ML_KEM:
         return self._key_gen(d, z)
 
     def encaps(self, ek: bytes) -> tuple[bytes, bytes]:
-        if not self._check_ek(ek):
-            raise ValueError("Encapsulation key is not valid.")
-
+        self._check_ek(ek)
         m = urandom(32)
-        return self._encaps(m, ek)
+        return self._encaps(ek, m)
 
     def decaps(self, dk: bytes, c: bytes) -> bytes:
         return self._decaps(dk, c)
@@ -58,15 +56,16 @@ class ML_KEM:
 
         return k_prime
 
-    def _check_ek(self, ek: bytes) -> bool:
+    def _check_ek(self, ek: bytes) -> None:
         k = self.parameters.k
 
         if len(ek) != 384 * k + 32:
-            return False
+            raise ValueError(f"Expected key of size {384 * k + 32}, got {len(ek)}.")
 
-        expected = ek[: 384 * k]
-        test = byte_encode(12, byte_decode(12, expected))
-        if expected != test:
-            return False
-
-        return True
+        for i in range(k):
+            expected = ek[i * 384 : i * 384 + 384]
+            test = byte_encode(12, byte_decode(12, expected))
+            if expected != test:
+                raise ValueError(
+                    "Encapsulation key contains bytes greater than or equal to q."
+                )
