@@ -38,7 +38,6 @@ class KPKE:
         eta1 = self.parameters.eta1
         rho, sigma = g(d + bytes([k]))
         n = 0
-
         LOG.debug(f"rho: {hexlify(rho).decode()}")
         LOG.debug(f"sigma: {hexlify(sigma).decode()}")
 
@@ -51,7 +50,6 @@ class KPKE:
         for i in range(k):
             for j in range(k):
                 a_[(i, j)] = sample_ntt(rho + bytes([j, i]))
-
         LOG.debug(f"aHat: {a_}")
 
         # generate vector s in (Z^n_q)^{k}
@@ -67,7 +65,6 @@ class KPKE:
             # vectors are columnar, so column index is always 0
             s[(i, 0)] = sample_poly_cbd(eta1, seed)
             n += 1
-
         LOG.debug(f"s: {s}")
 
         # generate vector e in (Z^n_q)^{k}
@@ -83,7 +80,6 @@ class KPKE:
             # vectors are columnar, so column index is always 0
             e[(i, 0)] = sample_poly_cbd(eta1, seed)
             n += 1
-
         LOG.debug(f"e: {e}")
 
         s_ = Matrix(rows=s.rows, cols=s.cols, entries=[ntt(x) for x in s.entries])
@@ -109,7 +105,6 @@ class KPKE:
         dk = reduce(
             lambda x, y: x + bytes(byte_encode(12, y.coefficients)), s_.entries, b""
         )
-
         LOG.debug(f"ek: {hexlify(ek).decode()}")
         LOG.debug(f"dk: {hexlify(dk).decode()}")
 
