@@ -50,7 +50,7 @@ class KPKE:
         )
         for i in range(k):
             for j in range(k):
-                a_[(i, j)] = sample_ntt(d + bytes([j, i]))
+                a_[(i, j)] = sample_ntt(rho + bytes([j, i]))
 
         LOG.debug(f"aHat: {a_}")
 

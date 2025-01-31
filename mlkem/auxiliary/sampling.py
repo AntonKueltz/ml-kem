@@ -40,7 +40,7 @@ def sample_poly_cbd(eta: int, b: bytes) -> PolynomialRing:
     bits = bytes_to_bits([x for x in b])
 
     for i in range(n):
-        x = sum([bits[i * eta + j] for j in range(eta)])
+        x = sum([bits[2 * i * eta + j] for j in range(eta)])
         y = sum([bits[2 * i * eta + eta + j] for j in range(eta)])
         f[i] = Zm(x - y, q)
 
