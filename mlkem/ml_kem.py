@@ -1,6 +1,6 @@
 from os import urandom
 
-from mlkem.auxiliary.crypto import g, h
+from mlkem.auxiliary.crypto import g, h, j
 from mlkem.auxiliary.general import byte_decode, byte_encode
 from mlkem.k_pke import K_PKE
 from mlkem.parameter_set import ParameterSet
@@ -24,6 +24,9 @@ class ML_KEM:
         m = urandom(32)
         return self._encaps(m, ek)
 
+    def decaps(self, dk: bytes, c: bytes) -> bytes:
+        return self._decaps(dk, c)
+
     def _key_gen(self, d: bytes, z: bytes) -> tuple[bytes, bytes]:
         ek, dk_pke = self.k_pke.key_gen(d)
         dk = dk_pke + ek + h(ek) + z
@@ -33,6 +36,27 @@ class ML_KEM:
         k, r = g(m + h(ek))
         c = self.k_pke.encrypt(ek, m, r)
         return k, c
+
+    def _decaps(self, dk: bytes, c: bytes) -> bytes:
+        k = self.parameters.k
+        # extract encryption and decryption keys, hash of encryption key, and rejection value
+        dk_pke = dk[: 384 * k]
+        ek_pke = dk[384 * k : 768 * k + 32]
+        h_ = dk[768 * k + 32 : 768 * k + 64]
+        z = dk[768 * k + 64 : 768 * k + 96]
+
+        # decrypt ciphertext
+        m_prime = self.k_pke.decrypt(dk_pke, c)
+        k_prime, r_prime = g(m_prime + h_)
+        k_bar = j(z + c)
+
+        # re-encrypt using the derived randomness r_prime
+        c_prime = self.k_pke.encrypt(ek_pke, m_prime, r_prime)
+        if c != c_prime:
+            # if ciphertexts do not match, then implicitly reject
+            k_prime = k_bar
+
+        return k_prime
 
     def _check_ek(self, ek: bytes) -> bool:
         k = self.parameters.k

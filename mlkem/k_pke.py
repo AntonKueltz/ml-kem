@@ -11,7 +11,6 @@ from mlkem.auxiliary.general import (
 )
 from mlkem.auxiliary.ntt import ntt, ntt_inv
 from mlkem.auxiliary.sampling import sample_ntt, sample_poly_cbd
-from mlkem.math.constants import n
 from mlkem.math.field import Zm
 from mlkem.math.matrix import Matrix
 from mlkem.math.polynomial_ring import PolynomialRing, RingRepresentation
@@ -164,17 +163,12 @@ class K_PKE:
         c2 = c[32 * du * k : 32 * (du * k + dv)]
 
         # decode u, v and s
-        u_decompressed = [decompress(du, x) for x in byte_decode(1, c1)]
-        u_prime = Matrix(
-            rows=k,
-            cols=1,
-            entries=[
-                PolynomialRing(u_decompressed[i : i + n], RingRepresentation.STANDARD)
-                for i in range(0, len(u_decompressed), n)
-            ],
+        u_prime = self._bytes_to_column_vector(
+            c1, RingRepresentation.STANDARD, du, compressed=True
         )
         v_prime = PolynomialRing(
-            [decompress(dv, x) for x in byte_decode(1, c2)], RingRepresentation.STANDARD
+            [decompress(dv, x) for x in byte_decode(dv, c2)],
+            RingRepresentation.STANDARD,
         )
         s_ = self._bytes_to_column_vector(dk, RingRepresentation.NTT, 12)
 
@@ -218,7 +212,11 @@ class K_PKE:
         return v, N
 
     def _bytes_to_column_vector(
-        self, b: bytes, representation: RingRepresentation, d: int
+        self,
+        b: bytes,
+        representation: RingRepresentation,
+        d: int,
+        compressed: bool = False,
     ) -> Matrix[PolynomialRing]:
         k = self.parameters.k
         coefficient_size = 32 * d
@@ -228,7 +226,12 @@ class K_PKE:
             cols=1,
             entries=[
                 PolynomialRing(
-                    byte_decode(d, b[i : i + coefficient_size]),
+                    [
+                        decompress(d, x)
+                        for x in byte_decode(d, b[i : i + coefficient_size])
+                    ]
+                    if compressed
+                    else byte_decode(d, b[i : i + coefficient_size]),
                     representation,
                 )
                 for i in range(0, coefficient_size * k, coefficient_size)
