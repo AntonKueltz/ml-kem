@@ -34,9 +34,15 @@ class PolynomialRing:
         """Compare two polynomial rings for equality.
 
         They must have the following conditions met to be equal:
-        * The same representation
-        * The same coefficients
-        * The same order (length of coefficients)
+          * The same representation
+          * The same coefficients
+          * The same order (length of coefficients)
+
+        Args:
+            | other (:class:`object`): The object to compare to (must be a :class:`PolynomialRing` instance).
+
+        Returns:
+            :type:`bool`: Whether the two objects are equal.
         """
         if not isinstance(other, PolynomialRing):
             return NotImplemented
@@ -78,7 +84,7 @@ class PolynomialRing:
         The resulting element will also be in :math:`\mathbb{Z}^n_m`.
 
         Args:
-            g (:class:`PolynomialRing`): The element to add to f (represent by self).
+            | g (:class:`PolynomialRing`): The element to add to f (represent by self).
 
         Returns:
             :class:`PolynomialRing`: An element equal to :math:`f + g`.
@@ -101,7 +107,7 @@ class PolynomialRing:
         representation. NTT multiplication is then used to multiply the two together.
 
         Args:
-            a (:class:`Zm` | :class:`PolynomialRing`): The value to multiply by.
+            | a (:class:`Zm` | :class:`PolynomialRing`): The value to multiply by.
 
         Returns:
             :class:`PolynomialRing`: The element in :math:`\mathbb{Z}^n_m` multiplied by `a`.

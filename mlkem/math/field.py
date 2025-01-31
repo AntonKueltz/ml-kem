@@ -25,7 +25,7 @@ class Zm:
         The resulting element will also be in :math:`\mathbb{Z}_m`.
 
         Args:
-            y (:class:`Zm`): The element to add to x (represented by self).
+            | y (:class:`Zm`): The element to add to x (represented by self).
 
         Returns:
             :class:`Zm`: An element equal to :math:`x + y \pmod{m}`.
@@ -42,7 +42,7 @@ class Zm:
         The resulting element will also be in :math:`\mathbb{Z}_m`.
 
         Args:
-            y (:class:`Zm`): The element to subtract from x (represented by self).
+            | y (:class:`Zm`): The element to subtract from x (represented by self).
 
         Returns:
             :class:`Zm`: An element equal to :math:`x - y \pmod{m}`.
@@ -55,7 +55,7 @@ class Zm:
         The resulting element will also be in :math:`\mathbb{Z}_m`.
 
         Args:
-            y (:class:`Zm`): The element to multiply x by (represented by self).
+            | y (:class:`Zm`): The element to multiply x by (represented by self).
 
         Returns:
             :class:`Zm`: An element equal to :math:`x * y \pmod{m}`.

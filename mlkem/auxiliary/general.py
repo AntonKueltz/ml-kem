@@ -11,10 +11,10 @@ def bits_to_bytes(bits: list[int]) -> list[int]:
     Bytes are represented as unsigned numbers in the range [0, 255]. Bits are either 0 or 1.
 
     Args:
-        bits (list[int]): The bit array (of a length that is a multiple of 8).
+        | bits (:type:`list[int]`): The bit array (of a length that is a multiple of 8).
 
     Returns:
-        list[int]: The array of bytes equivalent to the bit array.
+        :type:`list[int]`: The array of bytes equivalent to the bit array.
     """
     length = len(bits)
     if length % BITS_IN_BYTE != 0:
@@ -36,10 +36,10 @@ def bytes_to_bits(byts: list[int]) -> list[int]:
     Bytes are represented as unsigned numbers in the range [0, 255]. Bits are either 0 or 1.
 
     Args:
-        byts (list[int]): The byte array.
+        | byts (:type:`list[int]`): The byte array.
 
     Returns:
-        list[int]: The array of bits equivalent to the byte array.
+        :type:`list[int]`: The array of bits equivalent to the byte array.
     """
     c = byts.copy()
 

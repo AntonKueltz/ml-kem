@@ -59,10 +59,10 @@ class Matrix(Generic[T]):
         amount of columns in the matrix.
 
         Args:
-            index (tuple[int, int]): A tuple of (row index, column index).
+            | index (:type:`tuple[int, int]`): A tuple of (row index, column index).
 
         Returns:
-            T: The element at index (i, j) of the matrix.
+            :type:`T`: The element at index (i, j) of the matrix.
         """
         row, col = index
         if row >= self.rows or col >= self.cols:
@@ -81,8 +81,8 @@ class Matrix(Generic[T]):
         amount of columns in the matrix.
 
         Args:
-            index (tuple[int, int]): A tuple of (row index, column index).
-            value (T): The value to set at the given index.
+            | index (:type:`tuple[int, int]`): A tuple of (row index, column index).
+            | value (:type:`T`): The value to set at the given index.
         """
         row, col = index
         if row >= self.rows or col >= self.cols:
@@ -101,7 +101,7 @@ class Matrix(Generic[T]):
         :math:`C_{i,j} = A_{i,j} + B_{i,j}` for all valid indices :math:`(i, j)`.
 
         Args:
-            other (:class:`Matrix`): The matrix to add.
+            | other (:class:`Matrix`): The matrix to add.
 
         Returns:
             :class:`Matrix`: The sum of the matrices.
@@ -124,7 +124,7 @@ class Matrix(Generic[T]):
         calculated as the dot product of the i-th row of A and the j-th column of B.
 
         Args:
-            g (T | :class:`Matrix`): The scalar or matrix to multiply by.
+            | g (:type:`T` | :class:`Matrix`): The scalar or matrix to multiply by.
 
         Returns:
             :class:`Matrix`: The result of the multiplication.

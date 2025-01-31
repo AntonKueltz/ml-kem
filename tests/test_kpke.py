@@ -1,12 +1,12 @@
 from unittest import TestCase
 
-from mlkem.kpke import KPKE
+from mlkem.k_pke import K_PKE
 from mlkem.parameter_set import ML_KEM_512
 
 
 class TestKPKE(TestCase):
     def test_key_gen_ml_kem_512(self) -> None:
-        pke = KPKE(ML_KEM_512)
+        pke = K_PKE(ML_KEM_512)
         d = bytes.fromhex(
             "1EB4400A01629D517974E2CD85B9DEF59082DE508E6F9C2B0E341E12965955CA"
         )
