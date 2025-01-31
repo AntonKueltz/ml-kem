@@ -41,3 +41,12 @@ class TestMatrix(TestCase):
         actual = a * f
 
         self.assertEqual(expected, actual)
+
+    def test_transpose(self) -> None:
+        a = Matrix(rows=3, cols=2, entries=[1, 2, 3, 4, 5, 6])
+        expected = Matrix(rows=2, cols=3, entries=[1, 3, 5, 2, 4, 6])
+
+        actual = a.transpose()
+
+        self.assertEqual(expected, actual)
+        self.assertEqual(a, actual.transpose())

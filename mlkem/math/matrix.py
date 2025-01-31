@@ -67,7 +67,7 @@ class Matrix(Generic[T]):
         row, col = index
         if row >= self.rows or col >= self.cols:
             raise IndexError(
-                f"{row}x{col} is not a valid index for a {self.rows}x{self.cols} matrix."
+                f"{row}, {col} is not a valid index for a {self.rows}x{self.cols} matrix."
             )
 
         i = row * self.cols + col
@@ -87,7 +87,7 @@ class Matrix(Generic[T]):
         row, col = index
         if row >= self.rows or col >= self.cols:
             raise IndexError(
-                f"{row}x{col} is not a valid index for a {self.rows}x{self.cols} matrix."
+                f"{row}, {col} is not a valid index for a {self.rows}x{self.cols} matrix."
             )
 
         i = row * self.cols + col
@@ -154,11 +154,11 @@ class Matrix(Generic[T]):
         return Matrix(self.rows, self.cols, [f(x) for x in self.entries])
 
     def transpose(self) -> Matrix[T]:
-        t = Matrix(self.cols, self.rows, self.entries)
+        t = Matrix(self.cols, self.rows, self.entries[:])
 
         for i in range(self.rows):
             for j in range(self.cols):
-                t[(i, j)] = self[(j, i)]
+                t[(j, i)] = self[(i, j)]
 
         return t
 

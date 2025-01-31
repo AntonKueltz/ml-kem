@@ -6,7 +6,7 @@ from mlkem.parameter_set import ML_KEM_512, ML_KEM_768, ML_KEM_1024
 from parameterized import parameterized  # type: ignore
 
 
-class TestKPKE(TestCase):
+class TestKeyGen(TestCase):
     @parameterized.expand(
         [
             (
