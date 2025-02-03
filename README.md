@@ -8,6 +8,10 @@ As a prerequisite, `uv` is required for this project
 
     pip install uv
 
+Build the C extensions
+
+    uv run python setup.py build_ext --inplace
+
 Run the test suite
 
     uv run pytest

@@ -15,3 +15,7 @@ _templates/
 
 # tooling directories
 .idea
+
+# C stuff
+a.out
+*.so

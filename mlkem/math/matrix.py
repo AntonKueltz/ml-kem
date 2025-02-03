@@ -114,27 +114,6 @@ class Matrix(Generic[T]):
         entries = [x + y for (x, y) in zip(self.entries, other.entries)]
         return Matrix(self.rows, self.cols, entries)
 
-    def __sub__(self, other: Matrix[T]) -> Matrix[T]:
-        r"""Subtract two matrices.
-
-        The two matrices must have the same dimensions, otherwise a :class:`ValueError` is raised.
-        Subtraction is done by going element by element, thus for :math:`C = A - B` we would have
-        :math:`C_{i,j} = A_{i,j} - B_{i,j}` for all valid indices :math:`(i, j)`.
-
-        Args:
-            | other (:class:`Matrix`): The matrix to subtract.
-
-        Returns:
-            :class:`Matrix`: The difference of the matrices.
-        """
-        if self.rows != other.rows or self.cols != other.cols:
-            raise ValueError(
-                f"Cannot subtract matrices of different sizes. {self.rows}x{self.cols} + {other.rows}x{other.cols}"
-            )
-
-        entries = [x - y for (x, y) in zip(self.entries, other.entries)]
-        return Matrix(self.rows, self.cols, entries)
-
     def __mul__(self, g: T | Matrix[T]) -> Matrix[T]:
         r"""Multiply a matrix.
 

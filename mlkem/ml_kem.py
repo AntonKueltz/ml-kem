@@ -2,6 +2,7 @@ from os import urandom
 
 from mlkem.auxiliary.crypto import g, h, j
 from mlkem.auxiliary.general import byte_decode, byte_encode
+from mlkem.fast_k_pke import Fast_K_PKE
 from mlkem.k_pke import K_PKE
 from mlkem.parameter_set import ParameterSet
 
@@ -10,6 +11,7 @@ class ML_KEM:
     def __init__(self, parameters: ParameterSet):
         self.parameters = parameters
         self.k_pke = K_PKE(parameters)
+        self.fast_k_pke = Fast_K_PKE(parameters)
 
     def key_gen(self) -> tuple[bytes, bytes]:
         d = urandom(32)
@@ -26,7 +28,8 @@ class ML_KEM:
         return self._decaps(dk, c)
 
     def _key_gen(self, d: bytes, z: bytes) -> tuple[bytes, bytes]:
-        ek, dk_pke = self.k_pke.key_gen(d)
+        # ek, dk_pke = self.k_pke.key_gen(d)
+        ek, dk_pke = self.fast_k_pke.key_gen(d)
         dk = dk_pke + ek + h(ek) + z
         return ek, dk
 
