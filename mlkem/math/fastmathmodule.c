@@ -7,6 +7,8 @@
 #define N 256
 #define Q 3329
 
+#define ROUND(x, y) (((2 * (x)) + (y)) / (2 * (y)))
+
 const uint16_t ZETA[128] = {
     1, 1729, 2580, 3289, 2642, 630, 1897, 848,
     1062, 1919, 193, 797, 2786, 3260, 569, 1746,
@@ -131,6 +133,41 @@ void byteEncodePoly(const unsigned d, const polynomial_t f, unsigned char * cons
     }
 }
 
+polynomial_t byteDecodePoly(const unsigned d, const unsigned char * const bytes) {
+    polynomial_t result = { .coeffs = {0} };
+    for (unsigned i = 0; i < N; i++) {
+        for (unsigned j = 0; j < d; j++) {
+            div_t qr = div(i*d + j, 8);
+            result.coeffs[i] |= ((bytes[qr.quot] >> qr.rem) & 1) << j;
+        }
+        // TODO - might not need this
+        if (d == 12) {
+            result.coeffs[i] %= Q;
+        }
+    }
+    return result;
+}
+
+polynomial_t compressPoly(const unsigned d, const polynomial_t f) {
+    polynomial_t result = { .coeffs = {0} };
+    for (unsigned i = 0; i < N; i++) {
+        uint16_t x = f.coeffs[i];
+        uint16_t y = ROUND(((1 << d) * x), Q);
+        result.coeffs[i] = y % (1 << d);
+    }
+    return result;
+}
+
+polynomial_t decompressPoly(const unsigned d, const polynomial_t f) {
+    polynomial_t result = { .coeffs = {0} };
+    for (unsigned i = 0; i < N; i++) {
+        uint16_t y = f.coeffs[i];
+        uint16_t x = ROUND((Q * y), (1 << d));
+        result.coeffs[i] = x;
+    }
+    return result;
+}
+
 /***** NTT MATH *****/
 polynomial_t ntt(const polynomial_t x) {
     polynomial_t result = { .coeffs = {0} };
@@ -238,12 +275,6 @@ void addMatrix(const polynomial_t * const x, const polynomial_t * const y, polyn
     }
 }
 
-void mulScalarMatrix(const polynomial_t * const x, const polynomial_t y, polynomial_t * const z, const size_t k) {
-    for (size_t i = 0; i < k; i++) {
-        z[i] = multiplyNtt(x[i], y);
-    }
-}
-
 // TODO - can be optimized via e.g. Strassen's algorithm.
 void mulMatrix(const polynomial_t * const x, const polynomial_t * const y, polynomial_t * z, const unsigned xrow, const unsigned xcol, const unsigned yrow, const unsigned ycol) {
     for (unsigned i = 0; i < xrow; i++) {
@@ -275,6 +306,26 @@ void mapNttInvMatrix(const polynomial_t * const x, polynomial_t * const y, const
 void byteEncodeMatrix(const unsigned d, const polynomial_t * const f, unsigned char * const bytes, const size_t k) {
     for (size_t i = 0; i < k; i ++) {
         byteEncodePoly(d, f[i], &bytes[i*32*d]);
+    }
+}
+
+polynomial_t * byteDecodeMatrix(const unsigned d, const unsigned char * const bytes, const size_t k) {
+    polynomial_t * result = malloc(k * sizeof(polynomial_t));
+    for (unsigned i = 0; i < k; i++) {
+        result[i] = byteDecodePoly(d, &bytes[i*32*d]);
+    }
+    return result;
+}
+
+void compressMatrix(const unsigned d, const polynomial_t * const x, polynomial_t * const y, const size_t k) {
+    for (size_t i = 0; i < k; i++) {
+        y[i] = compressPoly(d, x[i]);
+    }
+}
+
+void decompressMatrix(const unsigned d, const polynomial_t * const x, polynomial_t * const y, const size_t k) {
+    for (size_t i = 0; i < k; i++) {
+        y[i] = decompressPoly(d, x[i]);
     }
 }
 
@@ -319,6 +370,36 @@ PyObject * composeMatrix(const polynomial_t * const data, const Py_ssize_t entri
     return output;
 }
 
+// addPoly
+static PyObject * fastmath_add_poly(PyObject * self, PyObject * args) {
+    // parse input
+    PyObject * intList1, * intList2;
+    if (!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &intList1, &PyList_Type, &intList2)) {
+        return NULL;
+    }
+    polynomial_t x = parsePolynomial(intList1);
+    polynomial_t y = parsePolynomial(intList2);
+    // perform the call
+    polynomial_t z = addPoly(x, y);
+    // package the output
+    return composePolynomial(z);
+}
+
+// subPoly
+static PyObject * fastmath_sub_poly(PyObject * self, PyObject * args) {
+    // parse input
+    PyObject * intList1, * intList2;
+    if (!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &intList1, &PyList_Type, &intList2)) {
+        return NULL;
+    }
+    polynomial_t x = parsePolynomial(intList1);
+    polynomial_t y = parsePolynomial(intList2);
+    // perform the call
+    polynomial_t z = subPoly(x, y);
+    // package the output
+    return composePolynomial(z);
+}
+
 // samplePolyCBD binding
 static PyObject * fastmath_sample_poly_cbd(PyObject * self, PyObject * args) {
     // parse input
@@ -333,16 +414,67 @@ static PyObject * fastmath_sample_poly_cbd(PyObject * self, PyObject * args) {
     return composePolynomial(result);
 }
 
-// ntt binding
-static PyObject * fastmath_ntt(PyObject * self, PyObject * args) {
+// byteEncodePoly
+static PyObject * fastmath_byte_encode_poly(PyObject * self, PyObject * args) {
     // parse input
     PyObject * intList;
-    if (!PyArg_ParseTuple(args, "O!", &PyList_Type, &intList)) {
+    unsigned d;
+    if (!PyArg_ParseTuple(args, "O!I", &PyList_Type, &intList, &d)) {
+        return NULL;
+    }
+    polynomial_t input = parsePolynomial(intList);
+    const size_t numBytes = 32 * d;
+    unsigned char * bytes = calloc(numBytes, sizeof(unsigned char));
+
+    // perform the call
+    byteEncodePoly(d, input, bytes);
+
+    // package output
+    PyObject * result = PyBytes_FromStringAndSize((char *)bytes, numBytes * sizeof(unsigned char));
+    free(bytes);
+    return result;
+}
+
+// byteDecodePoly
+static PyObject * fastmath_byte_decode_poly(PyObject * self, PyObject * args) {
+    // parse input
+    PyObject * bytes;
+    unsigned d;
+    if (!PyArg_ParseTuple(args, "SI", &bytes, &d)) {
+        return NULL;
+    }
+    // perform the call
+    polynomial_t result = byteDecodePoly(d, (unsigned char *)PyBytes_AsString(bytes));
+    // package output
+    return composePolynomial(result);
+}
+
+// compressPoly
+static PyObject * fastmath_compress_poly(PyObject * self, PyObject * args) {
+    // parse input
+    PyObject * intList;
+    unsigned d;
+    if (!PyArg_ParseTuple(args, "O!I", &PyList_Type, &intList, &d)) {
         return NULL;
     }
     polynomial_t input = parsePolynomial(intList);
     // perform the call
-    polynomial_t result = ntt(input);
+    polynomial_t result = compressPoly(d, input);
+    // package output
+    return composePolynomial(result);
+}
+
+// decompressPoly
+static PyObject * fastmath_decompress_poly(PyObject * self, PyObject * args) {
+    // parse input
+    PyObject * intList;
+    unsigned d;
+    if (!PyArg_ParseTuple(args, "O!I", &PyList_Type, &intList, &d)) {
+        return NULL;
+    }
+    polynomial_t input = parsePolynomial(intList);
+    // perform the call
+    polynomial_t result = decompressPoly(d, input);
     // package output
     return composePolynomial(result);
 }
@@ -393,28 +525,6 @@ static PyObject * fastmath_add_matrix(PyObject * self, PyObject * args) {
     PyObject * result = composeMatrix(z, entries);
     free(z);
     free(y);
-    free(x);
-    return result;
-}
-
-// mulScalarMatrix
-static PyObject * fastmath_mul_matrix_by_scalar(PyObject * self, PyObject * args) {
-    // parse input
-    PyObject * matrix, * scalar;
-    if (!PyArg_ParseTuple(args, "O!O!", &PyList_Type, &matrix, &PyList_Type, &scalar)) {
-        return NULL;
-    }
-    const Py_ssize_t entries = PyList_Size(matrix);
-    polynomial_t * x = parseMatrix(matrix, entries);
-    polynomial_t y = parsePolynomial(scalar);
-
-    // perform the call
-    polynomial_t * z = malloc(entries * sizeof(polynomial_t));
-    mulScalarMatrix(x, y, z, entries);
-
-    // package output and cleanup
-    PyObject * result = composeMatrix(z, entries);
-    free(z);
     free(x);
     return result;
 }
@@ -509,18 +619,87 @@ static PyObject * fastmath_byte_encode_matrix(PyObject * self, PyObject * args) 
     return result;
 }
 
+// byteDecodeMatrix
+static PyObject * fastmath_byte_decode_matrix(PyObject * self, PyObject * args) {
+    // // parse input
+    PyObject * bytes;
+    unsigned d, entries;
+    if (!PyArg_ParseTuple(args, "SII", &bytes, &d, &entries)) {
+        return NULL;
+    }
+
+    // perform the call
+    polynomial_t * x = byteDecodeMatrix(d, (unsigned char *)PyBytes_AsString(bytes), entries);
+
+    // package output and cleanup
+    PyObject * result = composeMatrix(x, entries);
+    free(x);
+    return result;
+}
+
+// compressMatrix
+static PyObject * fastmath_compress_matrix(PyObject * self, PyObject * args) {
+    // parse input
+    PyObject * matrix;
+    unsigned d;
+    if (!PyArg_ParseTuple(args, "O!I", &PyList_Type, &matrix, &d)) {
+        return NULL;
+    }
+    const Py_ssize_t entries = PyList_Size(matrix);
+    polynomial_t * x = parseMatrix(matrix, entries);
+
+    // perform the call
+    polynomial_t * y = malloc(entries * sizeof(polynomial_t));
+    compressMatrix(d, x, y, entries);
+
+    // package output and cleanup
+    PyObject * result = composeMatrix(y, entries);
+    free(y);
+    free(x);
+    return result;
+}
+
+// decompressMatrix
+static PyObject * fastmath_decompress_matrix(PyObject * self, PyObject * args) {
+    // parse input
+    PyObject * matrix;
+    unsigned d;
+    if (!PyArg_ParseTuple(args, "O!I", &PyList_Type, &matrix, &d)) {
+        return NULL;
+    }
+    const Py_ssize_t entries = PyList_Size(matrix);
+    polynomial_t * x = parseMatrix(matrix, entries);
+
+    // perform the call
+    polynomial_t * y = malloc(entries * sizeof(polynomial_t));
+    decompressMatrix(d, x, y, entries);
+
+    // package output and cleanup
+    PyObject * result = composeMatrix(y, entries);
+    free(y);
+    free(x);
+    return result;
+}
+
 // methods available to python-land
 static PyMethodDef FastMathMethods[] = {
+    {"add_poly", fastmath_add_poly, METH_VARARGS, "Add two polynomials."},
+    {"sub_poly", fastmath_sub_poly, METH_VARARGS, "Subtract two polynomials."},
     {"sample_poly_cbd", fastmath_sample_poly_cbd, METH_VARARGS, "Sample an element from a centered binomial distribution."},
-    {"ntt", fastmath_ntt, METH_VARARGS, "Perform the Number Theoretic Transform (NTT)."},
+    {"byte_encode_poly", fastmath_byte_encode_poly, METH_VARARGS, "Serializea polynomial to bytes."},
+    {"byte_decode_poly", fastmath_byte_decode_poly, METH_VARARGS, "Deserialize bytes to a polynomial."},
+    {"compress_poly", fastmath_compress_poly, METH_VARARGS, "Map the elements of a polynomial from Z_q to Z_{2^d}."},
+    {"decompress_poly", fastmath_decompress_poly, METH_VARARGS, "Map the elements of a polynomial from Z_{2^d} to Z_q."},
     {"ntt_inv", fastmath_ntt_inv, METH_VARARGS, "Perform the inverse Number Theoretic Transform (NTT)."},
     {"sample_ntt", fastmath_sample_ntt, METH_VARARGS, "Sample an element in NTT representation."},
     {"add_matrix", fastmath_add_matrix, METH_VARARGS, "Add two matrices."},
-    {"mul_matrix_by_scalar", fastmath_mul_matrix_by_scalar, METH_VARARGS, "Multiply a matrix of polynomials by a polynomial."},
     {"mul_matrix", fastmath_mul_matrix, METH_VARARGS, "Multiply two matrices."},
     {"map_ntt_matrix", fastmath_map_ntt_matrix, METH_VARARGS, "Map the NTT onto all elements in a matrix."},
     {"map_ntt_inv_matrix", fastmath_map_ntt_inv_matrix, METH_VARARGS, "Map the inverse NTT onto all elements in a matrix."},
     {"byte_encode_matrix", fastmath_byte_encode_matrix, METH_VARARGS, "Serialize a matrix to bytes."},
+    {"byte_decode_matrix", fastmath_byte_decode_matrix, METH_VARARGS, "Deserialize a bytes to a matrix."},
+    {"compress_matrix", fastmath_compress_matrix, METH_VARARGS, "Map the elements of each polynomial in a matrix from Z_q to Z_{2^d}."},
+    {"decompress_matrix", fastmath_decompress_matrix, METH_VARARGS, "Map the elements of each polynomial in a matrix from Z_{2^d} to Z_q."},
     {NULL, NULL, 0, NULL}
 };
 

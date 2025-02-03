@@ -3,15 +3,16 @@ from os import urandom
 from mlkem.auxiliary.crypto import g, h, j
 from mlkem.auxiliary.general import byte_decode, byte_encode
 from mlkem.fast_k_pke import Fast_K_PKE
+from mlkem.fastmath import byte_decode_matrix, byte_encode_matrix  # type: ignore
 from mlkem.k_pke import K_PKE
 from mlkem.parameter_set import ParameterSet
 
 
 class ML_KEM:
-    def __init__(self, parameters: ParameterSet):
+    def __init__(self, parameters: ParameterSet, fast: bool = True):
         self.parameters = parameters
-        self.k_pke = K_PKE(parameters)
-        self.fast_k_pke = Fast_K_PKE(parameters)
+        self.fast = fast
+        self.k_pke = Fast_K_PKE(parameters) if fast else K_PKE(parameters)
 
     def key_gen(self) -> tuple[bytes, bytes]:
         d = urandom(32)
@@ -28,8 +29,7 @@ class ML_KEM:
         return self._decaps(dk, c)
 
     def _key_gen(self, d: bytes, z: bytes) -> tuple[bytes, bytes]:
-        # ek, dk_pke = self.k_pke.key_gen(d)
-        ek, dk_pke = self.fast_k_pke.key_gen(d)
+        ek, dk_pke = self.k_pke.key_gen(d)
         dk = dk_pke + ek + h(ek) + z
         return ek, dk
 
@@ -65,10 +65,18 @@ class ML_KEM:
         if len(ek) != 384 * k + 32:
             raise ValueError(f"Expected key of size {384 * k + 32}, got {len(ek)}.")
 
-        for i in range(k):
-            expected = ek[i * 384 : i * 384 + 384]
-            test = byte_encode(12, byte_decode(12, expected))
+        if self.fast:
+            expected = ek[: 384 * k]
+            test = byte_encode_matrix(byte_decode_matrix(ek, 12, k), 12)
             if expected != test:
                 raise ValueError(
                     "Encapsulation key contains bytes greater than or equal to q."
                 )
+        else:
+            for i in range(k):
+                expected = ek[i * 384 : i * 384 + 384]
+                test = byte_encode(12, byte_decode(12, expected))
+                if expected != test:
+                    raise ValueError(
+                        "Encapsulation key contains bytes greater than or equal to q."
+                    )
