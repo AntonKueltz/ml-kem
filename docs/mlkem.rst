@@ -1,8 +1,14 @@
 mlkem
 ==========
 
-mlkem.kpke
-----------
+mlkem.fast_k_pke
+----------------
 
-.. automodule:: mlkem.kpke
+.. automodule:: mlkem.fast_k_pke
+    :members:
+
+mlkem.k_pke
+-----------
+
+.. automodule:: mlkem.k_pke
     :members:
