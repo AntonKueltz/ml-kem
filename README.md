@@ -6,7 +6,7 @@ cryptographic applications.
 
 The package includes includes a pure python implementation of the K-PKE function
 (`mlkem.k_pke.K_PKE`) and an implementation that leverages C extensions
-()`mlkem.fast_k_pke.Fast_K_PKE`). The implementations have interchangeable interfaces
+(`mlkem.fast_k_pke.Fast_K_PKE`). The implementations have interchangeable interfaces
 and can be selected in their wrapper class `mlkem.ml_kem.ML_KEM` by setting the
 `fast` param to `True` for C extensions and `False` for pure python e.g.
 
@@ -14,7 +14,7 @@ and can be selected in their wrapper class `mlkem.ml_kem.ML_KEM` by setting the
     ML_KEM(ParameterSet.ML_KEM_768, fast=False)  # Pure python
 
 Both implementations are self contained and portable (assuming you have 8 bits per byte
-on your system) with no dependencies on third party libraries in neither the C nor python
+on your system) with no dependencies on third party libraries in either the C or python
 code. Note that the performance of the C extensions is _significantly_ faster. The python
 implementation is primarily included for those that wish to explore and debug the algorithm.
 Performance against the NIST
@@ -23,7 +23,7 @@ Performance against the NIST
 test vectors can be seen below -
 
 #### C Extensions
-```bash
+```
 uv run pytest -k "key_gen or encaps or decaps"
 ================================================ test session starts ================================================
 platform darwin -- Python 3.11.11, pytest-8.3.4, pluggy-1.5.0
@@ -40,7 +40,7 @@ tests/test_key_gen.py ..........................................................
 ```
 
 #### Pure Python
-```bash
+```
 uv run pytest -k "key_gen or encaps or decaps"                                                              1 ↵
 ================================================ test session starts ================================================
 platform darwin -- Python 3.11.11, pytest-8.3.4, pluggy-1.5.0
