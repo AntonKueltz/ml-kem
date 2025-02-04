@@ -5,11 +5,11 @@ from mlkem.auxiliary.general import byte_decode, byte_encode
 from mlkem.fast_k_pke import Fast_K_PKE
 from mlkem.fastmath import byte_decode_matrix, byte_encode_matrix  # type: ignore
 from mlkem.k_pke import K_PKE
-from mlkem.parameter_set import ParameterSet
+from mlkem.parameter_set import ML_KEM_768, ParameterSet
 
 
 class ML_KEM:
-    def __init__(self, parameters: ParameterSet, fast: bool = True):
+    def __init__(self, parameters: ParameterSet = ML_KEM_768, fast: bool = True):
         self.parameters = parameters
         self.fast = fast
         self.k_pke = Fast_K_PKE(parameters) if fast else K_PKE(parameters)

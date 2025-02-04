@@ -14,10 +14,10 @@ and can be selected in their wrapper class `mlkem.ml_kem.ML_KEM` by setting the
 
 ```python
 from mlkem.ml_kem import ML_KEM
-from mlkem.parameter_set import ParameterSet
+from mlkem.parameter_set import ML_KEM_768
 
-ML_KEM(ParameterSet.ML_KEM_768, fast=True)  # C extensions
-ML_KEM(ParameterSet.ML_KEM_768, fast=False)  # Pure python
+ML_KEM(ML_KEM_768, fast=True)  # C extensions
+ML_KEM(ML_KEM_768, fast=False)  # Pure python
 ```
 
 Both implementations are self contained and portable (assuming you have 8 bits per byte
@@ -31,10 +31,10 @@ equivalent -
 
 ```python
 from mlkem.ml_kem import ML_KEM
-from mlkem.parameter_set import ParameterSet
+from mlkem.parameter_set import ML_KEM_768
 
 ML_KEM()
-ML_KEM(ParameterSet.ML_KEM_768, fast=True)
+ML_KEM(ML_KEM_768, fast=True)
 ```
 
 The interface follows the one defined in section 7 of the standard for the functions KeyGen,
@@ -75,6 +75,31 @@ Build the docs
     uv run make -C docs html
 
 # Performance
+
+Below are some benchmarks for each parameter set, running on an 2021 M1 MacBook Pro and python3.13
+```
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_512 took 0.635 seconds
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_768 took 0.931 seconds
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_1024 took 1.289 seconds
+```
+
+You can run the benchmark yourself using the below code -
+```python
+import timeit
+from mlkem.ml_kem import ML_KEM
+from mlkem.parameter_set import ML_KEM_512, ML_KEM_768, ML_KEM_1024
+
+def run(params):
+    ml_kem = ML_KEM(params)
+    ek, dk = ml_kem.key_gen()
+    k, c = ml_kem.encaps(ek)
+    k_ = ml_kem.decaps(dk, c)
+    assert k == k_
+
+for p, n in [(ML_KEM_512, "ML_KEM_512"), (ML_KEM_768, "ML_KEM_768"), (ML_KEM_1024, "ML_KEM_1024")]:
+   time = timeit.timeit(stmt=lambda: run(p), number=1000)
+   print(f"1000 KeyGen, Encaps and Decaps operations with parameter set {n} took {time:.3f} seconds")
+```
 
 The performance of the C extensions is _significantly_ faster. The python
 implementation is primarily included for those that wish to explore and debug the algorithm.
