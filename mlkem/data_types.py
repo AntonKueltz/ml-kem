@@ -2,7 +2,7 @@ from abc import abstractmethod
 from typing import Protocol, Self
 
 
-# the entries of a matrix must have a type supporting addition
+# the entries of a matrix must have a type supporting add, subtract and multiplication over a field
 # define that interface via this protocol
 class Field(Protocol):
     @abstractmethod
