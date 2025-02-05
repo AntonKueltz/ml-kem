@@ -20,29 +20,17 @@ from mlkem.fastmath import (  # type: ignore
     sample_poly_cbd,
     sub_poly,
 )
+from mlkem.k_pke import PKE_Interface
 from mlkem.parameter_set import ParameterSet
 
 
-class Fast_K_PKE:
-    """A public key encryption (PKE) scheme based on the module learning with errors (MLWE) problem."""
+class Fast_K_PKE(PKE_Interface):
+    """C extension implementation of the PKE Interface."""
 
     def __init__(self, parameters: ParameterSet):
         self.parameters = parameters
 
     def key_gen(self, d: bytes) -> tuple[bytes, bytes]:
-        r"""Creates a keypair used for encapsulation and decapsulation.
-
-        The decryption (private) key is a vector :math:`s` of length k (where k is defined by the ML-KEM parameter set)
-        with elements in :math:`R_q`. The encryption (public) key is a collection of "noisy" linear equations
-        :math:`(A, As + e)` in the secret variable :math:`s`. The rows of matrix A, which is generated pseudorandomly,
-        for the equation coeffients.
-
-        Args:
-            | d (:type:`bytes)`): The random seed used to derive the keypair. This should come from a random source suitable for cryptographic applications.
-
-        Returns:
-            :type:`tuple[bytes, bytes]`: The keypair with the encryption key first and the decryption key second.
-        """
         k = self.parameters.k
         rho, sigma = g(d + bytes([k]))
         N = 0
@@ -67,26 +55,6 @@ class Fast_K_PKE:
         return ek, dk
 
     def encrypt(self, ek: bytes, m: bytes, r: bytes) -> bytes:
-        r"""Takes an encryption key ek, a 32 byte plaintext message m, and randomness r as input
-        and produces a ciphertext c.
-
-        The algorithm starts by deriving matrix A and vector t from the encryption key. It then
-        generates a vector :math:`y \in R^k_q` and noise terms :math:`e1 \in R^k_q` and
-        :math:`e2 \in R_q`. It then encodes the 256 bit plaintext as a polynomial with degree 255,
-        where each bit of the plaintext is a coefficient of the polynomial. Then a new noisy equation
-        is computed - :math:`(A^Ty + e_1, t^Ty, + e_2)`. An appropriate encoding of the message polynomial
-        is then added to the latter term. Finally, the pair (u, v) is compressed and serialized into a byte
-        array.
-
-        Args:
-            | ek (:type:`bytes)`: The encryption key.
-            | m (:type:`bytes)`): The plaintext message.
-            | r (:type:`bytes)`): The randomness.
-
-        Returns:
-            :type:`bytes)`: The ciphertext c = c1 + c2. c1 encodes u and c2 encodes v.
-
-        """
         k = self.parameters.k
         du = self.parameters.du
         dv = self.parameters.dv

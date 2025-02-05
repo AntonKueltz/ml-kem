@@ -4,28 +4,70 @@ from mlkem.auxiliary.crypto import g, h, j
 from mlkem.auxiliary.general import byte_decode, byte_encode
 from mlkem.fast_k_pke import Fast_K_PKE
 from mlkem.fastmath import byte_decode_matrix, byte_encode_matrix  # type: ignore
-from mlkem.k_pke import K_PKE
+from mlkem.k_pke import K_PKE, PKE_Interface
 from mlkem.parameter_set import ML_KEM_768, ParameterSet
 
 
 class ML_KEM:
+    """A CCA-secure module-lattice-based key encapsulation mechanism (KEM)."""
+
+    parameter_set: ParameterSet
+    fast: bool
+    k_pke: PKE_Interface
+
     def __init__(self, parameters: ParameterSet = ML_KEM_768, fast: bool = True):
         self.parameters = parameters
         self.fast = fast
         self.k_pke = Fast_K_PKE(parameters) if fast else K_PKE(parameters)
 
     def key_gen(self) -> tuple[bytes, bytes]:
+        r"""Generate a keypair (ek, dk) for use in the ML-KEM system.
+
+        The key generation algorithm accepts no input, generates randomness internally, and produces an encapsulation
+        key and a decapsulation key. While the encapsulation key can be made public, the decapsulation key shall
+        remain private.
+
+        Returns:
+            :type:`tuple[bytes, bytes]`: The (encapsulation key, decapulation key) pair.
+        """
         d = urandom(32)
         z = urandom(32)
 
         return self._key_gen(d, z)
 
     def encaps(self, ek: bytes) -> tuple[bytes, bytes]:
-        self._check_ek(ek)
+        r"""Take an encapsulation key and produce a shared key and ciphertext.
+
+        The shared key can be used as e.g. input to a KDF or as a key for a symmetric cipher between two parties.
+        The ciphertext should be sent to the party in possession of the decapsulation key (the ciphertext is an
+        encapsulation of the shared key).
+
+        Args:
+            | ek (:type:`bytes`): The encapsulation key.
+
+        Returns:
+            :type:`tuple[bytes, bytes]`: The (shared key, ciphertext) pair.
+        """
+        self._check_encaps_input(ek)
         m = urandom(32)
         return self._encaps(ek, m)
 
     def decaps(self, dk: bytes, c: bytes) -> bytes:
+        r"""Takes a decapsulation key and ciphertext as input, does not use any randomness, and outputs a shared
+        secret.
+
+        The ciphertext should be produced by the encaps method using the encapsulation key corresponding to the
+        decapsulation key that was passed to this method. The result is the shared key, the same as the first value
+        in the tuple output by the encaps method.
+
+        Args:
+            | dk (:type:`bytes`): The decapsulation key.
+            | c (:type:`bytes`): The ciphertext.
+
+        Returns:
+            :type:`bytes`: The shared key.
+        """
+        self._check_decaps_input(dk, c)
         return self._decaps(dk, c)
 
     def _key_gen(self, d: bytes, z: bytes) -> tuple[bytes, bytes]:
@@ -59,7 +101,7 @@ class ML_KEM:
 
         return k_prime
 
-    def _check_ek(self, ek: bytes) -> None:
+    def _check_encaps_input(self, ek: bytes) -> None:
         k = self.parameters.k
 
         if len(ek) != 384 * k + 32:
@@ -80,3 +122,22 @@ class ML_KEM:
                     raise ValueError(
                         "Encapsulation key contains bytes greater than or equal to q."
                     )
+
+    def _check_decaps_input(self, dk: bytes, c: bytes) -> None:
+        k = self.parameters.k
+
+        expected_ciphertext_size = 32 * (self.parameters.du * k + self.parameters.dv)
+        if len(c) != expected_ciphertext_size:
+            raise ValueError(
+                f"Expected ciphertext of size {expected_ciphertext_size}, got {len(c)}."
+            )
+
+        expected_key_size = 768 * k + 96
+        if len(dk) != expected_key_size:
+            raise ValueError(
+                f"Expected ciphertext of size {expected_key_size}, got {len(dk)}."
+            )
+
+        expected_hash = dk[768 * k + 32 : 768 * k + 64]
+        if h(dk[384 * k : 768 * k + 32]) != expected_hash:
+            raise ValueError("Encapsulation key hash did not match expected hash.")

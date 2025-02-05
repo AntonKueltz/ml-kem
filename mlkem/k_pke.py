@@ -1,3 +1,4 @@
+from abc import ABC, abstractmethod
 from binascii import hexlify
 from functools import reduce
 from logging import getLogger
@@ -19,26 +20,81 @@ from mlkem.parameter_set import ParameterSet
 LOG = getLogger(__name__)
 
 
-class K_PKE:
-    """A public key encryption (PKE) scheme based on the module learning with errors (MLWE) problem."""
+class PKE_Interface(ABC):
+    """Interface for a public key encryption (PKE) scheme based on the module learning with errors (MLWE) problem.
 
-    def __init__(self, parameters: ParameterSet):
-        self.parameters = parameters
+    Using the interface directly is NOT allowed by FIPS-203. This scheme is only IND-CPA secure (secure under a chosen
+    plaintext attack), but not IND-CCA secure (secure under a chosen ciphertext attack). The ML_KEM class implements
+    the IND-CCA scheme, which is what is approved for usage in FIPS-203.
+    """
 
+    @abstractmethod
     def key_gen(self, d: bytes) -> tuple[bytes, bytes]:
         r"""Creates a keypair used for encapsulation and decapsulation.
 
         The decryption (private) key is a vector :math:`s` of length k (where k is defined by the ML-KEM parameter set)
         with elements in :math:`R_q`. The encryption (public) key is a collection of "noisy" linear equations
         :math:`(A, As + e)` in the secret variable :math:`s`. The rows of matrix A, which is generated pseudorandomly,
-        for the equation coeffients.
+        for the equation coefficients.
 
         Args:
-            | d (:type:`bytes)`): The random seed used to derive the keypair. This should come from a random source suitable for cryptographic applications.
+            | d (:type:`bytes`): The random seed used to derive the keypair. This should come from a random source suitable for cryptographic applications.
 
         Returns:
             :type:`tuple[bytes, bytes]`: The keypair with the encryption key first and the decryption key second.
         """
+        pass
+
+    @abstractmethod
+    def encrypt(self, ek: bytes, m: bytes, r: bytes) -> bytes:
+        r"""Takes an encryption key ek, a 32 byte plaintext message m, and randomness r as input
+        and produces a ciphertext c.
+
+        The algorithm starts by deriving matrix A and vector t from the encryption key. It then
+        generates a vector :math:`y \in R^k_q` and noise terms :math:`e1 \in R^k_q` and
+        :math:`e2 \in R_q`. It then encodes the 256 bit plaintext as a polynomial with degree 255,
+        where each bit of the plaintext is a coefficient of the polynomial. Then a new noisy equation
+        is computed - :math:`(A^T \cdot y + e_1, t^T \cdot y, + e_2)`. An appropriate encoding of the message polynomial
+        is then added to the latter term. Finally, the pair (u, v) is compressed and serialized into a byte
+        array.
+
+        Args:
+            | ek (:type:`bytes`): The encryption key.
+            | m (:type:`bytes`): The plaintext message.
+            | r (:type:`bytes`): The randomness.
+
+        Returns:
+            :type:`bytes`: The ciphertext c = c1 + c2. c1 encodes u and c2 encodes v.
+
+        """
+        pass
+
+    @abstractmethod
+    def decrypt(self, dk: bytes, c: bytes) -> bytes:
+        r"""Takes a decryption key dk and a ciphertext c, and produces a plaintext.
+
+        The algorithm first parses u' and v' out of the ciphertext (see encrypt for how these values are generated).
+        It then uses the secret vector s (which is decoded from dk) to recover the message m. The equation for
+        recovering m is :math:`m = v' - s^T \cdot u'`. There is also an additional step involving compressing and
+        encoding m in order to transform it from a polynomial in :math:`\mathbb{Z}^n_q` to a byte sequence.
+
+        Args:
+            | dk (:type:`bytes`): The decryption key.
+            | c (:type:`bytes`): The ciphertext message.
+
+        Returns:
+            :type:`bytes`: The plaintext.
+        """
+        pass
+
+
+class K_PKE(PKE_Interface):
+    """Pure python implementation of the PKE Interface."""
+
+    def __init__(self, parameters: ParameterSet):
+        self.parameters = parameters
+
+    def key_gen(self, d: bytes) -> tuple[bytes, bytes]:
         k = self.parameters.k
         eta1 = self.parameters.eta1
         rho, sigma = g(d + bytes([k]))
@@ -91,26 +147,6 @@ class K_PKE:
         return ek, dk
 
     def encrypt(self, ek: bytes, m: bytes, r: bytes) -> bytes:
-        r"""Takes an encryption key ek, a 32 byte plaintext message m, and randomness r as input
-        and produces a ciphertext c.
-
-        The algorithm starts by deriving matrix A and vector t from the encryption key. It then
-        generates a vector :math:`y \in R^k_q` and noise terms :math:`e1 \in R^k_q` and
-        :math:`e2 \in R_q`. It then encodes the 256 bit plaintext as a polynomial with degree 255,
-        where each bit of the plaintext is a coefficient of the polynomial. Then a new noisy equation
-        is computed - :math:`(A^Ty + e_1, t^Ty, + e_2)`. An appropriate encoding of the message polynomial
-        is then added to the latter term. Finally, the pair (u, v) is compressed and serialized into a byte
-        array.
-
-        Args:
-            | ek (:type:`bytes)`: The encryption key.
-            | m (:type:`bytes)`): The plaintext message.
-            | r (:type:`bytes)`): The randomness.
-
-        Returns:
-            :type:`bytes)`: The ciphertext c = c1 + c2. c1 encodes u and c2 encodes v.
-
-        """
         k = self.parameters.k
         du = self.parameters.du
         dv = self.parameters.dv
