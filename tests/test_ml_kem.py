@@ -1,12 +1,15 @@
 from unittest import TestCase
 
 from mlkem.ml_kem import ML_KEM
-from mlkem.parameter_set import ML_KEM_512
+from mlkem.parameter_set import ML_KEM_512, ML_KEM_768, ML_KEM_1024, ParameterSet
+
+from parameterized import parameterized  # type: ignore
 
 
 class TestML_KEM(TestCase):
-    def test_full(self) -> None:
-        ml_kem = ML_KEM(ML_KEM_512)
+    @parameterized.expand([ML_KEM_512, ML_KEM_768, ML_KEM_1024])
+    def test_full(self, params: ParameterSet) -> None:
+        ml_kem = ML_KEM(params)
 
         ek, dk = ml_kem.key_gen()
         k, c = ml_kem.encaps(ek)

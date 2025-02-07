@@ -78,66 +78,22 @@ Build the docs
 
 Below are some benchmarks for each parameter set, running on an 2021 M1 MacBook Pro and python3.13
 ```
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_512 took 0.635 seconds
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_768 took 0.931 seconds
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_1024 took 1.289 seconds
+===== C Extensions =====
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_512 took 0.544 seconds
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_768 took 0.794 seconds
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_1024 took 1.095 seconds
+===== Pure Python =====
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_512 took 32.670 seconds
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_768 took 51.277 seconds
+1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_1024 took 72.187 seconds
 ```
 
-You can run the benchmark yourself using the below code -
-```python
-import timeit
-from mlkem.ml_kem import ML_KEM
-from mlkem.parameter_set import ML_KEM_512, ML_KEM_768, ML_KEM_1024
+You can also run the benchmark yourself as well
 
-def run(params):
-    ml_kem = ML_KEM(params)
-    ek, dk = ml_kem.key_gen()
-    k, c = ml_kem.encaps(ek)
-    k_ = ml_kem.decaps(dk, c)
-    assert k == k_
-
-for p, n in [(ML_KEM_512, "ML_KEM_512"), (ML_KEM_768, "ML_KEM_768"), (ML_KEM_1024, "ML_KEM_1024")]:
-   time = timeit.timeit(stmt=lambda: run(p), number=1000)
-   print(f"1000 KeyGen, Encaps and Decaps operations with parameter set {n} took {time:.3f} seconds")
+```bash
+uv run benchmark  # for local development
+python -m mlkem.benchmark  # for pip installed package
 ```
 
-The performance of the C extensions is _significantly_ faster. The python
-implementation is primarily included for those that wish to explore and debug the algorithm.
-Performance against the NIST
-[keygen](https://github.com/usnistgov/ACVP-Server/tree/master/gen-val/json-files/ML-KEM-keyGen-FIPS203) and
-[encap/decap](https://github.com/usnistgov/ACVP-Server/tree/master/gen-val/json-files/ML-KEM-encapDecap-FIPS203)
-test vectors can be seen below -
-
-#### C Extensions
-```
-uv run pytest -k "key_gen or encaps or decaps"
-================================================ test session starts ================================================
-platform darwin -- Python 3.11.11, pytest-8.3.4, pluggy-1.5.0
-rootdir: /Users/antonku/dev/github/mlkem
-configfile: pyproject.toml
-plugins: cov-6.0.0
-collected 261 items / 36 deselected / 225 selected
-
-tests/test_decaps.py ...........................................................................              [ 33%]
-tests/test_encaps.py ...........................................................................              [ 66%]
-tests/test_key_gen.py ...........................................................................             [100%]
-
-======================================== 225 passed, 36 deselected in 0.23s =========================================
-```
-
-#### Pure Python
-```
-uv run pytest -k "key_gen or encaps or decaps"                                                              1 ↵
-================================================ test session starts ================================================
-platform darwin -- Python 3.11.11, pytest-8.3.4, pluggy-1.5.0
-rootdir: /Users/antonku/dev/github/mlkem
-configfile: pyproject.toml
-plugins: cov-6.0.0
-collected 261 items / 36 deselected / 225 selected
-
-tests/test_decaps.py ...........................................................................              [ 33%]
-tests/test_encaps.py ...........................................................................              [ 66%]
-tests/test_key_gen.py ...........................................................................             [100%]
-
-======================================== 225 passed, 36 deselected in 4.42s =========================================
-```
+The performance of the C extensions is _significantly_ faster (benchmark shows ~60-70x). The python implementation is
+primarily included for those  that wish to explore and interactively debug the algorithm using pure python tooling.
