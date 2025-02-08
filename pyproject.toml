@@ -20,6 +20,11 @@ classifiers = [
     "Operating System :: POSIX :: Linux"
 ]
 
+[project.urls]
+repo = "https://github.com/AntonKueltz/ml-kem"
+docs = "https://mlkem.readthedocs.io"
+pypi = "https://pypi.org/project/mlkem"
+
 [build-system]
 requires = ["setuptools>=75.6.0"]
 build-backend = "setuptools.build_meta"
