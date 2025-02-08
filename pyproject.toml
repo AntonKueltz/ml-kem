@@ -1,6 +1,6 @@
 [project]
 name = "mlkem"
-version = "0.0.2"
+version = "0.0.3"
 description = "A module-latice-based key-encapsulation mechanism (ML-KEM). Implements the FIPS-203 standard."
 readme = "README.md"
 requires-python = ">=3.11"

@@ -15,7 +15,7 @@ path.insert(0, str(Path("..").resolve()))
 project = "Module-Lattice-Based Key-Encapsulation Mechanism"
 copyright = str(datetime.now().year)
 author = "Anton Kueltz"
-release = "0.0.2"
+release = "0.0.3"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
