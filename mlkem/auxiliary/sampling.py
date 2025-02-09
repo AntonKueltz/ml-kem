@@ -6,6 +6,14 @@ from mlkem.math.polynomial_ring import PolynomialRing, RingRepresentation
 
 
 def sample_ntt(b: bytes) -> PolynomialRing:
+    r"""Take a seed and two indices and sample a pseudorandom elements in :math:`T_q`.
+
+    Args:
+        | b (:type:`bytes`): A 32-byte seed concatenated with two one byte indices as :code:`seed + i0 + i1`.
+
+    Returns:
+        :type:`mlkem.math.polynomial_ring.PolynomialRing`: A polynomial in NTT representation.
+    """
     if len(b) != 34:
         raise ValueError(
             f"Input must be 34 bytes (32-byte seed and two indices). Got {len(b)}."
@@ -33,6 +41,19 @@ def sample_ntt(b: bytes) -> PolynomialRing:
 
 
 def sample_poly_cbd(eta: int, b: bytes) -> PolynomialRing:
+    r"""Take a seed and output a sample from the distribution :math:`\mathcal{D}_{\eta}(R_q)`.
+
+    The distribution :math:`\mathcal{D}_{\eta}(R_q)` is a special distribution of polynomials
+    in :math:`R_q` with small coefficients. These are used as "noise" (or, for those familiar
+    with \*LWE terminology, "error") terms in the ML-KEM algorithm.
+
+    Args:
+        | eta (:type:`int`): A parameter of the ML-KEM instance determining the distribution of the noise.
+        | b (:type:`bytes`): A :code:`64 * eta`-byte seed.
+
+    Returns:
+        :type:`mlkem.math.polynomial_ring.PolynomialRing`: A polynomial with small coefficients.
+    """
     if len(b) != 64 * eta:
         raise ValueError(f"Input must be {64 * eta} bytes (got {len(b)}).")
 

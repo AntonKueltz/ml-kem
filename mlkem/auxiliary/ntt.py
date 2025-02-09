@@ -49,6 +49,17 @@ GAMMA_LOOKUP = [
 
 
 def ntt(f: PolynomialRing) -> PolynomialRing:
+    r"""Computes the NTT representation :math:`\hat{f}` of the given polynomial :math:`f \in R_q`.
+
+    Note that :code:`f.representation` must be :code:`RingRepresentation.STANDARD`, otherwise a
+    :type:`ValueError` will be raised.
+
+    Args:
+        | f (:type:`mlkem.math.polynomial_ring.PolynomialRing`): The polynomial to perform the transform on.
+
+    Return:
+        :type:`mlkem.math.polynomial_ring.PolynomialRing`: The NTT representation of :code:`f`.
+    """
     if f.representation != RingRepresentation.STANDARD:
         raise ValueError(
             "NTT can only be applied to polynomials in standard representation."
@@ -74,6 +85,17 @@ def ntt(f: PolynomialRing) -> PolynomialRing:
 
 
 def ntt_inv(f_: PolynomialRing) -> PolynomialRing:
+    r"""Computes the polynomial :math:`f \in R_q` that corresponds to the NTT representation :math:`\hat{f} \in T_q`.
+
+    Note that :code:`f_.representation` must be :code:`RingRepresentation.NTT`, otherwise a
+    :type:`ValueError` will be raised.
+
+    Args:
+        | f\_ (:type:`mlkem.math.polynomial_ring.PolynomialRing`): The polynomial to perform the transform on.
+
+    Return:
+        :type:`mlkem.math.polynomial_ring.PolynomialRing`: The standard representation of :code:`f_`.
+    """
     if f_.representation != RingRepresentation.NTT:
         raise ValueError(
             "Inverse NTT can only be applied to polynomials in NTT representation."
@@ -103,6 +125,18 @@ def ntt_inv(f_: PolynomialRing) -> PolynomialRing:
 
 
 def multiply_ntt(f_: PolynomialRing, g_: PolynomialRing) -> PolynomialRing:
+    r"""Computes the product (in the ring :math:`T_q`) of two NTT representations.
+
+    Note that :code:`f_.representation` and :code:`g_.representation` must be
+    :code:`RingRepresentation.NTT`, otherwise a :type:`ValueError` will be raised.
+
+     Args:
+        | f\_ (:type:`mlkem.math.polynomial_ring.PolynomialRing`): A multiplication operand.
+        | f\_ (:type:`mlkem.math.polynomial_ring.PolynomialRing`): A multiplication operand.
+
+    Returns:
+        :type:`mlkem.math.polynomial_ring.PolynomialRing`: The polynomial :math:`\hat{h} (\in T_q) = \hat{f} \cdot \hat{g}`.
+    """
     if (
         f_.representation != RingRepresentation.NTT
         or g_.representation != RingRepresentation.NTT

@@ -18,6 +18,21 @@ class Matrix(Generic[T]):
         entries: list[T] | None = None,
         constructor: Callable[[], T] | None = None,
     ) -> None:
+        r"""Initialize a matrix with the given dimensions and entries.
+
+        :code:`entries` or :code:`constructor` must be provided. If :code:`entries` is
+        provided it must be a list of exactly :code:`rows * cols` elements. The elements
+        should be in row-major order. If :code:`constructor` is provided then it should
+        be a callable that takes no arguments and returns an instance of :type:`T`. If neither
+        is provided a :type:`ValueError` is raised. If both are provided then :code:`entries`
+        is used.
+
+        Args:
+            | rows (:type:`int`): The number of rows in the matrix.
+            | cols (:type:`int`): The number of columns in the matrix.
+            | entries (:type:`list[T] | None`): The values of the matrix elements.
+            | constructor (:type:`Callable[[], T] | None`): A function to initialize all matrix elements.
+        """
         self.rows = rows
         self.cols = cols
 

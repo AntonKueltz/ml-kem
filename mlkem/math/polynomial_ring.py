@@ -6,6 +6,12 @@ from mlkem.math.field import Zm
 
 
 class RingRepresentation(StrEnum):
+    r"""The mathmetical representation of a :class:`PolynomialRing`.
+
+    * STANDARD = The conventional representation.
+    * NTT = The representation after the number theoretic transform (NTT) has been applied.
+    """
+
     STANDARD = "Standard Polynomial Ring (Rq)"
     NTT = "NTT Representation (Tq)"
 
@@ -21,6 +27,17 @@ class PolynomialRing:
         coefficients: list[Zm] | None = None,
         representation: RingRepresentation = RingRepresentation.STANDARD,
     ):
+        r"""Initialize a polynomial ring element.
+
+        The coefficients are indexed based on the degree of their corresponding term.
+        In other words, :code:`coefficients[i]` corresponds to the coefficient :math:`a_i` in the
+        term :math:`a_i X^i`. If no coefficients are provided then all coefficients are
+        initialized to 0.
+
+        Args:
+            | coefficients (:type:`list[mlkem.math.field.Zm] | None`): The coefficients of the polynomial.
+            | representation (:class:`RingRepresentation`): The mathematical representation of the polynomial.
+        """
         if coefficients is None:
             coefficients = [Zm(0, q) for _ in range(n)]
 
@@ -31,7 +48,7 @@ class PolynomialRing:
         self.representation = representation
 
     def __eq__(self, other: object) -> bool:
-        """Compare two polynomial rings for equality.
+        r"""Compare two polynomial rings for equality.
 
         They must have the following conditions met to be equal:
           * The same representation
@@ -61,7 +78,14 @@ class PolynomialRing:
         return "[ " + ", ".join([repr(x) for x in self.coefficients]) + " ]"
 
     def __getitem__(self, index: int) -> Zm:
-        """Get the coefficient at :code:`index`."""
+        r"""Get the coefficient at :code:`index`.
+
+        Args:
+            | index (:type:`int`): The index of the coefficient to get.
+
+        Returns:
+            :class:`mlkem.math.field.Zm`: The value of the coefficient.
+        """
         if index >= n:
             raise IndexError(
                 f"Index for Rq coefficient must be less than {n}. Got {index}."
@@ -70,7 +94,12 @@ class PolynomialRing:
         return self.coefficients[index]
 
     def __setitem__(self, index: int, value: Zm) -> None:
-        """Set the coefficient at :code:`index` to :code:`value`."""
+        r"""Set the coefficient at :code:`index` to :code:`value`.
+
+        Args:
+            | index (:type:`int`): The index of the coefficient to set.
+            | value (:class:`mlkem.math.field.Zm`): The value to set.
+        """
         if index >= n:
             raise IndexError(
                 f"Index for Rq coefficient must be less than {n}. Got {index}."
@@ -126,7 +155,7 @@ class PolynomialRing:
         representation. NTT multiplication is then used to multiply the two together.
 
         Args:
-            | a (:class:`Zm` | :class:`PolynomialRing`): The value to multiply by.
+            | a (:class:`mlkem.math.field.Zm` | :class:`PolynomialRing`): The value to multiply by.
 
         Returns:
             :class:`PolynomialRing`: The element in :math:`\mathbb{Z}^n_m` multiplied by `a`.

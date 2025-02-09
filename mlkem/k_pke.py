@@ -24,8 +24,8 @@ class PKE_Interface(ABC):
     """Interface for a public key encryption (PKE) scheme based on the module learning with errors (MLWE) problem.
 
     Using the interface directly is NOT allowed by FIPS-203. This scheme is only IND-CPA secure (secure under a chosen
-    plaintext attack), but not IND-CCA secure (secure under a chosen ciphertext attack). The ML_KEM class implements
-    the IND-CCA scheme, which is what is approved for usage in FIPS-203.
+    plaintext attack), but not IND-CCA secure (secure under a chosen ciphertext attack). :class:`mlkem.ml_kem.ML_KEM`
+    implements the IND-CCA scheme, which is what is approved for usage in FIPS-203.
     """
 
     @abstractmethod

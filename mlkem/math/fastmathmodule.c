@@ -140,10 +140,6 @@ polynomial_t byteDecodePoly(const unsigned d, const unsigned char * const bytes)
             div_t qr = div(i*d + j, 8);
             result.coeffs[i] |= ((bytes[qr.quot] >> qr.rem) & 1) << j;
         }
-        // TODO - might not need this
-        if (d == 12) {
-            result.coeffs[i] %= Q;
-        }
     }
     return result;
 }

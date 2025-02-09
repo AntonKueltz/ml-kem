@@ -1,4 +1,5 @@
 from os import urandom
+from typing import Callable
 
 from mlkem.auxiliary.crypto import g, h, j
 from mlkem.auxiliary.general import byte_decode, byte_encode
@@ -12,11 +13,18 @@ class ML_KEM:
     """A CCA-secure module-lattice-based key encapsulation mechanism (KEM)."""
 
     parameter_set: ParameterSet
+    randomness: Callable[[int], bytes]
     fast: bool
     k_pke: PKE_Interface
 
-    def __init__(self, parameters: ParameterSet = ML_KEM_768, fast: bool = True):
+    def __init__(
+        self,
+        parameters: ParameterSet = ML_KEM_768,
+        randomness: Callable[[int], bytes] = urandom,
+        fast: bool = True,
+    ):
         self.parameters = parameters
+        self.randomness = randomness
         self.fast = fast
         self.k_pke = Fast_K_PKE(parameters) if fast else K_PKE(parameters)
 
@@ -30,8 +38,8 @@ class ML_KEM:
         Returns:
             :type:`tuple[bytes, bytes]`: The (encapsulation key, decapulation key) pair.
         """
-        d = urandom(32)
-        z = urandom(32)
+        d = self.randomness(32)
+        z = self.randomness(32)
 
         return self._key_gen(d, z)
 
@@ -49,16 +57,16 @@ class ML_KEM:
             :type:`tuple[bytes, bytes]`: The (shared key, ciphertext) pair.
         """
         self._check_encaps_input(ek)
-        m = urandom(32)
+        m = self.randomness(32)
         return self._encaps(ek, m)
 
     def decaps(self, dk: bytes, c: bytes) -> bytes:
         r"""Takes a decapsulation key and ciphertext as input, does not use any randomness, and outputs a shared
         secret.
 
-        The ciphertext should be produced by the encaps method using the encapsulation key corresponding to the
+        The ciphertext should be produced by :func:`encaps` using the encapsulation key corresponding to the
         decapsulation key that was passed to this method. The result is the shared key, the same as the first value
-        in the tuple output by the encaps method.
+        in the tuple output by :func:`encaps`.
 
         Args:
             | dk (:type:`bytes`): The decapsulation key.

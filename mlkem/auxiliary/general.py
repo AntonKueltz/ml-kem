@@ -58,6 +58,18 @@ def _round_fraction(x: int, y: int) -> int:
 
 
 def compress(d: int, x: Zm) -> Zm:
+    r"""Map an element from :math:`\mathbb{Z}_q` to :math:`\mathbb{Z}_{2^d}`.
+
+    Note that :math:`q` is 12 bits and :math:`d` must be less than 12 bits, so this
+    operation is always lossy.
+
+    Args:
+        | d (:type:`int`): The number of bits (0 < d < 12) to compress :code:`x` to.
+        | x (:type:`mlkem.math.field.Zm`): An element of :math:`\mathbb{Z}_q`.
+
+    Returns:
+        :type:`mlkem.math.field.Zm`: :code:`x` compressed to an element of :math:`\mathbb{Z}_{2^d}`.
+    """
     if not d < MAX_D:
         raise ValueError(f"d must be less than {MAX_D} (got {d}).")
     if x.m != q:
@@ -69,6 +81,15 @@ def compress(d: int, x: Zm) -> Zm:
 
 
 def decompress(d: int, y: Zm) -> Zm:
+    r"""Map an element from :math:`\mathbb{Z}_{2^d}` to :math:`\mathbb{Z}_q`.
+
+    Args:
+        | d (:type:`int`): The number of bits (0 < d < 12) to decompress :code:`x` from.
+        | x (:type:`mlkem.math.field.Zm`): An element of :math:`\mathbb{Z}_{2^d}`.
+
+    Returns:
+        :type:`mlkem.math.field.Zm`: :code:`x` decompressed to an element of :math:`\mathbb{Z}_q`.
+    """
     if not d < MAX_D:
         raise ValueError(f"d must be less than {MAX_D} (got {d}).")
 
@@ -78,6 +99,17 @@ def decompress(d: int, y: Zm) -> Zm:
 
 
 def byte_encode(d: int, f: list[Zm]) -> bytes:
+    r"""Encode a list of integers into bytes.
+
+    The integers are all interpreted as d-bits in size, with :math:`1 \le d \le 12`.
+
+    Args:
+        | d (:type:`int`): The bit size of the integers in the list.
+        | f (:type:`list[mlkem.math.field.Zm]`): The integer list. If d=12 then the field order is :code:`mlkem.math.constants.q`, otherwise it is :code:`2**d`.
+
+    Returns:
+        :type:`bytes`: The byte-encoding of the integer list.
+    """
     if len(f) != n:
         raise ValueError(f"f must have {n} elements (got {len(f)}).")
 
@@ -97,6 +129,17 @@ def byte_encode(d: int, f: list[Zm]) -> bytes:
 
 
 def byte_decode(d: int, b: bytes) -> list[Zm]:
+    r"""Decode bytes into a list of integers.
+
+    Bytes are parsed as d-bit integers, with :math:`1 \le d \le 12`.
+
+    Args:
+        | d (:type:`int`): The bit size of the integers in the list.
+        | b (:type:`bytes`): The byte-encoding of an integer list.
+
+    Returns:
+        :type:`list[mlkem.math.field.Zm]`: The decoded integer list. If d=12 then the field order is :code:`mlkem.math.constants.q`, otherwise it is :code:`2**d`.
+    """
     if d > MAX_D or d < 1:
         raise ValueError(f"d may not be greater than {MAX_D} or less than 1 (got {d}).")
 

@@ -7,6 +7,12 @@ class Zm:
     val: int
 
     def __init__(self, val: int, m: int):
+        r"""Initialize an element in the field :math:`\mathbb{Z}_m`.
+
+        Args:
+            | val (:type:`int`): The (unreduced) value of the field element.
+            | m (:type:`int`): The modulus / order of the field.
+        """
         self.m = m
         self.val = val % m
 

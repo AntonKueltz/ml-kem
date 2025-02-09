@@ -1,11 +1,8 @@
 mlkem.math
 ==========
 
-mlkem.math.constants
---------------------
-
-.. automodule:: mlkem.math.constants
-    :members:
+This module is only relevant to the pure python implementation and does not apply
+to the default (C extension) implementation of this package.
 
 mlkem.math.matrix
 -----------------
@@ -29,4 +26,4 @@ mlkem.math.polynomial_ring
 .. automodule:: mlkem.math.polynomial_ring
     :members:
     :special-members:
-    :exclude-members: __hash__, __repr__, __weakref__
+    :exclude-members: __format__, __hash__, __new__, __repr__, __str__, __weakref__

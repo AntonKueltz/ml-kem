@@ -5,7 +5,7 @@ from mlkem.parameter_set import ML_KEM_512, ML_KEM_768, ML_KEM_1024, ParameterSe
 
 
 def f(params: ParameterSet, fast: bool) -> None:
-    ml_kem = ML_KEM(params, fast)
+    ml_kem = ML_KEM(params, fast=fast)
     ek, dk = ml_kem.key_gen()
     k, c = ml_kem.encaps(ek)
     k_ = ml_kem.decaps(dk, c)
