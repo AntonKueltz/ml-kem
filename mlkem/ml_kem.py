@@ -1,4 +1,4 @@
-from os import urandom
+from secrets import token_bytes
 from typing import Callable
 
 from mlkem.auxiliary.crypto import g, h, j
@@ -20,7 +20,7 @@ class ML_KEM:
     def __init__(
         self,
         parameters: ParameterSet = ML_KEM_768,
-        randomness: Callable[[int], bytes] = urandom,
+        randomness: Callable[[int], bytes] = token_bytes,
         fast: bool = True,
     ):
         self.parameters = parameters
