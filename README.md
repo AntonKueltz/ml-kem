@@ -142,6 +142,22 @@ Doing ML-KEM-1024 encaps ops for 1s: 36791 ML-KEM-1024 KEM encaps ops in 1.00s
 Doing ML-KEM-1024 decaps ops for 1s: 24031 ML-KEM-1024 KEM decaps ops in 1.00s
 ```
 
+## Rust
+
+You can also benchmark the rust code directly.
+
+```bash
+cargo bench
+```
+
+Flamegraphs are also available, provided your system has the `perf` (Linux) or `dtrace` (MacOS)
+binary available. Note that this may write several hundred MB of data to your hard drive. See
+below for an example.
+
+```bash
+RUSTFLAGS="-C force-frame-pointers=yes" cargo flamegraph --bench kem -- --bench --profile-time 5 "keygen/768"
+```
+
 # References
 
 * [FIPS-203: Module-Lattice-Based Key-Encapsulation Mechanism Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf)
