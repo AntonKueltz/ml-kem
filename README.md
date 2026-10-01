@@ -4,21 +4,21 @@
 # Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM)
 An implementation of the module-lattice-based key encapsulation mechanism (ML-KEM)
 as described in [FIPS-203](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf).
-At this time the package is in alpha and _SHOULD NOT_ be considered for real-world
+At this time the package is in beta and _SHOULD NOT_ be considered for real-world
 cryptographic applications.
 
 # Usage
 
 The interface follows the one defined in section 7 of the standard for the functions KeyGen,
-Encaps and Decaps.
+Encaps and Decaps. All functions operate on, and return, `bytes`.
 
 ```python
-from mlkem.ml_kem import ML_KEM
+from mlkem import ML_KEM
 
-ml_kem = ML_KEM()
-ek, dk = ml_kem.key_gen()  # encapsulation and decapsulation key
-k, c = ml_kem.encaps(ek)  # shared secret key and ciphertext
-k_ = ml_kem.decaps(dk, c)  # shared secret key
+kem = ML_KEM()
+ek, dk = kem.key_gen()  # encapsulation and decapsulation key
+k, c = kem.encaps(ek)  # shared secret key and ciphertext
+k_ = kem.decaps(dk, c)  # shared secret key
 ```
 
 In a less contrived scenario, Alice might run KeyGen and send the encapsulation key
@@ -28,108 +28,123 @@ ciphertext. Alice and Bob can then use the shared secret key to generate additio
 secret material by passing it to a KDF, use the shared secret to directly key a symmetric
 cipher like AES, etc.
 
-### Implementations
+## Parameter Sets
 
-The package includes includes a pure python implementation of the K-PKE function
-(`mlkem.k_pke.K_PKE`) and an implementation that leverages C extensions
-(`mlkem.fast_k_pke.Fast_K_PKE`). The implementations have interchangeable interfaces
-and can be selected in their wrapper class `mlkem.ml_kem.ML_KEM` by setting the
-`fast` param to `True` for C extensions and `False` for pure python. The default
-implementation is the one using C extensions and is recommended for all production
-scenarios (note that at this time _neither_ should be considered for real-world
-cryptographic applications as the security of the implementations has not been
-thoroughly assessed).
+NIST recommends the `ML_KEM_768` parameter set, which offers 192 bit security. `ML_KEM_512`
+and `ML_KEM_1024` are also available, which provide 128 and 256 bit security respectively.
+`ML_KEM_768` is used by default in this package. Below is an example of using the params
+for `ML_KEM_1024`.
 
 ```python
-from mlkem.ml_kem import ML_KEM
-from mlkem.parameter_set import ML_KEM_768
+from mlkem import ML_KEM, ParameterSet
 
-ML_KEM(ML_KEM_768, fast=True)  # C extensions
-ML_KEM(ML_KEM_768, fast=False)  # Pure python
+kem = ML_KEM(ParameterSet.ML_KEM_1024)
+ek, dk = kem.key_gen()  # encapsulation and decapsulation key
+k, c = kem.encaps(ek)  # shared secret key and ciphertext
+k_ = kem.decaps(dk, c)  # shared secret key
 ```
 
-Both implementations are self contained and portable (assuming you have 8 bits per byte
-on your system) with no dependencies on third party libraries in either the C or python
-code.
+# Implementation
 
-### Randomness
+The implementation follows the spec and the reference implementation closely. Many of the
+optimizations from the reference implementation are included, including optimized integer
+representations (see below), specialized encoding/decoding and compressing/decompressing
+code, and also several precomputations for commonly used values. Hashing is handled by the
+[sha3](https://crates.io/crates/sha3) and [shake](https://crates.io/crates/shake) crates.
+
+## Integer Representations
+
+This implementation makes use of the `i16` type to represent integers mod Q = 3329. Since Q
+can be represented in 12 bits this allows addition and subtraction to be done without reductions
+(to save cycles) and only applies reductions when e.g. multiplication is done. There are several
+reduced forms that exist throughout the implementation.
+* *Canonical*: represented as a value in [0, Q).
+* *Montgomery reduced*: represented as a value _x*R mod Q_ where R = 2^16.
+* *Barrett reduced*: represented as a value centered at 0 i.e. in ~[-Q/2, Q/2].
+
+The core arithmetic is generally done in the NTT domain using a montgomery represenation. When
+data needs to be serialized back to bytes it is then usually canonicalized via the process of
+doing a Barrett reduction and then doing a constant time conditional addition of Q for Barrett
+reduced values that are less than zero.
+
+## Randomness
 
 NIST requires that an approved RBG (random bit generator) be used as the source of randomness
-for all operations requiring randomness. The `ML_KEM` class allows a function that takes an
-integer and returns bytes to be passed as the `randomness` parameter to its constructor. By
-default, the `secrets.token_bytes` function is used. This function is acceptable for
-cryptographic applications, however, the underlying implementation may not be NIST approved.
-A custom, NIST-approved function can be passed as well. All that is required is that it conform
-to the signature `f(int) -> bytes`.
-
-```python
-from mlkem.ml_kem import ML_KEM
-from nist_approved_rbgs import my_rbg  # has type Callable[[int], bytes]
-
-ML_KEM(randomness=my_rbg)
-```
-
-### Parameter Sets
-
-NIST recommends the ML-KEM-768 parameter set, which offers 192 bit security. ML-KEM-512
-and ML-KEM-1024 are also available, which provide 128 and 256 bit security respectively.
-ML-KEM-768 is used by default in this package. Thus, the two instantiations below are
-equivalent -
-
-```python
-from secrets import token_bytes
-from mlkem.ml_kem import ML_KEM
-from mlkem.parameter_set import ML_KEM_768
-
-ML_KEM()
-ML_KEM(parameters=ML_KEM_768, randomness=token_bytes, fast=True)
-```
+for all operations requiring randomness. The current implementation uses `rand::rngs::StdRng`.
+You can read more about the RNG [here](https://rust-random.github.io/book/guide-rngs.html). While
+it is a cryptographically secure pseudorandom number generator (CSPRNG), it is not one that is
+NIST approved, so this implementation is currently not entirely NIST / FIPS compliant.
 
 # Development
 
-As a prerequisite, `uv` is required for this project
+As a prerequisite, the [rust toolchain](https://rust-lang.org/tools/install/) and
+[`uv`](https://docs.astral.sh/uv/#installation) are required  for this project.
 
-    pip install uv
+Build the rust code and bindings.
 
-Build the C extensions
+```bash
+uv run maturin develop -r
+```
 
-    uv run python setup.py build_ext --inplace
+Run the test suite.
 
-Run the test suite
+```bash
+cargo test     # tests the rust code
+uv run pytest  # tests the python interface
+```
 
-    uv run pytest
+Build the docs.
 
-Build the docs
-
-    uv run make -C docs html
+```bash
+uv run make -C docs html
+```
 
 # Performance
 
-Below are some benchmarks for each parameter set, running on an 2021 M1 MacBook Pro and python3.13
+Below are some benchmarks for each parameter set, running on 64bit OS with a i9-9900k and
+python3.14.
+
 ```
-===== C Extensions =====
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_512 took 0.544 seconds
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_768 took 0.794 seconds
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_1024 took 1.095 seconds
-===== Pure Python =====
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_512 took 32.670 seconds
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_768 took 51.277 seconds
-1000 KeyGen, Encaps and Decaps operations with parameter set ML_KEM_1024 took 72.187 seconds
+ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
+
+op      param set      ops/sec (med)     µs/op           min           max       stdev
+--------------------------------------------------------------------------------------
+keygen  ML_KEM_512            39,319      25.4        39,188        39,549         150
+keygen  ML_KEM_768            24,260      41.2        24,106        24,504         170
+keygen  ML_KEM_1024           15,701      63.7        15,631        15,746          44
+encaps  ML_KEM_512            52,025      19.2        51,338        52,948         686
+encaps  ML_KEM_768            37,789      26.5        36,666        38,014         539
+encaps  ML_KEM_1024           27,732      36.1        27,067        27,811         302
+decaps  ML_KEM_512            42,433      23.6        42,362        42,987         260
+decaps  ML_KEM_768            30,796      32.5        30,664        31,060         146
+decaps  ML_KEM_1024           22,960      43.6        22,535        22,999         192
 ```
 
 You can also run the benchmark yourself as well
 
 ```bash
-uv run benchmark  # for local development
+uv run benchmark           # for local development
 python -m mlkem.benchmark  # for pip installed package
 ```
 
-The performance of the C extensions is _significantly_ faster (benchmark shows ~60-70x). The
-python implementation is primarily included for those  that wish to explore and interactively
-debug the algorithm using pure python tooling.
+Compared to openSSL below you can see that performance is a bit slower, but is on the same
+order of magnitude.
+
+```
+Doing ML-KEM-512 keygen ops for 1s: 43784 ML-KEM-512 KEM keygen ops in 1.00s
+Doing ML-KEM-512 encaps ops for 1s: 65276 ML-KEM-512 KEM encaps ops in 0.99s
+Doing ML-KEM-512 decaps ops for 1s: 42353 ML-KEM-512 KEM decaps ops in 1.00s
+Doing ML-KEM-768 keygen ops for 1s: 28874 ML-KEM-768 KEM keygen ops in 0.98s
+Doing ML-KEM-768 encaps ops for 1s: 49158 ML-KEM-768 KEM encaps ops in 1.00s
+Doing ML-KEM-768 decaps ops for 1s: 31662 ML-KEM-768 KEM decaps ops in 1.00s
+Doing ML-KEM-1024 keygen ops for 1s: 19272 ML-KEM-1024 KEM keygen ops in 1.00s
+Doing ML-KEM-1024 encaps ops for 1s: 36791 ML-KEM-1024 KEM encaps ops in 1.00s
+Doing ML-KEM-1024 decaps ops for 1s: 24031 ML-KEM-1024 KEM decaps ops in 1.00s
+```
 
 # References
 
 * [FIPS-203: Module-Lattice-Based Key-Encapsulation Mechanism Standard](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf)
+* [Kyber reference implementation](https://github.com/pq-crystals/kyber)
 * [CRYSTALS-Kyber: a CCA-secure module-lattice-based KEM](https://eprint.iacr.org/2017/634.pdf)
 * [Kyber terminates](https://cryptojedi.org/papers/terminate-20230516.pdf)

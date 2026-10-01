@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from pathlib import Path
 from sys import path
 
@@ -13,9 +13,9 @@ path.insert(0, str(Path("..").resolve()))
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
 project = "Module-Lattice-Based Key-Encapsulation Mechanism"
-copyright = str(datetime.now().year)
+copyright = str(datetime.now(UTC).year)
 author = "Anton Kueltz"
-release = "0.0.3"
+release = "0.1.0"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
