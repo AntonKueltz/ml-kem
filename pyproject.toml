@@ -23,6 +23,11 @@ classifiers = [
     "Operating System :: POSIX :: Linux"
 ]
 
+[project.urls]
+source = "https://pypi.org/project/mlkem/"
+documentation = "https://mlkem.readthedocs.io"
+pypi = "https://pypi.org/project/mlkem/"
+
 [project.scripts]
 benchmark = "mlkem.benchmark:main"
 
