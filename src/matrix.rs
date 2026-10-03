@@ -299,8 +299,8 @@ impl Mul for &Vector {
     }
 }
 
-impl From<(Vec<u8>, PolynomialRepresentation)> for Vector {
-    fn from((value, t): (Vec<u8>, PolynomialRepresentation)) -> Self {
+impl From<(&[u8], PolynomialRepresentation)> for Vector {
+    fn from((value, t): (&[u8], PolynomialRepresentation)) -> Self {
         let k = value.len() / 384;
         let mut r = Self::new(k);
         let mut byte_idx = 0;

@@ -33449,7 +33449,7 @@ fn test_decaps_512_01() {
         0xb8, 0x4c,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -33628,7 +33628,7 @@ fn test_decaps_512_02() {
         0x7d, 0x95,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -33807,7 +33807,7 @@ fn test_decaps_512_03() {
         0xee, 0x59,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -33986,7 +33986,7 @@ fn test_decaps_512_04() {
         0xd9, 0x80,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -34165,7 +34165,7 @@ fn test_decaps_512_05() {
         0x8d, 0x99,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -34344,7 +34344,7 @@ fn test_decaps_512_06() {
         0x91, 0x3f,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -34523,7 +34523,7 @@ fn test_decaps_512_07() {
         0xc1, 0x04,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -34702,7 +34702,7 @@ fn test_decaps_512_08() {
         0x29, 0x7d,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -34881,7 +34881,7 @@ fn test_decaps_512_09() {
         0x4f, 0xd6,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -35060,7 +35060,7 @@ fn test_decaps_512_10() {
         0x8a, 0x95,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -35239,7 +35239,7 @@ fn test_decaps_512_11() {
         0xef, 0x57,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -35418,7 +35418,7 @@ fn test_decaps_512_12() {
         0xa9, 0x96,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -35597,7 +35597,7 @@ fn test_decaps_512_13() {
         0x5a, 0xec,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -35776,7 +35776,7 @@ fn test_decaps_512_14() {
         0xfa, 0x8e,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -35955,7 +35955,7 @@ fn test_decaps_512_15() {
         0x2b, 0x42,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -36134,7 +36134,7 @@ fn test_decaps_512_16() {
         0x22, 0xdf,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -36313,7 +36313,7 @@ fn test_decaps_512_17() {
         0xa6, 0x97,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -36492,7 +36492,7 @@ fn test_decaps_512_18() {
         0x10, 0x30,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -36671,7 +36671,7 @@ fn test_decaps_512_19() {
         0x23, 0x93,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -36850,7 +36850,7 @@ fn test_decaps_512_20() {
         0x6a, 0xdd,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -37029,7 +37029,7 @@ fn test_decaps_512_21() {
         0x64, 0xbe,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -37208,7 +37208,7 @@ fn test_decaps_512_22() {
         0x35, 0xed,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -37387,7 +37387,7 @@ fn test_decaps_512_23() {
         0x46, 0x02,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -37566,7 +37566,7 @@ fn test_decaps_512_24() {
         0xbe, 0x5d,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -37745,7 +37745,7 @@ fn test_decaps_512_25() {
         0x28, 0x34,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -37996,7 +37996,7 @@ fn test_decaps_768_01() {
         0x7d, 0x3f,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -38247,7 +38247,7 @@ fn test_decaps_768_02() {
         0x0e, 0x5c,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -38498,7 +38498,7 @@ fn test_decaps_768_03() {
         0x88, 0x1c,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -38749,7 +38749,7 @@ fn test_decaps_768_04() {
         0x7e, 0x5a,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -39000,7 +39000,7 @@ fn test_decaps_768_05() {
         0x8c, 0x60,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -39251,7 +39251,7 @@ fn test_decaps_768_06() {
         0xa9, 0x45,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -39502,7 +39502,7 @@ fn test_decaps_768_07() {
         0x15, 0xd6,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -39753,7 +39753,7 @@ fn test_decaps_768_08() {
         0x7c, 0x2e,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -40004,7 +40004,7 @@ fn test_decaps_768_09() {
         0xf5, 0xe2,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -40255,7 +40255,7 @@ fn test_decaps_768_10() {
         0x47, 0x2c,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -40506,7 +40506,7 @@ fn test_decaps_768_11() {
         0xc9, 0x3d,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -40757,7 +40757,7 @@ fn test_decaps_768_12() {
         0x45, 0x7c,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -41008,7 +41008,7 @@ fn test_decaps_768_13() {
         0x63, 0x20,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -41259,7 +41259,7 @@ fn test_decaps_768_14() {
         0x8c, 0x05,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -41510,7 +41510,7 @@ fn test_decaps_768_15() {
         0x37, 0x10,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -41761,7 +41761,7 @@ fn test_decaps_768_16() {
         0xfd, 0xc6,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -42012,7 +42012,7 @@ fn test_decaps_768_17() {
         0xa6, 0x6b,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -42263,7 +42263,7 @@ fn test_decaps_768_18() {
         0x31, 0x68,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -42514,7 +42514,7 @@ fn test_decaps_768_19() {
         0x8f, 0x90,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -42765,7 +42765,7 @@ fn test_decaps_768_20() {
         0x25, 0xc2,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -43016,7 +43016,7 @@ fn test_decaps_768_21() {
         0x66, 0x71,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -43267,7 +43267,7 @@ fn test_decaps_768_22() {
         0x65, 0xb7,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -43518,7 +43518,7 @@ fn test_decaps_768_23() {
         0x0d, 0xaa,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -43769,7 +43769,7 @@ fn test_decaps_768_24() {
         0x82, 0xe5,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -44020,7 +44020,7 @@ fn test_decaps_768_25() {
         0xe9, 0xad,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -44355,7 +44355,7 @@ fn test_decaps_1024_01() {
         0xb2, 0xeb,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -44690,7 +44690,7 @@ fn test_decaps_1024_02() {
         0x40, 0x75,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -45025,7 +45025,7 @@ fn test_decaps_1024_03() {
         0x7c, 0x70,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -45360,7 +45360,7 @@ fn test_decaps_1024_04() {
         0x4f, 0xd0,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -45695,7 +45695,7 @@ fn test_decaps_1024_05() {
         0xfb, 0x79,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -46030,7 +46030,7 @@ fn test_decaps_1024_06() {
         0xeb, 0xf0,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -46365,7 +46365,7 @@ fn test_decaps_1024_07() {
         0x4c, 0x76,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -46700,7 +46700,7 @@ fn test_decaps_1024_08() {
         0x87, 0x0b,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -47035,7 +47035,7 @@ fn test_decaps_1024_09() {
         0x2d, 0x9c,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -47370,7 +47370,7 @@ fn test_decaps_1024_10() {
         0x85, 0xa8,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -47705,7 +47705,7 @@ fn test_decaps_1024_11() {
         0x0b, 0x90,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -48040,7 +48040,7 @@ fn test_decaps_1024_12() {
         0x57, 0xe3,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -48375,7 +48375,7 @@ fn test_decaps_1024_13() {
         0x87, 0xca,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -48710,7 +48710,7 @@ fn test_decaps_1024_14() {
         0x9b, 0x21,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -49045,7 +49045,7 @@ fn test_decaps_1024_15() {
         0x72, 0x90,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -49380,7 +49380,7 @@ fn test_decaps_1024_16() {
         0xca, 0x16,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -49715,7 +49715,7 @@ fn test_decaps_1024_17() {
         0xc4, 0x59,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -50050,7 +50050,7 @@ fn test_decaps_1024_18() {
         0x31, 0xdd,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -50385,7 +50385,7 @@ fn test_decaps_1024_19() {
         0x06, 0x0f,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -50720,7 +50720,7 @@ fn test_decaps_1024_20() {
         0x3e, 0x49,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -51055,7 +51055,7 @@ fn test_decaps_1024_21() {
         0x1a, 0xa2,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -51390,7 +51390,7 @@ fn test_decaps_1024_22() {
         0x46, 0xcd,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -51725,7 +51725,7 @@ fn test_decaps_1024_23() {
         0xab, 0x72,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -52060,7 +52060,7 @@ fn test_decaps_1024_24() {
         0xa3, 0x57,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -52395,7 +52395,7 @@ fn test_decaps_1024_25() {
         0xd4, 0x52,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -52574,7 +52574,7 @@ fn test_decaps_512_additional_01() {
         0x81, 0xe9,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -52753,7 +52753,7 @@ fn test_decaps_512_additional_02() {
         0x54, 0x93,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -52932,7 +52932,7 @@ fn test_decaps_512_additional_03() {
         0x85, 0x87,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -53111,7 +53111,7 @@ fn test_decaps_512_additional_04() {
         0x12, 0xb3,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -53290,7 +53290,7 @@ fn test_decaps_512_additional_05() {
         0x77, 0xcc,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -53469,7 +53469,7 @@ fn test_decaps_512_additional_06() {
         0x6a, 0xfb,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -53648,7 +53648,7 @@ fn test_decaps_512_additional_07() {
         0x6e, 0x5a,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -53827,7 +53827,7 @@ fn test_decaps_512_additional_08() {
         0xb1, 0x71,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -54006,7 +54006,7 @@ fn test_decaps_512_additional_09() {
         0x76, 0x2e,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -54185,7 +54185,7 @@ fn test_decaps_512_additional_10() {
         0xbb, 0x32,
     ];
 
-    let k = KEM::ml_kem_512().decaps(&dk, &c);
+    let k = KEM::ml_kem_512().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -54436,7 +54436,7 @@ fn test_decaps_768_additional_01() {
         0x51, 0xe4,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -54687,7 +54687,7 @@ fn test_decaps_768_additional_02() {
         0x9b, 0x0b,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -54938,7 +54938,7 @@ fn test_decaps_768_additional_03() {
         0x4c, 0x08,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -55189,7 +55189,7 @@ fn test_decaps_768_additional_04() {
         0x4f, 0xb0,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -55440,7 +55440,7 @@ fn test_decaps_768_additional_05() {
         0xe7, 0x5d,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -55691,7 +55691,7 @@ fn test_decaps_768_additional_06() {
         0x8f, 0x5a,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -55942,7 +55942,7 @@ fn test_decaps_768_additional_07() {
         0xd7, 0xf3,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -56193,7 +56193,7 @@ fn test_decaps_768_additional_08() {
         0xbe, 0x91,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -56444,7 +56444,7 @@ fn test_decaps_768_additional_09() {
         0x46, 0xdd,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -56695,7 +56695,7 @@ fn test_decaps_768_additional_10() {
         0x51, 0xe0,
     ];
 
-    let k = KEM::ml_kem_768().decaps(&dk, &c);
+    let k = KEM::ml_kem_768().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -57030,7 +57030,7 @@ fn test_decaps_1024_additional_01() {
         0x0a, 0xff,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -57365,7 +57365,7 @@ fn test_decaps_1024_additional_02() {
         0x54, 0x10,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -57700,7 +57700,7 @@ fn test_decaps_1024_additional_03() {
         0x59, 0x43,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -58035,7 +58035,7 @@ fn test_decaps_1024_additional_04() {
         0xc0, 0xe7,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -58370,7 +58370,7 @@ fn test_decaps_1024_additional_05() {
         0x04, 0xd0,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -58705,7 +58705,7 @@ fn test_decaps_1024_additional_06() {
         0x46, 0xf5,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -59040,7 +59040,7 @@ fn test_decaps_1024_additional_07() {
         0xb3, 0x1c,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -59375,7 +59375,7 @@ fn test_decaps_1024_additional_08() {
         0x69, 0x7b,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -59710,7 +59710,7 @@ fn test_decaps_1024_additional_09() {
         0xfe, 0x4c,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }
@@ -60045,7 +60045,7 @@ fn test_decaps_1024_additional_10() {
         0x2b, 0x27,
     ];
 
-    let k = KEM::ml_kem_1024().decaps(&dk, &c);
+    let k = KEM::ml_kem_1024().decaps(&dk, &c).unwrap();
 
     assert_eq!(k, expected_k);
 }

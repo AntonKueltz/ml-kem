@@ -67,8 +67,38 @@ impl KEM {
         self.encaps_internal(ek, m)
     }
 
-    pub fn decaps(&self, dk: &[u8], c: &[u8]) -> Vec<u8> {
-        self.decaps_internal(dk, c)
+    pub fn decaps(&self, dk: &[u8], c: &[u8]) -> Result<Vec<u8>, &str> {
+        match self.decaps_ciphertext_check(c) {
+            true => Ok(self.decaps_internal(dk, c)),
+            false => Err("Invalid ciphertext passed to decaps."),
+        }
+    }
+
+    pub fn encaps_key_check(&self, ek_bytes: &Vec<u8>) -> bool {
+        let ek_len = 384 * self.k;
+        if ek_bytes.len() != ek_len + 32 {
+            return false;
+        }
+
+        let ek = &ek_bytes[..ek_len];
+        let p = Vector::from((ek, PolynomialRepresentation::NTT));
+        let test: Vec<u8> = p.into();
+
+        ek == test
+    }
+
+    fn decaps_ciphertext_check(&self, c_bytes: &[u8]) -> bool {
+        c_bytes.len() == (self.du * self.k + self.dv) << 5
+    }
+
+    pub fn decaps_key_check(&self, dk_bytes: &Vec<u8>) -> bool {
+        let i = 768 * self.k + 32;
+        if dk_bytes.len() != (i + 64) {
+            return false;
+        }
+        let test = h(&dk_bytes[384 * self.k..i]);
+
+        ct_cmp(&test, &dk_bytes[i..i + 32].to_vec())
     }
 
     fn key_gen_internal(&mut self, d: [u8; 32], z: [u8; 32]) -> (Vec<u8>, Vec<u8>) {
@@ -151,7 +181,7 @@ impl KEM {
 
         let mut n: u8 = 0;
         let (tbytes, rho) = ek_pke.split_at(384 * self.k);
-        let t = Vector::from((tbytes.to_vec(), PolynomialRepresentation::NTT));
+        let t = Vector::from((tbytes, PolynomialRepresentation::NTT));
 
         let at = match &self.at {
             None => &self.sample_a(&rho.to_vec(), true),
@@ -188,7 +218,7 @@ impl KEM {
 
         let u = Vector::decode_decompress(c1, self.k, self.du);
         let v = Polynomial::decode_decompress(c2, self.dv);
-        let s = Vector::from((dk_pke.to_vec(), PolynomialRepresentation::NTT));
+        let s = Vector::from((dk_pke, PolynomialRepresentation::NTT));
 
         let w = v - (&s * &u.ntt()).inv_ntt();
         w.to_msg()

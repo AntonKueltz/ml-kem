@@ -1,4 +1,4 @@
-use pyo3::prelude::*;
+use pyo3::{exceptions::PyValueError, prelude::*};
 
 use crate::kem::KEM;
 
@@ -46,12 +46,27 @@ impl MlKem {
         self.kem.key_gen()
     }
 
-    fn encaps(&self, ek: Vec<u8>) -> (Vec<u8>, Vec<u8>) {
-        self.kem.encaps(&ek)
+    #[pyo3(signature = (ek, check_key = true))]
+    fn encaps(&self, ek: Vec<u8>, check_key: bool) -> PyResult<(Vec<u8>, Vec<u8>)> {
+        if check_key && !self.kem.encaps_key_check(&ek) {
+            return Err(PyValueError::new_err("Invalid key passed to encaps."));
+        }
+
+        Ok(self.kem.encaps(&ek))
     }
 
-    fn decaps(&self, dk: Vec<u8>, c: Vec<u8>) -> Vec<u8> {
-        self.kem.decaps(&dk, &c)
+    #[pyo3(signature = (dk, c, check_key = true))]
+    fn decaps(&self, dk: Vec<u8>, c: Vec<u8>, check_key: bool) -> PyResult<Vec<u8>> {
+        if check_key && !self.kem.decaps_key_check(&dk) {
+            return Err(PyValueError::new_err("Invalid key passed to decaps."));
+        }
+
+        match self.kem.decaps(&dk, &c) {
+            Ok(bytes) => Ok(bytes),
+            Err(_) => Err(PyValueError::new_err(
+                "Invalid ciphertext passed to decaps.",
+            )),
+        }
     }
 }
 
