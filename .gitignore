@@ -72,3 +72,6 @@ docs/_build/
 
 # Pyenv
 .python-version
+
+# helper utils e.g. testcase generation
+gen.py
