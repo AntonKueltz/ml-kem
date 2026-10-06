@@ -1,7 +1,6 @@
 use sha3::{Digest, Sha3_256};
 
 use crate::matrix::Matrix;
-use crate::polynomial::{N, Q};
 use crate::vector::Vector;
 
 #[derive(Clone)]
@@ -39,20 +38,5 @@ impl<const K: usize> EncapsKey<K> {
 
         let hashed = hasher.finalize();
         hashed.try_into().unwrap()
-    }
-
-    pub fn check(&self) -> Result<(), String> {
-        for i in 0..K {
-            for j in 0..N {
-                let x = self.t[i][j];
-                if x < 0 || x >= Q {
-                    return Err(String::from(
-                        "Integers encoded in the encaps key must be in the range [0, q-1].",
-                    ));
-                }
-            }
-        }
-
-        Ok(())
     }
 }

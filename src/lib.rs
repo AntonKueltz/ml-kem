@@ -8,7 +8,6 @@ pub mod encaps_key;
 pub mod integer_field;
 pub mod kem;
 pub mod matrix;
-pub mod param_set;
 pub mod polynomial;
 pub mod vector;
 

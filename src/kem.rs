@@ -1,7 +1,7 @@
 use rand::{RngExt, make_rng, rngs::StdRng};
 use sha3::{Digest, Sha3_512};
 
-use crate::crypto_primitives::prf;
+use crate::crypto_primitives::{ct_cmp, j, prf};
 use crate::decaps_key::DecapsKey;
 use crate::encaps_key::EncapsKey;
 use crate::matrix::Matrix;
@@ -22,7 +22,6 @@ pub trait Kem: sealed::Sealed {
     const ETA2: usize;
     const DU: usize;
     const DV: usize;
-    const DU_LEN: usize;
 
     type EncapsKey;
     type EncapsKeyBytes: AsRef<[u8]> + AsMut<[u8]>;
@@ -33,11 +32,13 @@ pub trait Kem: sealed::Sealed {
     type Ctxt: AsRef<[u8]> + AsMut<[u8]>;
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey);
-    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String>;
-    // fn decaps(dk: Self::DecapsKey, c: Self::Ctxt) -> [u8; 32];
+    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt);
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String>;
+
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes;
     fn serialize_dk(dk: &Self::DecapsKey) -> Self::DecapsKeyBytes;
     fn deserialize_ek(bytes: &[u8]) -> Result<Self::EncapsKey, String>;
+    fn deserialize_dk(bytes: &[u8]) -> Result<Self::DecapsKey, String>;
 }
 
 impl sealed::Sealed for MlKem512 {}
@@ -48,7 +49,6 @@ impl Kem for MlKem512 {
     const ETA2: usize = 2;
     const DU: usize = 10;
     const DV: usize = 4;
-    const DU_LEN: usize = 640;
 
     type EncapsKey = EncapsKey<{ Self::K }>;
     type EncapsKeyBytes = [u8; 800];
@@ -69,18 +69,20 @@ impl Kem for MlKem512 {
         key_gen_internal::<Self, { Self::K }>(&d, &z)
     }
 
-    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String> {
-        match ek.check() {
-            Err(msg) => Err(msg),
-            Ok(()) => {
-                let mut rng: StdRng = make_rng();
-                let mut m = [0u8; 32];
-                rng.fill(&mut m);
+    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt) {
+        let mut rng: StdRng = make_rng();
+        let mut m = [0u8; 32];
+        rng.fill(&mut m);
 
-                let mut c = [0u8; 768];
-                let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
-                Ok((k, c))
-            }
+        let mut c = [0u8; 768];
+        let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+        (k, c)
+    }
+
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String> {
+        match dk.check() {
+            Err(msg) => Err(msg),
+            Ok(()) => Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut [0u8; 768])),
         }
     }
 
@@ -123,11 +125,38 @@ impl Kem for MlKem512 {
         }
 
         let (t_bytes, rho_bytes) = bytes.split_at(768);
-        let t = Vector::<{ Self::K }>::from((t_bytes, PolynomialRepresentation::NTT));
+        let t = match Vector::<{ Self::K }>::try_from((t_bytes, PolynomialRepresentation::NTT)) {
+            Ok(val) => val,
+            Err(msg) => return Err(msg),
+        };
         let rho: [u8; 32] = rho_bytes.try_into().unwrap();
         let at = sample_a(&rho, true);
 
         Ok(EncapsKey::<{ Self::K }>::new(t, rho, at))
+    }
+
+    fn deserialize_dk(bytes: &[u8]) -> Result<Self::DecapsKey, String> {
+        if bytes.len() != 1632 {
+            return Err(String::from("Invalid length for serialized decaps key."));
+        }
+
+        let s_bytes = &bytes[..768];
+        let ek_bytes = &bytes[768..1568];
+        let ek_hash_bytes = &bytes[1568..1600];
+        let z_bytes = &bytes[1600..];
+
+        let s = match Vector::<{ Self::K }>::try_from((s_bytes, PolynomialRepresentation::NTT)) {
+            Ok(val) => val,
+            Err(msg) => return Err(msg),
+        };
+        let ek = match Self::deserialize_ek(ek_bytes) {
+            Err(msg) => return Err(msg),
+            Ok(k) => k,
+        };
+        let ek_hash: [u8; 32] = ek_hash_bytes.try_into().unwrap();
+        let z: [u8; 32] = z_bytes.try_into().unwrap();
+
+        Ok(DecapsKey::<{ Self::K }>::new(s, ek, ek_hash, z))
     }
 }
 
@@ -139,7 +168,6 @@ impl Kem for MlKem768 {
     const ETA2: usize = 2;
     const DU: usize = 10;
     const DV: usize = 4;
-    const DU_LEN: usize = 960;
 
     type EncapsKey = EncapsKey<{ Self::K }>;
     type EncapsKeyBytes = [u8; 1184];
@@ -160,18 +188,24 @@ impl Kem for MlKem768 {
         key_gen_internal::<Self, { Self::K }>(&d, &z)
     }
 
-    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String> {
-        match ek.check() {
-            Err(msg) => Err(msg),
-            Ok(()) => {
-                let mut rng: StdRng = make_rng();
-                let mut m = [0u8; 32];
-                rng.fill(&mut m);
+    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt) {
+        let mut rng: StdRng = make_rng();
+        let mut m = [0u8; 32];
+        rng.fill(&mut m);
 
-                let mut c = [0u8; 1088];
-                let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
-                Ok((k, c))
-            }
+        let mut c = [0u8; 1088];
+        let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+        (k, c)
+    }
+
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String> {
+        match dk.check() {
+            Err(msg) => Err(msg),
+            Ok(()) => Ok(decaps_internal::<Self, { Self::K }>(
+                dk,
+                c,
+                &mut [0u8; 1088],
+            )),
         }
     }
 
@@ -218,11 +252,38 @@ impl Kem for MlKem768 {
         }
 
         let (t_bytes, rho_bytes) = bytes.split_at(1152);
-        let t = Vector::<{ Self::K }>::from((t_bytes, PolynomialRepresentation::NTT));
+        let t = match Vector::<{ Self::K }>::try_from((t_bytes, PolynomialRepresentation::NTT)) {
+            Ok(val) => val,
+            Err(msg) => return Err(msg),
+        };
         let rho: [u8; 32] = rho_bytes.try_into().unwrap();
         let at = sample_a(&rho, true);
 
         Ok(EncapsKey::<{ Self::K }>::new(t, rho, at))
+    }
+
+    fn deserialize_dk(bytes: &[u8]) -> Result<Self::DecapsKey, String> {
+        if bytes.len() != 2400 {
+            return Err(String::from("Invalid length for serialized decaps key."));
+        }
+
+        let s_bytes = &bytes[..1152];
+        let ek_bytes = &bytes[1152..2336];
+        let ek_hash_bytes = &bytes[2336..2368];
+        let z_bytes = &bytes[2368..];
+
+        let s = match Vector::<{ Self::K }>::try_from((s_bytes, PolynomialRepresentation::NTT)) {
+            Ok(val) => val,
+            Err(msg) => return Err(msg),
+        };
+        let ek = match Self::deserialize_ek(ek_bytes) {
+            Err(msg) => return Err(msg),
+            Ok(k) => k,
+        };
+        let ek_hash: [u8; 32] = ek_hash_bytes.try_into().unwrap();
+        let z: [u8; 32] = z_bytes.try_into().unwrap();
+
+        Ok(DecapsKey::<{ Self::K }>::new(s, ek, ek_hash, z))
     }
 }
 
@@ -234,7 +295,6 @@ impl Kem for MlKem1024 {
     const ETA2: usize = 2;
     const DU: usize = 11;
     const DV: usize = 5;
-    const DU_LEN: usize = 1408;
 
     type EncapsKey = EncapsKey<{ Self::K }>;
     type EncapsKeyBytes = [u8; 1568];
@@ -255,18 +315,24 @@ impl Kem for MlKem1024 {
         key_gen_internal::<Self, { Self::K }>(&d, &z)
     }
 
-    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String> {
-        match ek.check() {
-            Err(msg) => Err(msg),
-            Ok(()) => {
-                let mut rng: StdRng = make_rng();
-                let mut m = [0u8; 32];
-                rng.fill(&mut m);
+    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt) {
+        let mut rng: StdRng = make_rng();
+        let mut m = [0u8; 32];
+        rng.fill(&mut m);
 
-                let mut c = [0u8; 1568];
-                let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
-                Ok((k, c))
-            }
+        let mut c = [0u8; 1568];
+        let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+        (k, c)
+    }
+
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String> {
+        match dk.check() {
+            Err(msg) => Err(msg),
+            Ok(()) => Ok(decaps_internal::<Self, { Self::K }>(
+                dk,
+                c,
+                &mut [0u8; 1568],
+            )),
         }
     }
 
@@ -317,11 +383,38 @@ impl Kem for MlKem1024 {
         }
 
         let (t_bytes, rho_bytes) = bytes.split_at(1536);
-        let t = Vector::<{ Self::K }>::from((t_bytes, PolynomialRepresentation::NTT));
+        let t = match Vector::<{ Self::K }>::try_from((t_bytes, PolynomialRepresentation::NTT)) {
+            Ok(val) => val,
+            Err(msg) => return Err(msg),
+        };
         let rho: [u8; 32] = rho_bytes.try_into().unwrap();
         let at = sample_a(&rho, true);
 
         Ok(EncapsKey::<{ Self::K }>::new(t, rho, at))
+    }
+
+    fn deserialize_dk(bytes: &[u8]) -> Result<Self::DecapsKey, String> {
+        if bytes.len() != 3168 {
+            return Err(String::from("Invalid length for serialized decaps key."));
+        }
+
+        let s_bytes = &bytes[..1536];
+        let ek_bytes = &bytes[1536..3104];
+        let ek_hash_bytes = &bytes[3104..3136];
+        let z_bytes = &bytes[3136..];
+
+        let s = match Vector::<{ Self::K }>::try_from((s_bytes, PolynomialRepresentation::NTT)) {
+            Ok(val) => val,
+            Err(msg) => return Err(msg),
+        };
+        let ek = match Self::deserialize_ek(ek_bytes) {
+            Err(msg) => return Err(msg),
+            Ok(k) => k,
+        };
+        let ek_hash: [u8; 32] = ek_hash_bytes.try_into().unwrap();
+        let z: [u8; 32] = z_bytes.try_into().unwrap();
+
+        Ok(DecapsKey::<{ Self::K }>::new(s, ek, ek_hash, z))
     }
 }
 
@@ -347,8 +440,23 @@ fn encaps_internal<P: Kem, const K: usize>(
     let (x, y) = hashed.split_at(32);
     let (k, r): ([u8; 32], [u8; 32]) = (x.try_into().unwrap(), y.try_into().unwrap());
 
-    pke_encrypt::<P, K>(ek, &m, &r, c);
+    pke_encrypt::<P, K>(ek, m, &r, c);
     k
+}
+
+fn decaps_internal<P: Kem, const K: usize>(dk: &DecapsKey<K>, c: &[u8], c_: &mut [u8]) -> [u8; 32] {
+    let m = pke_decrypt::<P, K>(dk.s(), c);
+
+    let mut sha512 = Sha3_512::default();
+    sha512.update(&m);
+    sha512.update(dk.ek_hash());
+    let hashed = sha512.finalize();
+    let (x, y) = hashed.split_at(32);
+    let (k, r): ([u8; 32], [u8; 32]) = (x.try_into().unwrap(), y.try_into().unwrap());
+
+    let kbar = j(dk.z(), c);
+    pke_encrypt::<P, K>(dk.ek(), &m, &r, c_);
+    if !ct_cmp(c, c_) { kbar } else { k }
 }
 
 fn pke_key_gen<P: Kem, const K: usize>(d: &[u8; 32]) -> (EncapsKey<K>, Vector<K>) {
@@ -417,8 +525,20 @@ fn pke_encrypt<P: Kem, const K: usize>(
     let mu = Polynomial::from_msg(m);
     let v = (ek.t() * &y).inv_ntt() + e2 + mu;
 
-    u.reduce().compress_encode(P::DU, &mut c[..P::DU_LEN]);
-    v.reduce().compress_encode(P::DV, &mut c[P::DU_LEN..]);
+    let du_len = (P::DU * K) << 5;
+    u.reduce().compress_encode(P::DU, &mut c[..du_len]);
+    v.reduce().compress_encode(P::DV, &mut c[du_len..]);
+}
+
+fn pke_decrypt<P: Kem, const K: usize>(s: &Vector<K>, c: &[u8]) -> [u8; 32] {
+    let du_len = (P::DU * K) << 5;
+    let (c1, c2) = c.split_at(du_len);
+
+    let u = Vector::decode_decompress(P::DU, c1);
+    let v = Polynomial::decode_decompress(P::DV, c2);
+    let w = v - (s * &u.ntt()).inv_ntt();
+
+    w.to_msg()
 }
 
 fn sample_a<const K: usize>(rho: &[u8; 32], transposed: bool) -> Matrix<K> {
@@ -448,3 +568,7 @@ mod key_gen_test;
 #[cfg(test)]
 #[path = "unit_tests/encaps_test.rs"]
 mod encaps_test;
+
+#[cfg(test)]
+#[path = "unit_tests/decaps_test.rs"]
+mod decaps_test;

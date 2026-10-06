@@ -1,26 +1,47 @@
 use criterion::{Criterion, criterion_group, criterion_main};
 use std::hint::black_box;
 
-use mlkem::kem::KEM;
+use mlkem::kem::{Kem, MlKem512, MlKem768, MlKem1024};
 
 fn bench_kem(c: &mut Criterion) {
-    for (name, mut kem) in [
-        ("512", KEM::ml_kem_512()),
-        ("768", KEM::ml_kem_768()),
-        ("1024", KEM::ml_kem_1024()),
-    ] {
-        c.bench_function(&format!("keygen/{name}"), |b| b.iter(|| kem.key_gen()));
+    // 512
+    c.bench_function(&format!("keygen/512"), |b| b.iter(|| MlKem512::key_gen()));
 
-        let (ek, dk) = kem.key_gen();
-        c.bench_function(&format!("encaps/{name}"), |b| {
-            b.iter(|| kem.encaps(black_box(&ek)))
-        });
+    let (ek, dk) = MlKem512::key_gen();
+    c.bench_function(&format!("encaps/512"), |b| {
+        b.iter(|| MlKem512::encaps(black_box(&ek)))
+    });
 
-        let (_, ct) = kem.encaps(&ek);
-        c.bench_function(&format!("decaps/{name}"), |b| {
-            b.iter(|| kem.decaps(black_box(&dk), black_box(&ct)))
-        });
-    }
+    let (_, ct) = MlKem512::encaps(&ek);
+    c.bench_function(&format!("decaps/512"), |b| {
+        b.iter(|| MlKem512::decaps(black_box(&dk), black_box(&ct)))
+    });
+
+    // 768
+    c.bench_function(&format!("keygen/768"), |b| b.iter(|| MlKem768::key_gen()));
+
+    let (ek, dk) = MlKem768::key_gen();
+    c.bench_function(&format!("encaps/768"), |b| {
+        b.iter(|| MlKem768::encaps(black_box(&ek)))
+    });
+
+    let (_, ct) = MlKem768::encaps(&ek);
+    c.bench_function(&format!("decaps/768"), |b| {
+        b.iter(|| MlKem768::decaps(black_box(&dk), black_box(&ct)))
+    });
+
+    // 1024
+    c.bench_function(&format!("keygen/1024"), |b| b.iter(|| MlKem1024::key_gen()));
+
+    let (ek, dk) = MlKem1024::key_gen();
+    c.bench_function(&format!("encaps/1024"), |b| {
+        b.iter(|| MlKem1024::encaps(black_box(&ek)))
+    });
+
+    let (_, ct) = MlKem1024::encaps(&ek);
+    c.bench_function(&format!("decaps/1024"), |b| {
+        b.iter(|| MlKem1024::decaps(black_box(&dk), black_box(&ct)))
+    });
 }
 
 criterion_group!(benches, bench_kem);

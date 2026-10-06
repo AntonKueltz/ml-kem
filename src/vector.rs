@@ -111,7 +111,15 @@ impl<const K: usize> Vector<K> {
         }
     }
 
-    pub fn decode_decompress_11(c: &[u8]) -> Self {
+    pub fn decode_decompress(du: usize, c: &[u8]) -> Self {
+        match du {
+            11 => Self::decode_decompress_11(c),
+            10 => Self::decode_decompress_10(c),
+            _ => Self::new(PolynomialRepresentation::STANDARD),
+        }
+    }
+
+    fn decode_decompress_11(c: &[u8]) -> Self {
         assert_eq!(c.len(), 1408);
 
         let mut r = Self::new(PolynomialRepresentation::STANDARD);
@@ -150,7 +158,7 @@ impl<const K: usize> Vector<K> {
         r
     }
 
-    pub fn decode_decompress_10(c: &[u8]) -> Self {
+    fn decode_decompress_10(c: &[u8]) -> Self {
         assert_eq!(c.len(), K * 320);
 
         let mut r = Self::new(PolynomialRepresentation::STANDARD);
@@ -243,18 +251,22 @@ impl<const K: usize> Zeroize for Vector<K> {
     }
 }
 
-impl<const K: usize> From<(&[u8], PolynomialRepresentation)> for Vector<K> {
-    fn from((value, t): (&[u8], PolynomialRepresentation)) -> Self {
+impl<const K: usize> TryFrom<(&[u8], PolynomialRepresentation)> for Vector<K> {
+    type Error = String;
+
+    fn try_from((value, t): (&[u8], PolynomialRepresentation)) -> Result<Self, Self::Error> {
         assert_eq!(value.len(), 384 * K);
         let mut r = Self::new(t);
 
         for i in 0..K {
             let (start, end) = (i * 384, (i + 1) * 384);
-            let p = Polynomial::from((value[start..end].try_into().unwrap(), t));
-            r[i] = p;
+            match Polynomial::try_from((value[start..end].try_into().unwrap(), t)) {
+                Ok(p) => r[i] = p,
+                Err(msg) => return Err(msg),
+            }
         }
 
-        r
+        Ok(r)
     }
 }
 

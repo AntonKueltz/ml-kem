@@ -33,4 +33,11 @@ impl<const K: usize> DecapsKey<K> {
     pub fn z(&self) -> &[u8; 32] {
         &self.z
     }
+
+    pub fn check(&self) -> Result<(), String> {
+        match self.ek_hash == self.ek.h() {
+            true => Ok(()),
+            false => Err(String::from("Invalid encaps key hash.")),
+        }
+    }
 }

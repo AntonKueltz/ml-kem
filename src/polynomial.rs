@@ -266,7 +266,7 @@ impl Polynomial {
         }
     }
 
-    pub fn decode_decompress(c: &[u8], dv: usize) -> Self {
+    pub fn decode_decompress(dv: usize, c: &[u8]) -> Self {
         match dv {
             5 => Self::decode_decompress_5(c),
             4 => Self::decode_decompress_4(c),
@@ -275,8 +275,9 @@ impl Polynomial {
     }
 
     fn decode_decompress_5(c: &[u8]) -> Self {
-        let mut r = Self::new(PolynomialRepresentation::STANDARD);
+        assert_eq!(c.len(), 160);
 
+        let mut r = Self::new(PolynomialRepresentation::STANDARD);
         let mut t = [0u8; 8];
         let mut ci = 0;
 
@@ -301,6 +302,8 @@ impl Polynomial {
     }
 
     fn decode_decompress_4(c: &[u8]) -> Self {
+        assert_eq!(c.len(), 128);
+
         let mut r = Self::new(PolynomialRepresentation::STANDARD);
 
         for i in 0..128 {
@@ -387,8 +390,10 @@ impl Zeroize for Polynomial {
     }
 }
 
-impl From<([u8; 384], PolynomialRepresentation)> for Polynomial {
-    fn from((value, t): ([u8; 384], PolynomialRepresentation)) -> Self {
+impl TryFrom<([u8; 384], PolynomialRepresentation)> for Polynomial {
+    type Error = String;
+
+    fn try_from((value, t): ([u8; 384], PolynomialRepresentation)) -> Result<Self, Self::Error> {
         let mut p = Polynomial::new(t);
         let mut p_idx = 0;
         let mut byte_idx = 0;
@@ -399,13 +404,18 @@ impl From<([u8; 384], PolynomialRepresentation)> for Polynomial {
 
             let b0 = (a0 as i16) | (((a1 & 0xf) as i16) << 8);
             let b1 = ((a1 >> 4) as i16) | ((a2 as i16) << 4);
+            if b0 >= Q || b1 >= Q || b0 < 0 || b1 < 0 {
+                return Err(String::from(
+                    "Polynomial coefficients must be canonically encoded (in range [0, q-1]).",
+                ));
+            }
 
             p[p_idx] = b0;
             p[p_idx + 1] = b1;
             p_idx += 2;
         }
 
-        p
+        Ok(p)
     }
 }
 
