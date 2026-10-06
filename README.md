@@ -159,17 +159,17 @@ python3.14.
 ```
 ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
 
-op      param set      ops/sec (med)     µs/op           min           max       stdev
---------------------------------------------------------------------------------------
-keygen  ML_KEM_512            39,319      25.4        39,188        39,549         150
-keygen  ML_KEM_768            24,260      41.2        24,106        24,504         170
-keygen  ML_KEM_1024           15,701      63.7        15,631        15,746          44
-encaps  ML_KEM_512            52,025      19.2        51,338        52,948         686
-encaps  ML_KEM_768            37,789      26.5        36,666        38,014         539
-encaps  ML_KEM_1024           27,732      36.1        27,067        27,811         302
-decaps  ML_KEM_512            42,433      23.6        42,362        42,987         260
-decaps  ML_KEM_768            30,796      32.5        30,664        31,060         146
-decaps  ML_KEM_1024           22,960      43.6        22,535        22,999         192
+op             param set      ops/sec (med)     µs/op           min           max       stdev
+---------------------------------------------------------------------------------------------
+keygen         ML_KEM_512            40,869      24.5        40,194        41,058         394
+keygen         ML_KEM_768            23,880      41.9        23,429        23,976         217
+keygen         ML_KEM_1024           15,568      64.2        15,525        15,600          28
+encaps         ML_KEM_512            55,187      18.1        54,941        55,460         213
+encaps         ML_KEM_768            37,985      26.3        37,699        38,046         141
+encaps         ML_KEM_1024           27,606      36.2        27,336        27,797         198
+decaps         ML_KEM_512            41,995      23.8        41,163        42,162         429
+decaps         ML_KEM_768            29,103      34.4        28,676        29,113         202
+decaps         ML_KEM_1024           21,448      46.6        21,022        21,482         192
 ```
 
 You can also run the benchmark yourself as well
@@ -194,12 +194,36 @@ Doing ML-KEM-1024 encaps ops for 1s: 36791 ML-KEM-1024 KEM encaps ops in 1.00s
 Doing ML-KEM-1024 decaps ops for 1s: 24031 ML-KEM-1024 KEM decaps ops in 1.00s
 ```
 
+Depending on your specific CPU architecture, you may be able to see significant performance
+improvements compiling the rust source specifically for your instruction set. For example,
+compiling with `RUSTFLAGS='-C target-cpu=native'` yields the following performance gains
+on the same i9-9900k. With this change we see performance a bit faster than openSSL.
+
+```
+$ RUSTFLAGS='-C target-cpu=native' uv run maturin develop -r
+$ uv run benchmark --duration 1
+
+ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
+
+op             param set      ops/sec (med)     µs/op           min           max       stdev
+---------------------------------------------------------------------------------------------
+keygen         ML_KEM_512            50,375      19.9        49,953        50,494         216
+keygen         ML_KEM_768            30,963      32.3        30,804        31,090         111
+keygen         ML_KEM_1024           20,057      49.9        19,913        20,198         109
+encaps         ML_KEM_512            81,164      12.3        80,100        81,423         619
+encaps         ML_KEM_768            57,887      17.3        56,710        58,348         688
+encaps         ML_KEM_1024           42,111      23.7        40,901        42,176         537
+decaps         ML_KEM_512            61,733      16.2        61,535        62,081         202
+decaps         ML_KEM_768            44,770      22.3        44,527        44,817         117
+decaps         ML_KEM_1024           31,901      31.3        31,479        32,407         381
+```
+
 ## Rust
 
 You can also benchmark the rust code directly.
 
 ```bash
-cargo bench
+cargo bench --bench kem
 ```
 
 Flamegraphs are also available, provided your system has the `perf` (Linux) or `dtrace` (MacOS)
