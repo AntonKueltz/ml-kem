@@ -2,7 +2,7 @@ from unittest import TestCase
 
 from parameterized import parameterized
 
-from mlkem import ML_KEM, ParameterSet
+from mlkem import ML_KEM, DecapsKey, ParameterSet
 
 
 class TestML_KEM_512DecapsWycheproof(TestCase):
@@ -65,10 +65,11 @@ class TestML_KEM_512DecapsWycheproof(TestCase):
         ]
     )
     def test_mlkem_512_decaps_wycheproof(
-        self, dk: bytes, c: bytes, valid: bool, k: bytes | None
+        self, dk_bytes: bytes, c: bytes, valid: bool, k: bytes | None
     ):
         kem = ML_KEM(ParameterSet.ML_KEM_512)
         try:
+            dk = DecapsKey.from_bytes(dk_bytes)
             k_actual = kem.decaps(dk, c)
             self.assertEqual(k_actual == k, valid)
         except ValueError:

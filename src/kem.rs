@@ -29,7 +29,7 @@ pub trait Kem: sealed::Sealed {
     type DecapsKey;
     type DecapsKeyBytes: AsRef<[u8]> + AsMut<[u8]>;
 
-    type Ctxt: AsRef<[u8]> + AsMut<[u8]>;
+    type Ctxt: AsRef<[u8]> + AsMut<[u8]> + for<'a> TryFrom<&'a [u8]>;
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey);
     fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt);

@@ -5,11 +5,27 @@ class ParameterSet(Enum):
     ML_KEM_768 = 768
     ML_KEM_1024 = 1024
 
+class EncapsKey:
+    def __bytes__(self) -> bytes: ...
+    def to_bytes(self) -> bytes: ...
+    @property
+    def parameter_set(self) -> ParameterSet: ...
+    @staticmethod
+    def from_bytes(bytes) -> EncapsKey: ...
+
+class DecapsKey:
+    def __bytes__(self) -> bytes: ...
+    def to_bytes(self) -> bytes: ...
+    @property
+    def parameter_set(self) -> ParameterSet: ...
+    @staticmethod
+    def from_bytes(bytes) -> DecapsKey: ...
+
 class ML_KEM:
     """A CCA-secure module-lattice-based key encapsulation mechanism (KEM)."""
 
     def __init__(self, parameter_set: ParameterSet): ...
-    def key_gen(self) -> tuple[bytes, bytes]:
+    def key_gen(self) -> tuple[EncapsKey, DecapsKey]:
         r"""Generate a keypair (ek, dk) for use in the ML-KEM system.
 
         The key generation algorithm accepts no input, generates randomness internally, and produces an encapsulation
@@ -17,10 +33,10 @@ class ML_KEM:
         remain private.
 
         Returns:
-            :type:`tuple[bytes, bytes]`: The (encapsulation key, decapulation key) pair.
+            :type:`tuple[EncapsKey, DecapsKey]`: The (encapsulation key, decapulation key) pair.
         """
 
-    def encaps(self, ek: bytes, check_key: bool = True) -> tuple[bytes, bytes]:
+    def encaps(self, ek: EncapsKey, check_key: bool = True) -> tuple[bytes, bytes]:
         r"""Take an encapsulation key and produce a shared key and ciphertext.
 
         The shared key can be used as e.g. input to a KDF or as a key for a symmetric cipher between two parties.
@@ -33,14 +49,14 @@ class ML_KEM:
         `SP 800-227 [1] <https://nvlpubs.nist.gov/nistpubs/SpecialPublications/NIST.SP.800-227.pdf>`_)".
 
         Args:
-            | ek (:type:`bytes`): The encapsulation key.
+            | ek (:type:`EncapsKey`): The encapsulation key.
             | check_key: (:type:`bool`): Whether or not to check the encapsulation key.
 
         Returns:
             :type:`tuple[bytes, bytes]`: The (shared key, ciphertext) pair.
         """
 
-    def decaps(self, dk: bytes, c: bytes, check_key: bool = True) -> bytes:
+    def decaps(self, dk: DecapsKey, c: bytes, check_key: bool = True) -> bytes:
         r"""Takes a decapsulation key and ciphertext as input, does not use any randomness, and outputs a shared
         secret.
 
@@ -55,7 +71,7 @@ class ML_KEM:
         Ciphertext checks are always performed.
 
         Args:
-            | dk (:type:`bytes`): The decapsulation key.
+            | dk (:type:`DecapsKey`): The decapsulation key.
             | c (:type:`bytes`): The ciphertext.
             | check_key: (:type:`bool`): Whether or not to check the decapsulation key.
 

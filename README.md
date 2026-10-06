@@ -44,6 +44,47 @@ k, c = kem.encaps(ek)  # shared secret key and ciphertext
 k_ = kem.decaps(dk, c)  # shared secret key
 ```
 
+## Keys
+
+When `ML_KEM.key_gen` is run it returns two objects, `EncapsKey` and a `DecapsKey`. You can
+serialize these to `bytes` as follows.
+
+```python
+from mlkem import ML_KEM
+
+kem = ML_KEM()
+ek, dk = kem.key_gen()
+ek_bytes = bytes(ek)  # ek.to_bytes() is also valid
+dk_bytes = bytes(dk)  # dk.to_bytes() is also valid
+```
+
+You can also deserialize bytes into a key, provided that the byte encoding is canonical and
+compliant with FIPS-203.
+
+```python
+from mlkem import DecapsKey, EncapsKey
+
+ek_bytes = b"..."  # canonically encodeed encapsulation key
+ek = EncapsKey.from_bytes(ek_bytes)
+
+dk_bytes = b"..."  # canonically encodeed decapsulation key
+dk = DecapsKey.from_bytes(dk_bytes)
+```
+
+You can also check which parameter set a key was generated with. A mismatch between a key and
+the KEM parameter set will cause an error.
+
+```python
+from mlkem import ML_KEM, ParameterSet
+
+kem512 = ML_KEM(ParameterSet.ML_KEM_512)
+kem768 = ML_KEM(ParameterSet.ML_KEM_768)
+ek512, _ = kem512.key_gen()
+
+ek512.parameter_set  # => ParameterSet.ML_KEM_512
+kem768.encaps(ek512)  # => ValueError: Key does not match this ML_KEM parameter set
+```
+
 # Implementation
 
 The implementation follows the spec and the reference implementation closely. Many of the
@@ -66,6 +107,17 @@ The core arithmetic is generally done in the NTT domain using a montgomery repre
 data needs to be serialized back to bytes it is then usually canonicalized via the process of
 doing a Barrett reduction and then doing a constant time conditional addition of Q for Barrett
 reduced values that are less than zero.
+
+## Memory
+
+Memory inside the rust core logic is entirely stack allocated and does not use any dynamically
+allocated memory. Since the source of variance in memory sizes throughout MLKEM is the parameter
+set each parameter set is a specialized implementation of the `Kem` trait that allows that impl
+to use constants for its array sizes. `Vec<u8>` _is_ used in the pyo3 bindings to represent bytes
+at the border between python and rust code. I do not know of a way to avoid this and use a rust
+`u8` array reference or slice to represent python `bytes` in a way that plays nice with PyO3. The performance penalty is negligible, the main consideration is management of values that are
+considered secret if they are copied across the language boundary and if they are not promptly
+garbage collected and zeroizeed by python.
 
 ## Randomness
 

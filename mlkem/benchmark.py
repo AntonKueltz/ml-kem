@@ -1,12 +1,10 @@
 """Benchmark ML-KEM operations: ops/sec for each parameter set.
 
-Operations: keygen, encaps, decaps.
+Operations: keygen, encaps, decaps, plus key (de)serialization.
 
 Usage:
     python benchmark.py
-    python benchmark.py --ops encaps --duration 5 --repeats 7 --json results.json
-
-Replace the import below with wherever ML_KEM and ParameterSet live.
+    python benchmark.py --ops encaps decaps --duration 5 --repeats 7 --json results.json
 """
 
 from __future__ import annotations
@@ -20,7 +18,7 @@ import time
 from collections.abc import Callable
 from dataclasses import asdict, dataclass
 
-from mlkem import ML_KEM, ParameterSet
+from mlkem import ML_KEM, DecapsKey, EncapsKey, ParameterSet
 
 SHARED_SECRET_LEN = 32
 
@@ -29,9 +27,9 @@ SHARED_SECRET_LEN = 32
 class Case:
     """One parameter set to benchmark.
 
-    ParameterSet is a PyO3 enum: it can't be iterated, has no .name, and may not
-    be hashable, so the benchmark lists the sets explicitly and carries its own
-    labels. `sizes` are FIPS 203 sizes in bytes: (ek, dk, ciphertext).
+    ParameterSet is a PyO3 enum: it can't be iterated and has no .name, so the
+    benchmark lists the sets explicitly and carries its own labels. `sizes` are
+    FIPS 203 sizes in bytes: (ek, dk, ciphertext).
     """
 
     name: str
@@ -116,69 +114,109 @@ def bench(
     )
 
 
-def make_keygen(case: Case) -> Callable[[], object]:
+def _check(cond: bool, msg: str) -> None:
+    if not cond:
+        raise AssertionError(msg)
+
+
+def _keys(case: Case) -> tuple[ML_KEM, EncapsKey, DecapsKey]:
+    """Fresh keypair with size and parameter-set sanity checks."""
     ek_len, dk_len, _ = case.sizes
     kem = ML_KEM(case.ps)
-    a, b = kem.key_gen()
-    if sorted((len(a), len(b))) != sorted((ek_len, dk_len)):
-        raise AssertionError(
-            f"{case.name} keygen: sizes {(len(a), len(b))}, expected {(ek_len, dk_len)}"
-        )
+    ek, dk = kem.key_gen()
+    _check(
+        len(ek.to_bytes()) == ek_len,
+        f"{case.name}: ek is {len(ek.to_bytes())} bytes, expected {ek_len}",
+    )
+    _check(
+        len(dk.to_bytes()) == dk_len,
+        f"{case.name}: dk is {len(dk.to_bytes())} bytes, expected {dk_len}",
+    )
+    _check(ek.parameter_set == case.ps, f"{case.name}: ek parameter_set mismatch")
+    _check(dk.parameter_set == case.ps, f"{case.name}: dk parameter_set mismatch")
+    return kem, ek, dk
+
+
+def make_keygen(case: Case) -> Callable[[], object]:
+    kem, _, _ = _keys(case)  # sanity check only; timed region is key_gen itself
     return kem.key_gen
 
 
 def make_encaps(case: Case) -> Callable[[], object]:
-    ek_len, _, ct_len = case.sizes
-    kem = ML_KEM(case.ps)
-    keys = kem.key_gen()
-    # Don't assume return order: pick the key whose length matches ek.
-    ek = next((k for k in keys if len(k) == ek_len), None)
-    if ek is None:
-        raise AssertionError(f"{case.name}: no key of length {ek_len} in keygen output")
+    _, _, ct_len = case.sizes
+    kem, ek, _ = _keys(case)
 
-    out = kem.encaps(ek)
-    if sorted(len(x) for x in out) != sorted((ct_len, SHARED_SECRET_LEN)):
-        raise AssertionError(
-            f"{case.name} encaps: sizes {tuple(len(x) for x in out)}, "
-            f"expected ct={ct_len}, ss={SHARED_SECRET_LEN}"
-        )
-    # Fixed ek, keygen excluded from the timed region. Encaps is randomized,
-    # so each call still does fresh work.
+    ss, ct = kem.encaps(ek)
+    _check(
+        len(ss) == SHARED_SECRET_LEN, f"{case.name}: shared secret is {len(ss)} bytes"
+    )
+    _check(
+        len(ct) == ct_len,
+        f"{case.name}: ciphertext is {len(ct)} bytes, expected {ct_len}",
+    )
+    # Fixed ek, keygen excluded. Encaps is randomized, so each call does fresh work.
     return lambda: kem.encaps(ek)
 
 
 def make_decaps(case: Case) -> Callable[[], object]:
-    ek_len, dk_len, ct_len = case.sizes
-    kem = ML_KEM(case.ps)
-    keys = kem.key_gen()
-    ek = next((k for k in keys if len(k) == ek_len), None)
-    dk = next((k for k in keys if len(k) == dk_len), None)
-    if ek is None or dk is None:
-        raise AssertionError(
-            f"{case.name}: keygen output lacks ek ({ek_len}) or dk ({dk_len})"
-        )
-
-    parts = kem.encaps(ek)
-    ct = next((x for x in parts if len(x) == ct_len), None)
-    ss = next((x for x in parts if len(x) == SHARED_SECRET_LEN), None)
-    if ct is None or ss is None:
-        raise AssertionError(
-            f"{case.name} encaps: sizes {tuple(len(x) for x in parts)}, "
-            f"expected ct={ct_len}, ss={SHARED_SECRET_LEN}"
-        )
+    kem, ek, dk = _keys(case)
+    ss, ct = kem.encaps(ek)
 
     # Round-trip check: decaps must recover the encapsulated shared secret.
-    if kem.decaps(dk, ct) != ss:
-        raise AssertionError(f"{case.name}: decaps(dk, ct) != encaps shared secret")
+    _check(
+        kem.decaps(dk, ct) == ss, f"{case.name}: decaps(dk, ct) != encaps shared secret"
+    )
     # Fixed (dk, ct); keygen and encaps are outside the timed region.
     return lambda: kem.decaps(dk, ct)
+
+
+def make_ek_to_bytes(case: Case) -> Callable[[], object]:
+    _, ek, _ = _keys(case)
+    return ek.to_bytes
+
+
+def make_ek_from_bytes(case: Case) -> Callable[[], object]:
+    # Note: deserialization re-expands the matrix A from rho (K^2 sample_ntt
+    # calls), so this is expected to be much slower than to_bytes.
+    _, ek, _ = _keys(case)
+    data = ek.to_bytes()
+    _check(
+        EncapsKey.from_bytes(data).to_bytes() == data,
+        f"{case.name}: ek serialization round trip failed",
+    )
+    return lambda: EncapsKey.from_bytes(data)
+
+
+def make_dk_to_bytes(case: Case) -> Callable[[], object]:
+    _, _, dk = _keys(case)
+    return dk.to_bytes
+
+
+def make_dk_from_bytes(case: Case) -> Callable[[], object]:
+    # Includes the nested ek deserialization (and its matrix expansion).
+    kem, ek, dk = _keys(case)
+    data = dk.to_bytes()
+    dk2 = DecapsKey.from_bytes(data)
+    _check(dk2.to_bytes() == data, f"{case.name}: dk serialization round trip failed")
+    # A deserialized dk must still decapsulate correctly.
+    ss, ct = kem.encaps(ek)
+    _check(
+        kem.decaps(dk2, ct) == ss, f"{case.name}: decaps with deserialized dk failed"
+    )
+    return lambda: DecapsKey.from_bytes(data)
 
 
 OPS: dict[str, Callable[[Case], Callable[[], object]]] = {
     "keygen": make_keygen,
     "encaps": make_encaps,
     "decaps": make_decaps,
+    "ek_to_bytes": make_ek_to_bytes,
+    "ek_from_bytes": make_ek_from_bytes,
+    "dk_to_bytes": make_dk_to_bytes,
+    "dk_from_bytes": make_dk_from_bytes,
 }
+
+CORE_OPS = ["keygen", "encaps", "decaps"]
 
 
 def main() -> None:
@@ -186,9 +224,10 @@ def main() -> None:
     parser.add_argument(
         "--ops",
         nargs="+",
-        choices=[*OPS, "all"],
-        default=["all"],
-        help="operations to benchmark (default: all)",
+        choices=[*OPS, "core", "all"],
+        default=["core"],
+        help="operations to benchmark; 'core' = keygen/encaps/decaps, "
+        "'all' adds serialization (default: core)",
     )
     parser.add_argument(
         "--duration",
@@ -211,7 +250,12 @@ def main() -> None:
     parser.add_argument("--json", metavar="PATH", help="also write results as JSON")
     args = parser.parse_args()
 
-    selected = list(OPS) if "all" in args.ops else args.ops
+    if "all" in args.ops:
+        selected = list(OPS)
+    elif "core" in args.ops:
+        selected = CORE_OPS + [o for o in args.ops if o not in ("core", *CORE_OPS)]
+    else:
+        selected = args.ops
 
     print(
         f"Python {platform.python_version()} on {platform.platform()} ({platform.machine()})"
@@ -230,14 +274,14 @@ def main() -> None:
             )
 
     header = (
-        f"{'op':<8}{'param set':<12}{'ops/sec (med)':>16}{'µs/op':>10}"
+        f"{'op':<15}{'param set':<12}{'ops/sec (med)':>16}{'µs/op':>10}"
         f"{'min':>14}{'max':>14}{'stdev':>12}"
     )
     print(header)
     print("-" * len(header))
     for r in results:
         print(
-            f"{r.operation:<8}{r.parameter_set:<12}{r.ops_per_sec_median:>16,.0f}"
+            f"{r.operation:<15}{r.parameter_set:<12}{r.ops_per_sec_median:>16,.0f}"
             f"{r.us_per_op_median:>10.1f}{r.ops_per_sec_min:>14,.0f}"
             f"{r.ops_per_sec_max:>14,.0f}{r.ops_per_sec_stdev:>12,.0f}"
         )
