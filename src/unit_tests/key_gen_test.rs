@@ -181,7 +181,7 @@ fn test_key_gen_internal_512_01() {
         0xaf, 0xa2, 0x2b, 0x5f, 0xc5, 0x57, 0x43, 0x05, 0x60, 0xcc, 0xd6, 0x93,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -370,7 +370,7 @@ fn test_key_gen_internal_512_02() {
         0x84, 0xb8, 0xd8, 0xaa, 0xcf, 0x77, 0x6e, 0xf9, 0xcf, 0x76, 0x6c, 0xf8,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -559,7 +559,7 @@ fn test_key_gen_internal_512_03() {
         0xd5, 0x0e, 0xa8, 0xd6, 0x46, 0xa0, 0x23, 0x1f, 0x11, 0xd8, 0x99, 0x81,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -748,7 +748,7 @@ fn test_key_gen_internal_512_04() {
         0x78, 0x56, 0xa5, 0xc9, 0x99, 0x00, 0x90, 0x8c, 0xf4, 0x8f, 0xff, 0x8f,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -937,7 +937,7 @@ fn test_key_gen_internal_512_05() {
         0x28, 0x4b, 0x33, 0x81, 0x17, 0x93, 0x78, 0x9a, 0x0e, 0x7a, 0xfe, 0x72,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -1126,7 +1126,7 @@ fn test_key_gen_internal_512_06() {
         0x3b, 0xde, 0x5d, 0xba, 0xc0, 0xfb, 0x09, 0xdd, 0x57, 0x7b, 0x71, 0x28,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -1315,7 +1315,7 @@ fn test_key_gen_internal_512_07() {
         0xda, 0x1a, 0xe4, 0xa5, 0x03, 0x4d, 0x8c, 0x1d, 0x8c, 0xf9, 0xc1, 0x8d,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -1504,7 +1504,7 @@ fn test_key_gen_internal_512_08() {
         0x23, 0x79, 0x74, 0x05, 0x12, 0xdf, 0xd3, 0x59, 0x94, 0x13, 0xb1, 0x4e,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -1693,7 +1693,7 @@ fn test_key_gen_internal_512_09() {
         0xfa, 0x4e, 0x69, 0xfd, 0x6b, 0xbb, 0x01, 0x82, 0xd4, 0xf9, 0xab, 0x26,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -1882,7 +1882,7 @@ fn test_key_gen_internal_512_10() {
         0x2f, 0x9f, 0xba, 0xd9, 0x42, 0xf5, 0x34, 0x1d, 0x6e, 0xe7, 0x92, 0xc9,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -2071,7 +2071,7 @@ fn test_key_gen_internal_512_11() {
         0xde, 0x2e, 0x3e, 0x23, 0x3a, 0xe6, 0x49, 0x42, 0xba, 0xd2, 0x5e, 0x8d,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -2260,7 +2260,7 @@ fn test_key_gen_internal_512_12() {
         0xcc, 0xdd, 0x20, 0xd2, 0x9e, 0x68, 0x24, 0x92, 0xe3, 0x9f, 0xac, 0x8a,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -2449,7 +2449,7 @@ fn test_key_gen_internal_512_13() {
         0x3e, 0x8e, 0x46, 0xf0, 0x5f, 0x47, 0x67, 0xf4, 0xab, 0x9e, 0xef, 0x39,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -2638,7 +2638,7 @@ fn test_key_gen_internal_512_14() {
         0xd8, 0x32, 0xa8, 0x6e, 0x47, 0x5f, 0x42, 0xf6, 0x7b, 0xc6, 0xff, 0x8a,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -2827,7 +2827,7 @@ fn test_key_gen_internal_512_15() {
         0xcd, 0x6b, 0xa2, 0x26, 0xea, 0x13, 0x4b, 0x43, 0x02, 0xe7, 0x1a, 0xf8,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -3016,7 +3016,7 @@ fn test_key_gen_internal_512_16() {
         0x83, 0x28, 0xd8, 0xb4, 0x72, 0x2e, 0x88, 0x55, 0xd3, 0xd6, 0xcd, 0xbc,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -3205,7 +3205,7 @@ fn test_key_gen_internal_512_17() {
         0xb5, 0x9a, 0x93, 0xd6, 0x1f, 0x9d, 0x25, 0x59, 0x9a, 0xfc, 0xb0, 0x59,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -3394,7 +3394,7 @@ fn test_key_gen_internal_512_18() {
         0xee, 0x15, 0x7c, 0x5d, 0xcf, 0x6b, 0xcb, 0x24, 0x6a, 0xc9, 0x9a, 0x6b,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -3583,7 +3583,7 @@ fn test_key_gen_internal_512_19() {
         0xe0, 0x33, 0x93, 0x7f, 0x0a, 0x3b, 0x04, 0x2d, 0xd9, 0x63, 0x7e, 0xbd,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -3772,7 +3772,7 @@ fn test_key_gen_internal_512_20() {
         0x8a, 0x4b, 0xf6, 0xf0, 0xba, 0xed, 0xb3, 0xdf, 0x8b, 0x1d, 0x9e, 0x41,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -3961,7 +3961,7 @@ fn test_key_gen_internal_512_21() {
         0xae, 0x0b, 0x37, 0x1e, 0xdc, 0xf1, 0x39, 0x2b, 0x48, 0xcf, 0xe7, 0xdd,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -4150,7 +4150,7 @@ fn test_key_gen_internal_512_22() {
         0xc4, 0xda, 0xba, 0x6f, 0x1d, 0xeb, 0x2a, 0x65, 0xe9, 0xc6, 0x08, 0x62,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -4339,7 +4339,7 @@ fn test_key_gen_internal_512_23() {
         0x1c, 0xbe, 0x56, 0x5c, 0x9b, 0x52, 0x73, 0xde, 0x8c, 0x3c, 0xec, 0x1a,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -4528,7 +4528,7 @@ fn test_key_gen_internal_512_24() {
         0x7f, 0xbc, 0xaf, 0x74, 0xb5, 0xef, 0xa8, 0x73, 0x10, 0xbe, 0x1a, 0x1e,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -4717,7 +4717,7 @@ fn test_key_gen_internal_512_25() {
         0xc4, 0x5e, 0x80, 0xbd, 0xab, 0xec, 0x92, 0x59, 0xfe, 0x88, 0xed, 0x51,
     ];
 
-    let (ek, dk) = key_gen_internal::<2>(&d, &z, 3);
+    let (ek, dk) = key_gen_internal::<MlKem512, 2>(&d, &z);
     let ek_bytes = MlKem512::serialize_ek(&ek);
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
@@ -4982,7 +4982,7 @@ fn test_key_gen_internal_768_01() {
         0x9d, 0x2d, 0x76, 0x14, 0x48, 0x20, 0x95, 0xef, 0x18, 0x17, 0xe1, 0xe9, 0xe4, 0xac, 0x88,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -5247,7 +5247,7 @@ fn test_key_gen_internal_768_02() {
         0x2e, 0x26, 0xfc, 0x01, 0xa7, 0x4b, 0x93, 0x63, 0x48, 0x5b, 0x34, 0xe5, 0x52, 0x91, 0x73,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -5512,7 +5512,7 @@ fn test_key_gen_internal_768_03() {
         0x44, 0x2f, 0x9e, 0xe1, 0x70, 0xe4, 0x43, 0xff, 0xf3, 0x03, 0x3f, 0x3a, 0xc5, 0x66, 0x55,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -5777,7 +5777,7 @@ fn test_key_gen_internal_768_04() {
         0x6b, 0xb4, 0x5f, 0x6a, 0xe7, 0x9e, 0x72, 0xf8, 0x66, 0xf9, 0x53, 0xa9, 0xc8, 0x27, 0x14,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -6042,7 +6042,7 @@ fn test_key_gen_internal_768_05() {
         0xfa, 0xba, 0x99, 0x41, 0xec, 0x79, 0xd2, 0x94, 0x4a, 0x49, 0x24, 0xd5, 0x40, 0x7f, 0xe5,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -6307,7 +6307,7 @@ fn test_key_gen_internal_768_06() {
         0xba, 0x3a, 0x35, 0xf6, 0x9b, 0x11, 0x1d, 0x7c, 0x2b, 0xbf, 0x80, 0x12, 0x4d, 0x17, 0x20,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -6572,7 +6572,7 @@ fn test_key_gen_internal_768_07() {
         0x0a, 0xfd, 0xae, 0xde, 0xa1, 0xbe, 0xcd, 0x54, 0x6e, 0xe7, 0x2b, 0xcf, 0xc8, 0x78, 0xa6,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -6837,7 +6837,7 @@ fn test_key_gen_internal_768_08() {
         0x6f, 0x38, 0x28, 0x9a, 0x1b, 0x26, 0x03, 0xc4, 0x8a, 0xfe, 0xcb, 0x6d, 0x2c, 0x12, 0xd1,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -7102,7 +7102,7 @@ fn test_key_gen_internal_768_09() {
         0xbb, 0x42, 0x7b, 0x46, 0x49, 0x6f, 0xe5, 0xb1, 0x7d, 0xa0, 0xc5, 0x2d, 0x44, 0xeb, 0x8c,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -7367,7 +7367,7 @@ fn test_key_gen_internal_768_10() {
         0x36, 0x28, 0x8f, 0x98, 0x9a, 0x41, 0xf3, 0xa6, 0x8f, 0x1d, 0xb0, 0x13, 0x15, 0xdf, 0x3d,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -7632,7 +7632,7 @@ fn test_key_gen_internal_768_11() {
         0x71, 0xd8, 0xe6, 0x95, 0xad, 0x72, 0x34, 0x82, 0xc9, 0x17, 0x06, 0xbf, 0xf3, 0x63, 0xce,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -7897,7 +7897,7 @@ fn test_key_gen_internal_768_12() {
         0x45, 0xec, 0xed, 0x04, 0x6f, 0x7f, 0xcb, 0xed, 0xc4, 0x39, 0x7c, 0x44, 0xab, 0xb0, 0xb4,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -8162,7 +8162,7 @@ fn test_key_gen_internal_768_13() {
         0x3a, 0x16, 0x24, 0xbf, 0x57, 0x6b, 0xda, 0xf6, 0x85, 0x03, 0x11, 0x2e, 0xd0, 0x31, 0xf4,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -8427,7 +8427,7 @@ fn test_key_gen_internal_768_14() {
         0x41, 0x13, 0xb1, 0x70, 0xb0, 0x4d, 0x49, 0xad, 0x66, 0x80, 0xf7, 0x88, 0xb1, 0xa2, 0x6f,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -8692,7 +8692,7 @@ fn test_key_gen_internal_768_15() {
         0xd4, 0x8d, 0xe6, 0x45, 0x40, 0x74, 0x17, 0xfd, 0x22, 0xe5, 0xf5, 0x3c, 0x9c, 0x29, 0x5d,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -8957,7 +8957,7 @@ fn test_key_gen_internal_768_16() {
         0x54, 0x20, 0x38, 0xc2, 0x6f, 0x36, 0xe3, 0x04, 0x1c, 0xb6, 0x14, 0xdd, 0x13, 0xee, 0xe0,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -9222,7 +9222,7 @@ fn test_key_gen_internal_768_17() {
         0x76, 0x0a, 0xa1, 0x4a, 0xa2, 0xc8, 0x17, 0x30, 0x17, 0xa3, 0x0d, 0x6a, 0x87, 0x1b, 0x45,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -9487,7 +9487,7 @@ fn test_key_gen_internal_768_18() {
         0x24, 0x22, 0xbc, 0x35, 0x64, 0x9d, 0x1c, 0xa3, 0x30, 0x17, 0xb3, 0xdd, 0x34, 0x4d, 0x71,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -9752,7 +9752,7 @@ fn test_key_gen_internal_768_19() {
         0x20, 0xf1, 0x7d, 0xb6, 0xf5, 0xd4, 0x36, 0xca, 0xb7, 0x6a, 0x4e, 0xb5, 0x11, 0x16, 0x20,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -10017,7 +10017,7 @@ fn test_key_gen_internal_768_20() {
         0x06, 0x82, 0x3d, 0x2d, 0x1b, 0x83, 0x83, 0x04, 0x11, 0x78, 0xa5, 0x68, 0xa3, 0xf8, 0xd0,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -10282,7 +10282,7 @@ fn test_key_gen_internal_768_21() {
         0x83, 0xb8, 0x52, 0xa8, 0x3b, 0xf5, 0x90, 0xa8, 0x74, 0x01, 0x46, 0x28, 0xcd, 0x48, 0x32,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -10547,7 +10547,7 @@ fn test_key_gen_internal_768_22() {
         0xa8, 0x33, 0xc5, 0xfd, 0x66, 0x45, 0x1f, 0xfd, 0x6e, 0xe2, 0x6d, 0xf4, 0x0e, 0x83, 0xba,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -10812,7 +10812,7 @@ fn test_key_gen_internal_768_23() {
         0x52, 0x45, 0x2d, 0xef, 0x34, 0x18, 0xa8, 0xb0, 0x13, 0x8d, 0x47, 0xc4, 0x29, 0xb7, 0x1e,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -11077,7 +11077,7 @@ fn test_key_gen_internal_768_24() {
         0x66, 0x04, 0x70, 0x4a, 0xbd, 0x49, 0x67, 0x12, 0xbd, 0x99, 0x54, 0x4d, 0x0a, 0xd0, 0x7d,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -11342,7 +11342,7 @@ fn test_key_gen_internal_768_25() {
         0x10, 0x61, 0x02, 0xd3, 0x74, 0x31, 0x72, 0x20, 0x43, 0xc8, 0xa3, 0x2f, 0x56, 0x9b, 0x68,
     ];
 
-    let (ek, dk) = key_gen_internal::<3>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem768, 3>(&d, &z);
     let ek_bytes = MlKem768::serialize_ek(&ek);
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
@@ -11685,7 +11685,7 @@ fn test_key_gen_internal_1024_01() {
         0x99, 0xe9, 0x12,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -12028,7 +12028,7 @@ fn test_key_gen_internal_1024_02() {
         0x9f, 0xfa, 0x17,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -12371,7 +12371,7 @@ fn test_key_gen_internal_1024_03() {
         0xa2, 0xc0, 0x47,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -12714,7 +12714,7 @@ fn test_key_gen_internal_1024_04() {
         0x0b, 0x3a, 0xe6,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -13057,7 +13057,7 @@ fn test_key_gen_internal_1024_05() {
         0x60, 0x0a, 0x8a,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -13400,7 +13400,7 @@ fn test_key_gen_internal_1024_06() {
         0xf3, 0x57, 0x68,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -13743,7 +13743,7 @@ fn test_key_gen_internal_1024_07() {
         0xd7, 0x6f, 0x72,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -14086,7 +14086,7 @@ fn test_key_gen_internal_1024_08() {
         0x79, 0x4c, 0x02,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -14429,7 +14429,7 @@ fn test_key_gen_internal_1024_09() {
         0x1b, 0x1b, 0xcc,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -14772,7 +14772,7 @@ fn test_key_gen_internal_1024_10() {
         0xb8, 0xf7, 0x9a,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -15115,7 +15115,7 @@ fn test_key_gen_internal_1024_11() {
         0xe0, 0x56, 0x54,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -15458,7 +15458,7 @@ fn test_key_gen_internal_1024_12() {
         0xb5, 0x33, 0xfb,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -15801,7 +15801,7 @@ fn test_key_gen_internal_1024_13() {
         0x5d, 0x86, 0x69,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -16144,7 +16144,7 @@ fn test_key_gen_internal_1024_14() {
         0xcb, 0xb5, 0x4a,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -16487,7 +16487,7 @@ fn test_key_gen_internal_1024_15() {
         0xa8, 0x69, 0x46,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -16830,7 +16830,7 @@ fn test_key_gen_internal_1024_16() {
         0xe4, 0x87, 0xf1,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -17173,7 +17173,7 @@ fn test_key_gen_internal_1024_17() {
         0xf4, 0xba, 0x24,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -17516,7 +17516,7 @@ fn test_key_gen_internal_1024_18() {
         0xde, 0x2f, 0x3a,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -17859,7 +17859,7 @@ fn test_key_gen_internal_1024_19() {
         0x42, 0xff, 0x94,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -18202,7 +18202,7 @@ fn test_key_gen_internal_1024_20() {
         0xf8, 0xcb, 0x86,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -18545,7 +18545,7 @@ fn test_key_gen_internal_1024_21() {
         0x2b, 0x9e, 0x21,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -18888,7 +18888,7 @@ fn test_key_gen_internal_1024_22() {
         0xfd, 0x69, 0x5c,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -19231,7 +19231,7 @@ fn test_key_gen_internal_1024_23() {
         0xc8, 0xa7, 0xb0,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -19574,7 +19574,7 @@ fn test_key_gen_internal_1024_24() {
         0x7d, 0x25, 0x85,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
@@ -19917,7 +19917,7 @@ fn test_key_gen_internal_1024_25() {
         0x01, 0xdf, 0x34,
     ];
 
-    let (ek, dk) = key_gen_internal::<4>(&d, &z, 2);
+    let (ek, dk) = key_gen_internal::<MlKem1024, 4>(&d, &z);
     let ek_bytes = MlKem1024::serialize_ek(&ek);
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 

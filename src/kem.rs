@@ -22,6 +22,7 @@ pub trait Kem: sealed::Sealed {
     const ETA2: usize;
     const DU: usize;
     const DV: usize;
+    const DU_LEN: usize;
 
     type EncapsKey;
     type EncapsKeyBytes: AsRef<[u8]> + AsMut<[u8]>;
@@ -30,14 +31,13 @@ pub trait Kem: sealed::Sealed {
     type DecapsKeyBytes: AsRef<[u8]> + AsMut<[u8]>;
 
     type Ctxt: AsRef<[u8]> + AsMut<[u8]>;
-    type DuEncoded: AsRef<[u8]> + AsMut<[u8]>;
-    type DvEncoded: AsRef<[u8]> + AsMut<[u8]>;
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey);
+    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String>;
+    // fn decaps(dk: Self::DecapsKey, c: Self::Ctxt) -> [u8; 32];
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes;
     fn serialize_dk(dk: &Self::DecapsKey) -> Self::DecapsKeyBytes;
-    // fn encaps(Self::EncapsKey) -> ([u8; 32], Self::Ctxt);
-    // fn decaps(Self::DecapsKey, Self::Ctxt) -> [u8; 32];
+    fn deserialize_ek(bytes: &[u8]) -> Result<Self::EncapsKey, String>;
 }
 
 impl sealed::Sealed for MlKem512 {}
@@ -48,6 +48,7 @@ impl Kem for MlKem512 {
     const ETA2: usize = 2;
     const DU: usize = 10;
     const DV: usize = 4;
+    const DU_LEN: usize = 640;
 
     type EncapsKey = EncapsKey<{ Self::K }>;
     type EncapsKeyBytes = [u8; 800];
@@ -56,8 +57,6 @@ impl Kem for MlKem512 {
     type DecapsKeyBytes = [u8; 1632];
 
     type Ctxt = [u8; 768];
-    type DuEncoded = [u8; 640];
-    type DvEncoded = [u8; 128];
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
         let mut rng: StdRng = make_rng();
@@ -67,7 +66,22 @@ impl Kem for MlKem512 {
         rng.fill(&mut d);
         rng.fill(&mut z);
 
-        key_gen_internal::<{ Self::K }>(&d, &z, Self::ETA1)
+        key_gen_internal::<Self, { Self::K }>(&d, &z)
+    }
+
+    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String> {
+        match ek.check() {
+            Err(msg) => Err(msg),
+            Ok(()) => {
+                let mut rng: StdRng = make_rng();
+                let mut m = [0u8; 32];
+                rng.fill(&mut m);
+
+                let mut c = [0u8; 768];
+                let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+                Ok((k, c))
+            }
+        }
     }
 
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
@@ -102,6 +116,19 @@ impl Kem for MlKem512 {
 
         serialized
     }
+
+    fn deserialize_ek(bytes: &[u8]) -> Result<Self::EncapsKey, String> {
+        if bytes.len() != 800 {
+            return Err(String::from("Invalid length for serialized encaps key."));
+        }
+
+        let (t_bytes, rho_bytes) = bytes.split_at(768);
+        let t = Vector::<{ Self::K }>::from((t_bytes, PolynomialRepresentation::NTT));
+        let rho: [u8; 32] = rho_bytes.try_into().unwrap();
+        let at = sample_a(&rho, true);
+
+        Ok(EncapsKey::<{ Self::K }>::new(t, rho, at))
+    }
 }
 
 impl sealed::Sealed for MlKem768 {}
@@ -112,6 +139,7 @@ impl Kem for MlKem768 {
     const ETA2: usize = 2;
     const DU: usize = 10;
     const DV: usize = 4;
+    const DU_LEN: usize = 960;
 
     type EncapsKey = EncapsKey<{ Self::K }>;
     type EncapsKeyBytes = [u8; 1184];
@@ -120,8 +148,6 @@ impl Kem for MlKem768 {
     type DecapsKeyBytes = [u8; 2400];
 
     type Ctxt = [u8; 1088];
-    type DuEncoded = [u8; 960];
-    type DvEncoded = [u8; 128];
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
         let mut rng: StdRng = make_rng();
@@ -131,8 +157,22 @@ impl Kem for MlKem768 {
         rng.fill(&mut d);
         rng.fill(&mut z);
 
-        let (ek, dk) = key_gen_internal::<{ Self::K }>(&d, &z, Self::ETA1);
-        (ek, dk)
+        key_gen_internal::<Self, { Self::K }>(&d, &z)
+    }
+
+    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String> {
+        match ek.check() {
+            Err(msg) => Err(msg),
+            Ok(()) => {
+                let mut rng: StdRng = make_rng();
+                let mut m = [0u8; 32];
+                rng.fill(&mut m);
+
+                let mut c = [0u8; 1088];
+                let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+                Ok((k, c))
+            }
+        }
     }
 
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
@@ -171,6 +211,19 @@ impl Kem for MlKem768 {
 
         serialized
     }
+
+    fn deserialize_ek(bytes: &[u8]) -> Result<Self::EncapsKey, String> {
+        if bytes.len() != 1184 {
+            return Err(String::from("Invalid length for serialized encaps key."));
+        }
+
+        let (t_bytes, rho_bytes) = bytes.split_at(1152);
+        let t = Vector::<{ Self::K }>::from((t_bytes, PolynomialRepresentation::NTT));
+        let rho: [u8; 32] = rho_bytes.try_into().unwrap();
+        let at = sample_a(&rho, true);
+
+        Ok(EncapsKey::<{ Self::K }>::new(t, rho, at))
+    }
 }
 
 impl sealed::Sealed for MlKem1024 {}
@@ -181,6 +234,7 @@ impl Kem for MlKem1024 {
     const ETA2: usize = 2;
     const DU: usize = 11;
     const DV: usize = 5;
+    const DU_LEN: usize = 1408;
 
     type EncapsKey = EncapsKey<{ Self::K }>;
     type EncapsKeyBytes = [u8; 1568];
@@ -189,8 +243,6 @@ impl Kem for MlKem1024 {
     type DecapsKeyBytes = [u8; 3168];
 
     type Ctxt = [u8; 1568];
-    type DuEncoded = [u8; 1408];
-    type DvEncoded = [u8; 160];
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
         let mut rng: StdRng = make_rng();
@@ -200,7 +252,22 @@ impl Kem for MlKem1024 {
         rng.fill(&mut d);
         rng.fill(&mut z);
 
-        key_gen_internal::<{ Self::K }>(&d, &z, Self::ETA1)
+        key_gen_internal::<Self, { Self::K }>(&d, &z)
+    }
+
+    fn encaps(ek: Self::EncapsKey) -> Result<([u8; 32], Self::Ctxt), String> {
+        match ek.check() {
+            Err(msg) => Err(msg),
+            Ok(()) => {
+                let mut rng: StdRng = make_rng();
+                let mut m = [0u8; 32];
+                rng.fill(&mut m);
+
+                let mut c = [0u8; 1568];
+                let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+                Ok((k, c))
+            }
+        }
     }
 
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
@@ -243,20 +310,48 @@ impl Kem for MlKem1024 {
 
         serialized
     }
+
+    fn deserialize_ek(bytes: &[u8]) -> Result<Self::EncapsKey, String> {
+        if bytes.len() != 1568 {
+            return Err(String::from("Invalid length for serialized encaps key."));
+        }
+
+        let (t_bytes, rho_bytes) = bytes.split_at(1536);
+        let t = Vector::<{ Self::K }>::from((t_bytes, PolynomialRepresentation::NTT));
+        let rho: [u8; 32] = rho_bytes.try_into().unwrap();
+        let at = sample_a(&rho, true);
+
+        Ok(EncapsKey::<{ Self::K }>::new(t, rho, at))
+    }
 }
 
-fn key_gen_internal<const K: usize>(
+fn key_gen_internal<P: Kem, const K: usize>(
     d: &[u8; 32],
     z: &[u8; 32],
-    eta: usize,
 ) -> (EncapsKey<K>, DecapsKey<K>) {
-    let (ek, s) = pke_key_gen::<K>(d, eta);
+    let (ek, s) = pke_key_gen::<P, K>(d);
     let ek_hash = ek.h();
     let dk = DecapsKey::<K>::new(s.reduce(), ek.clone(), ek_hash, *z);
     (ek, dk)
 }
 
-fn pke_key_gen<const K: usize>(d: &[u8; 32], eta: usize) -> (EncapsKey<K>, Vector<K>) {
+fn encaps_internal<P: Kem, const K: usize>(
+    ek: &EncapsKey<K>,
+    m: &[u8; 32],
+    c: &mut [u8],
+) -> [u8; 32] {
+    let mut hasher = Sha3_512::new();
+    hasher.update(m);
+    hasher.update(ek.h());
+    let hashed = hasher.finalize();
+    let (x, y) = hashed.split_at(32);
+    let (k, r): ([u8; 32], [u8; 32]) = (x.try_into().unwrap(), y.try_into().unwrap());
+
+    pke_encrypt::<P, K>(ek, &m, &r, c);
+    k
+}
+
+fn pke_key_gen<P: Kem, const K: usize>(d: &[u8; 32]) -> (EncapsKey<K>, Vector<K>) {
     let mut hasher = Sha3_512::new();
     hasher.update(d);
     hasher.update(&[K as u8]);
@@ -266,12 +361,12 @@ fn pke_key_gen<const K: usize>(d: &[u8; 32], eta: usize) -> (EncapsKey<K>, Vecto
 
     let a = sample_a(&rho, false);
     let mut n: u8 = 0;
-    let prf_len = eta << 6;
+    let prf_len = P::ETA1 << 6;
 
     let mut s = Vector::<K>::new(PolynomialRepresentation::NTT);
     for i in 0..K {
         let prf_bytes = &prf(&sigma, n)[..prf_len];
-        let p = Polynomial::sample_cbd(eta, prf_bytes);
+        let p = Polynomial::sample_cbd(P::ETA1, prf_bytes);
         s[i] = p.ntt();
         n += 1;
     }
@@ -279,7 +374,7 @@ fn pke_key_gen<const K: usize>(d: &[u8; 32], eta: usize) -> (EncapsKey<K>, Vecto
     let mut e = Vector::<K>::new(PolynomialRepresentation::NTT);
     for i in 0..K {
         let prf_bytes = &prf(&sigma, n)[..prf_len];
-        let p = Polynomial::sample_cbd(eta, prf_bytes);
+        let p = Polynomial::sample_cbd(P::ETA1, prf_bytes);
         e[i] = p.ntt();
         n += 1;
     }
@@ -287,6 +382,43 @@ fn pke_key_gen<const K: usize>(d: &[u8; 32], eta: usize) -> (EncapsKey<K>, Vecto
     let t = &(&a * &s).to_mont() + &e;
     let ek_pke = EncapsKey::<K>::new(t.reduce(), rho, a.transpose());
     (ek_pke, s)
+}
+
+fn pke_encrypt<P: Kem, const K: usize>(
+    ek: &EncapsKey<K>,
+    m: &[u8; 32],
+    r: &[u8; 32],
+    c: &mut [u8],
+) {
+    let mut n: u8 = 0;
+    let prf_len1 = P::ETA1 << 6;
+
+    let mut y = Vector::<K>::new(PolynomialRepresentation::NTT);
+    for i in 0..K {
+        let prf_bytes = &prf(r, n)[..prf_len1];
+        let p = Polynomial::sample_cbd(P::ETA1, prf_bytes);
+        y[i] = p.ntt();
+        n += 1;
+    }
+
+    let prf_len2 = P::ETA2 << 6;
+
+    let mut e1 = Vector::<K>::new(PolynomialRepresentation::STANDARD);
+    for i in 0..K {
+        let prf_bytes = &prf(r, n)[..prf_len2];
+        let p = Polynomial::sample_cbd(P::ETA2, prf_bytes);
+        e1[i] = p;
+        n += 1;
+    }
+
+    let prf_bytes = &prf(r, n)[..prf_len2];
+    let e2 = Polynomial::sample_cbd(P::ETA2, prf_bytes);
+    let u = &(ek.at() * &y).inv_ntt() + &e1;
+    let mu = Polynomial::from_msg(m);
+    let v = (ek.t() * &y).inv_ntt() + e2 + mu;
+
+    u.reduce().compress_encode(P::DU, &mut c[..P::DU_LEN]);
+    v.reduce().compress_encode(P::DV, &mut c[P::DU_LEN..]);
 }
 
 fn sample_a<const K: usize>(rho: &[u8; 32], transposed: bool) -> Matrix<K> {
@@ -312,3 +444,7 @@ fn sample_a<const K: usize>(rho: &[u8; 32], transposed: bool) -> Matrix<K> {
 #[cfg(test)]
 #[path = "unit_tests/key_gen_test.rs"]
 mod key_gen_test;
+
+#[cfg(test)]
+#[path = "unit_tests/encaps_test.rs"]
+mod encaps_test;

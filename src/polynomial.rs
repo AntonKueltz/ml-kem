@@ -209,8 +209,15 @@ impl Polynomial {
         r
     }
 
-    pub fn compress_encode_5(&self) -> [u8; 160] {
-        let mut r = [0; 160];
+    pub fn compress_encode(&self, dv: usize, r: &mut [u8]) {
+        match dv {
+            5 => self.compress_encode_5(r),
+            4 => self.compress_encode_4(r),
+            _ => (),
+        }
+    }
+
+    fn compress_encode_5(&self, r: &mut [u8]) {
         let mut ri = 0;
         let mut t = [0u8; 8];
 
@@ -233,12 +240,9 @@ impl Polynomial {
             r[ri + 4] = (t[6] >> 2) | (t[7] << 3);
             ri += 5;
         }
-
-        r
     }
 
-    pub fn compress_encode_4(&self) -> [u8; 128] {
-        let mut r = [0; 128];
+    fn compress_encode_4(&self, r: &mut [u8]) {
         let mut ri = 0;
         let mut t = [0u8; 8];
 
@@ -260,8 +264,6 @@ impl Polynomial {
             r[ri + 3] = t[6] | (t[7] << 4);
             ri += 4;
         }
-
-        r
     }
 
     pub fn decode_decompress(c: &[u8], dv: usize) -> Self {

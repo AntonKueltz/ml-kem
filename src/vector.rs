@@ -33,7 +33,15 @@ impl<const K: usize> Vector<K> {
         self.map(Polynomial::inv_ntt)
     }
 
-    pub fn compress_encode_11(&self, r: &mut [u8]) {
+    pub fn compress_encode(&self, du: usize, r: &mut [u8]) {
+        match du {
+            11 => self.compress_encode_11(r),
+            10 => self.compress_encode_10(r),
+            _ => (),
+        }
+    }
+
+    fn compress_encode_11(&self, r: &mut [u8]) {
         assert_eq!(r.len(), 1408);
 
         let mut t = [0u16; 8];
@@ -71,7 +79,7 @@ impl<const K: usize> Vector<K> {
         }
     }
 
-    pub fn compress_encode_10(&self, r: &mut [u8]) {
+    fn compress_encode_10(&self, r: &mut [u8]) {
         assert_eq!(r.len(), K * 320);
 
         let mut t = [0u16; 8];
@@ -249,28 +257,6 @@ impl<const K: usize> From<(&[u8], PolynomialRepresentation)> for Vector<K> {
         r
     }
 }
-
-// impl<const K: usize> From<Vector<K>> for &[u8] {
-//     fn from(value: Vector) -> Self {
-//         let k = value.coords.len();
-//         let mut r = Vec::<u8>::with_capacity(384 * k);
-
-//         for i in 0..k {
-//             let p = value.coords[i];
-
-//             for j in (0..N).step_by(2) {
-//                 let a0 = norm_q(p.f[j]) as u16;
-//                 let a1 = norm_q(p.f[j + 1]) as u16;
-
-//                 r.push(a0 as u8);
-//                 r.push(((a0 >> 8) as u8) | (((a1 & 0xf) << 4) as u8));
-//                 r.push((a1 >> 4) as u8);
-//             }
-//         }
-
-//         r
-//     }
-// }
 
 #[cfg(test)]
 #[path = "unit_tests/vector_test.rs"]
