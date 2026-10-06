@@ -8,7 +8,7 @@ fn test_encode_decode_dv5() {
             p.f[i] = ((start + i) % Q as usize) as i16;
         }
 
-        let c = p.compress_encode(5);
+        let c = p.compress_encode_5();
         let q = Polynomial::decode_decompress(&c, 5);
 
         for i in 0..N {
@@ -17,7 +17,7 @@ fn test_encode_decode_dv5() {
             assert!(e.min(Q - e) <= 52, "i={i} x={x} y={y}");
         }
 
-        let c_ = q.compress_encode(5);
+        let c_ = q.compress_encode_5();
         assert_eq!(c_, c);
     }
 }
@@ -30,7 +30,7 @@ fn test_encode_decode_dv4() {
             p.f[i] = ((start + i) % Q as usize) as i16;
         }
 
-        let c = p.compress_encode(4);
+        let c = p.compress_encode_4();
         let q = Polynomial::decode_decompress(&c, 4);
 
         for i in 0..N {
@@ -39,7 +39,7 @@ fn test_encode_decode_dv4() {
             assert!(e.min(Q - e) <= 104, "i={i} x={x} y={y}");
         }
 
-        let c_ = q.compress_encode(4);
+        let c_ = q.compress_encode_4();
         assert_eq!(c_, c);
     }
 }

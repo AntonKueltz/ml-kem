@@ -1,54 +1,65 @@
-use rand::RngExt;
-use rand::{make_rng, rngs::StdRng};
+use rand::{RngExt, make_rng, rngs::StdRng};
+use sha3::{Digest, Sha3_512};
 
-use crate::crypto_primitives::{ct_cmp, g, h, j, prf};
-use crate::matrix::{Matrix, Vector};
+use crate::crypto_primitives::prf;
+use crate::decaps_key::DecapsKey;
+use crate::encaps_key::EncapsKey;
+use crate::matrix::Matrix;
 use crate::polynomial::{Polynomial, PolynomialRepresentation};
+use crate::vector::Vector;
 
-pub struct KEM {
-    k: usize,
-    eta1: usize,
-    eta2: usize,
-    du: usize,
-    dv: usize,
-    at: Option<Matrix>,
+mod sealed {
+    pub trait Sealed {}
 }
 
-impl KEM {
-    pub fn ml_kem_512() -> Self {
-        Self {
-            k: 2,
-            eta1: 3,
-            eta2: 2,
-            du: 10,
-            dv: 4,
-            at: None,
-        }
-    }
+pub struct MlKem512 {}
+pub struct MlKem768 {}
+pub struct MlKem1024 {}
 
-    pub fn ml_kem_768() -> Self {
-        Self {
-            k: 3,
-            eta1: 2,
-            eta2: 2,
-            du: 10,
-            dv: 4,
-            at: None,
-        }
-    }
+pub trait Kem: sealed::Sealed {
+    const K: usize;
+    const ETA1: usize;
+    const ETA2: usize;
+    const DU: usize;
+    const DV: usize;
 
-    pub fn ml_kem_1024() -> Self {
-        Self {
-            k: 4,
-            eta1: 2,
-            eta2: 2,
-            du: 11,
-            dv: 5,
-            at: None,
-        }
-    }
+    type EncapsKey;
+    type EncapsKeyBytes: AsRef<[u8]> + AsMut<[u8]>;
 
-    pub fn key_gen(&mut self) -> (Vec<u8>, Vec<u8>) {
+    type DecapsKey;
+    type DecapsKeyBytes: AsRef<[u8]> + AsMut<[u8]>;
+
+    type Ctxt: AsRef<[u8]> + AsMut<[u8]>;
+    type DuEncoded: AsRef<[u8]> + AsMut<[u8]>;
+    type DvEncoded: AsRef<[u8]> + AsMut<[u8]>;
+
+    fn key_gen() -> (Self::EncapsKey, Self::DecapsKey);
+    fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes;
+    fn serialize_dk(dk: &Self::DecapsKey) -> Self::DecapsKeyBytes;
+    // fn encaps(Self::EncapsKey) -> ([u8; 32], Self::Ctxt);
+    // fn decaps(Self::DecapsKey, Self::Ctxt) -> [u8; 32];
+}
+
+impl sealed::Sealed for MlKem512 {}
+
+impl Kem for MlKem512 {
+    const K: usize = 2;
+    const ETA1: usize = 3;
+    const ETA2: usize = 2;
+    const DU: usize = 10;
+    const DV: usize = 4;
+
+    type EncapsKey = EncapsKey<{ Self::K }>;
+    type EncapsKeyBytes = [u8; 800];
+
+    type DecapsKey = DecapsKey<{ Self::K }>;
+    type DecapsKeyBytes = [u8; 1632];
+
+    type Ctxt = [u8; 768];
+    type DuEncoded = [u8; 640];
+    type DvEncoded = [u8; 128];
+
+    fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
         let mut rng: StdRng = make_rng();
         let mut d = [0u8; 32];
         let mut z = [0u8; 32];
@@ -56,201 +67,248 @@ impl KEM {
         rng.fill(&mut d);
         rng.fill(&mut z);
 
-        self.key_gen_internal(d, z)
+        key_gen_internal::<{ Self::K }>(&d, &z, Self::ETA1)
     }
 
-    pub fn encaps(&self, ek: &[u8]) -> (Vec<u8>, Vec<u8>) {
-        let mut rng: StdRng = make_rng();
-        let mut m = [0u8; 32];
+    fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
+        let mut serialized = [0u8; 800];
+        let t = ek.t();
+        let rho = ek.rho();
 
-        rng.fill(&mut m);
-        self.encaps_internal(ek, m)
+        let bytes: [u8; 384] = t[0].into();
+        serialized[..384].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = t[1].into();
+        serialized[384..768].copy_from_slice(&bytes);
+
+        serialized[768..].copy_from_slice(rho);
+        serialized
     }
 
-    pub fn decaps(&self, dk: &[u8], c: &[u8]) -> Result<Vec<u8>, &str> {
-        match self.decaps_ciphertext_check(c) {
-            true => Ok(self.decaps_internal(dk, c)),
-            false => Err("Invalid ciphertext passed to decaps."),
-        }
-    }
+    fn serialize_dk(dk: &Self::DecapsKey) -> Self::DecapsKeyBytes {
+        let mut serialized = [0u8; 1632];
+        let s = dk.s();
+        let ek_bytes = Self::serialize_ek(dk.ek());
+        let ek_hash = dk.ek_hash();
+        let z = dk.z();
 
-    pub fn encaps_key_check(&self, ek_bytes: &Vec<u8>) -> bool {
-        let ek_len = 384 * self.k;
-        if ek_bytes.len() != ek_len + 32 {
-            return false;
-        }
+        let bytes: [u8; 384] = s[0].into();
+        serialized[..384].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = s[1].into();
+        serialized[384..768].copy_from_slice(&bytes);
 
-        let ek = &ek_bytes[..ek_len];
-        let p = Vector::from((ek, PolynomialRepresentation::NTT));
-        let test: Vec<u8> = p.into();
+        serialized[768..1568].copy_from_slice(&ek_bytes);
+        serialized[1568..1600].copy_from_slice(ek_hash);
+        serialized[1600..].copy_from_slice(z);
 
-        ek == test
-    }
-
-    fn decaps_ciphertext_check(&self, c_bytes: &[u8]) -> bool {
-        c_bytes.len() == (self.du * self.k + self.dv) << 5
-    }
-
-    pub fn decaps_key_check(&self, dk_bytes: &Vec<u8>) -> bool {
-        let i = 768 * self.k + 32;
-        if dk_bytes.len() != (i + 64) {
-            return false;
-        }
-        let test = h(&dk_bytes[384 * self.k..i]);
-
-        ct_cmp(&test, &dk_bytes[i..i + 32].to_vec())
-    }
-
-    fn key_gen_internal(&mut self, d: [u8; 32], z: [u8; 32]) -> (Vec<u8>, Vec<u8>) {
-        let (ek, mut dk) = self.pke_key_gen(d);
-        dk.append(&mut ek.clone());
-        dk.append(&mut h(&ek.clone()));
-        dk.append(&mut z.to_vec());
-        (ek, dk)
-    }
-
-    fn encaps_internal(&self, ek: &[u8], m: [u8; 32]) -> (Vec<u8>, Vec<u8>) {
-        let mut g_in = m.to_vec();
-        g_in.append(&mut h(ek));
-
-        let (k, r) = g(&g_in);
-        let c = self.pke_encrypt(ek, &m, r);
-
-        (k, c)
-    }
-
-    fn decaps_internal(&self, dk: &[u8], c: &[u8]) -> Vec<u8> {
-        let i1 = 384 * self.k;
-        let i2 = 768 * self.k + 32;
-        let i3 = i2 + 32;
-        let i4 = i3 + 32;
-
-        let dk_pke = &dk[0..i1];
-        let ek_pke = &dk[i1..i2];
-        let h = &dk[i2..i3];
-        let z = &dk[i3..i4];
-
-        let m = self.pke_decrypt(dk_pke, c);
-
-        let mut g_in = m.clone();
-        g_in.append(&mut h.to_vec());
-        let (k, r) = g(&g_in);
-
-        let mut j_in = z.to_vec();
-        j_in.append(&mut c.to_vec());
-        let kbar = j(&j_in);
-
-        let c_ = self.pke_encrypt(ek_pke, &m, r);
-        if !ct_cmp(&c.to_vec(), &c_) { kbar } else { k }
-    }
-
-    fn pke_key_gen(&mut self, d: [u8; 32]) -> (Vec<u8>, Vec<u8>) {
-        let mut n: u8 = 0;
-        let mut data = d.to_vec();
-        data.push(self.k as u8);
-        let (mut rho, sigma) = g(&data);
-
-        let a = self.sample_a(&rho, false);
-        self.at = Some(a.transpose());
-
-        let mut s = Vector::new(self.k);
-        for _ in 0..self.k {
-            let p = Polynomial::sample_cbd(self.eta1, &prf(self.eta1, &sigma, n));
-            s.push(p.ntt());
-            n += 1;
-        }
-
-        let mut e = Vector::new(self.k);
-        for _ in 0..self.k {
-            let p = Polynomial::sample_cbd(self.eta1, &prf(self.eta1, &sigma, n));
-            e.push(p.ntt());
-            n += 1;
-        }
-
-        let t = &(&a * &s).to_mont() + &e;
-        let mut ek_pke: Vec<u8> = t.reduce().into();
-        ek_pke.append(&mut rho);
-        let dk_pke: Vec<u8> = s.reduce().into();
-
-        (ek_pke, dk_pke)
-    }
-
-    fn pke_encrypt(&self, ek_pke: &[u8], m: &[u8], r: Vec<u8>) -> Vec<u8> {
-        debug_assert_eq!(m.len(), 32);
-        debug_assert_eq!(r.len(), 32);
-
-        let mut n: u8 = 0;
-        let (tbytes, rho) = ek_pke.split_at(384 * self.k);
-        let t = Vector::from((tbytes, PolynomialRepresentation::NTT));
-
-        let at = match &self.at {
-            None => &self.sample_a(&rho.to_vec(), true),
-            Some(m) => m,
-        };
-
-        let mut y = Vector::new(self.k);
-        for _ in 0..self.k {
-            let p = Polynomial::sample_cbd(self.eta1, &prf(self.eta1, &r, n));
-            y.push(p.ntt());
-            n += 1;
-        }
-
-        let mut e1 = Vector::new(self.k);
-        for _ in 0..self.k {
-            let p = Polynomial::sample_cbd(self.eta2, &prf(self.eta2, &r, n));
-            e1.push(p);
-            n += 1;
-        }
-
-        let e2 = Polynomial::sample_cbd(self.eta2, &prf(self.eta2, &r, n));
-        let u = &(at * &y).inv_ntt() + &e1;
-        let mu = Polynomial::from_msg(m);
-        let v = (&t * &y).inv_ntt() + e2 + mu;
-
-        let mut c1 = u.reduce().compress_encode(self.du);
-        let mut c2 = v.reduce().compress_encode(self.dv);
-        c1.append(&mut c2);
-        c1
-    }
-
-    fn pke_decrypt(&self, dk_pke: &[u8], c: &[u8]) -> Vec<u8> {
-        let (c1, c2) = c.split_at(32 * self.du * self.k);
-
-        let u = Vector::decode_decompress(c1, self.k, self.du);
-        let v = Polynomial::decode_decompress(c2, self.dv);
-        let s = Vector::from((dk_pke, PolynomialRepresentation::NTT));
-
-        let w = v - (&s * &u.ntt()).inv_ntt();
-        w.to_msg()
-    }
-
-    fn sample_a(&self, rho: &Vec<u8>, transposed: bool) -> Matrix {
-        let mut a = Matrix::new(self.k);
-
-        for i in 0..self.k {
-            let mut row = Vector::new(self.k);
-
-            for j in 0..self.k {
-                let mut bytes = rho.clone(); // TODO - optimize
-                if transposed {
-                    bytes.push(i as u8);
-                    bytes.push(j as u8);
-                } else {
-                    bytes.push(j as u8);
-                    bytes.push(i as u8);
-                }
-
-                let item = Polynomial::sample_ntt(&bytes);
-                row.push(item);
-            }
-
-            a.add_row(row);
-        }
-
-        a
+        serialized
     }
 }
 
+impl sealed::Sealed for MlKem768 {}
+
+impl Kem for MlKem768 {
+    const K: usize = 3;
+    const ETA1: usize = 2;
+    const ETA2: usize = 2;
+    const DU: usize = 10;
+    const DV: usize = 4;
+
+    type EncapsKey = EncapsKey<{ Self::K }>;
+    type EncapsKeyBytes = [u8; 1184];
+
+    type DecapsKey = DecapsKey<{ Self::K }>;
+    type DecapsKeyBytes = [u8; 2400];
+
+    type Ctxt = [u8; 1088];
+    type DuEncoded = [u8; 960];
+    type DvEncoded = [u8; 128];
+
+    fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
+        let mut rng: StdRng = make_rng();
+        let mut d = [0u8; 32];
+        let mut z = [0u8; 32];
+
+        rng.fill(&mut d);
+        rng.fill(&mut z);
+
+        let (ek, dk) = key_gen_internal::<{ Self::K }>(&d, &z, Self::ETA1);
+        (ek, dk)
+    }
+
+    fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
+        let mut serialized = [0u8; 1184];
+        let t = ek.t();
+        let rho = ek.rho();
+
+        let bytes: [u8; 384] = t[0].into();
+        serialized[..384].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = t[1].into();
+        serialized[384..768].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = t[2].into();
+        serialized[768..1152].copy_from_slice(&bytes);
+
+        serialized[1152..].copy_from_slice(rho);
+        serialized
+    }
+
+    fn serialize_dk(dk: &Self::DecapsKey) -> Self::DecapsKeyBytes {
+        let mut serialized = [0u8; 2400];
+        let s = dk.s();
+        let ek_bytes = Self::serialize_ek(dk.ek());
+        let ek_hash = dk.ek_hash();
+        let z = dk.z();
+
+        let bytes: [u8; 384] = s[0].into();
+        serialized[..384].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = s[1].into();
+        serialized[384..768].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = s[2].into();
+        serialized[768..1152].copy_from_slice(&bytes);
+
+        serialized[1152..2336].copy_from_slice(&ek_bytes);
+        serialized[2336..2368].copy_from_slice(ek_hash);
+        serialized[2368..].copy_from_slice(z);
+
+        serialized
+    }
+}
+
+impl sealed::Sealed for MlKem1024 {}
+
+impl Kem for MlKem1024 {
+    const K: usize = 4;
+    const ETA1: usize = 2;
+    const ETA2: usize = 2;
+    const DU: usize = 11;
+    const DV: usize = 5;
+
+    type EncapsKey = EncapsKey<{ Self::K }>;
+    type EncapsKeyBytes = [u8; 1568];
+
+    type DecapsKey = DecapsKey<{ Self::K }>;
+    type DecapsKeyBytes = [u8; 3168];
+
+    type Ctxt = [u8; 1568];
+    type DuEncoded = [u8; 1408];
+    type DvEncoded = [u8; 160];
+
+    fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
+        let mut rng: StdRng = make_rng();
+        let mut d = [0u8; 32];
+        let mut z = [0u8; 32];
+
+        rng.fill(&mut d);
+        rng.fill(&mut z);
+
+        key_gen_internal::<{ Self::K }>(&d, &z, Self::ETA1)
+    }
+
+    fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
+        let mut serialized = [0u8; 1568];
+        let t = ek.t();
+        let rho = ek.rho();
+
+        let bytes: [u8; 384] = t[0].into();
+        serialized[..384].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = t[1].into();
+        serialized[384..768].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = t[2].into();
+        serialized[768..1152].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = t[3].into();
+        serialized[1152..1536].copy_from_slice(&bytes);
+
+        serialized[1536..].copy_from_slice(rho);
+        serialized
+    }
+
+    fn serialize_dk(dk: &Self::DecapsKey) -> Self::DecapsKeyBytes {
+        let mut serialized = [0u8; 3168];
+        let s = dk.s();
+        let ek_bytes = Self::serialize_ek(dk.ek());
+        let ek_hash = dk.ek_hash();
+        let z = dk.z();
+
+        let bytes: [u8; 384] = s[0].into();
+        serialized[..384].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = s[1].into();
+        serialized[384..768].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = s[2].into();
+        serialized[768..1152].copy_from_slice(&bytes);
+        let bytes: [u8; 384] = s[3].into();
+        serialized[1152..1536].copy_from_slice(&bytes);
+
+        serialized[1536..3104].copy_from_slice(&ek_bytes);
+        serialized[3104..3136].copy_from_slice(ek_hash);
+        serialized[3136..].copy_from_slice(z);
+
+        serialized
+    }
+}
+
+fn key_gen_internal<const K: usize>(
+    d: &[u8; 32],
+    z: &[u8; 32],
+    eta: usize,
+) -> (EncapsKey<K>, DecapsKey<K>) {
+    let (ek, s) = pke_key_gen::<K>(d, eta);
+    let ek_hash = ek.h();
+    let dk = DecapsKey::<K>::new(s.reduce(), ek.clone(), ek_hash, *z);
+    (ek, dk)
+}
+
+fn pke_key_gen<const K: usize>(d: &[u8; 32], eta: usize) -> (EncapsKey<K>, Vector<K>) {
+    let mut hasher = Sha3_512::new();
+    hasher.update(d);
+    hasher.update(&[K as u8]);
+    let hashed = hasher.finalize();
+    let (l, r) = hashed.split_at(32);
+    let (rho, sigma): ([u8; 32], [u8; 32]) = (l.try_into().unwrap(), r.try_into().unwrap());
+
+    let a = sample_a(&rho, false);
+    let mut n: u8 = 0;
+    let prf_len = eta << 6;
+
+    let mut s = Vector::<K>::new(PolynomialRepresentation::NTT);
+    for i in 0..K {
+        let prf_bytes = &prf(&sigma, n)[..prf_len];
+        let p = Polynomial::sample_cbd(eta, prf_bytes);
+        s[i] = p.ntt();
+        n += 1;
+    }
+
+    let mut e = Vector::<K>::new(PolynomialRepresentation::NTT);
+    for i in 0..K {
+        let prf_bytes = &prf(&sigma, n)[..prf_len];
+        let p = Polynomial::sample_cbd(eta, prf_bytes);
+        e[i] = p.ntt();
+        n += 1;
+    }
+
+    let t = &(&a * &s).to_mont() + &e;
+    let ek_pke = EncapsKey::<K>::new(t.reduce(), rho, a.transpose());
+    (ek_pke, s)
+}
+
+fn sample_a<const K: usize>(rho: &[u8; 32], transposed: bool) -> Matrix<K> {
+    let mut a = Matrix::<K>::new();
+
+    for i in 0..K {
+        let mut row = Vector::new(PolynomialRepresentation::NTT);
+
+        for j in 0..K {
+            if transposed {
+                row[j] = Polynomial::sample_ntt(rho, i as u8, j as u8);
+            } else {
+                row[j] = Polynomial::sample_ntt(rho, j as u8, i as u8)
+            };
+        }
+
+        a[i] = row;
+    }
+
+    a
+}
+
 #[cfg(test)]
-#[path = "unit_tests/kem_test.rs"]
-mod kem_test;
+#[path = "unit_tests/key_gen_test.rs"]
+mod key_gen_test;

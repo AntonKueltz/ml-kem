@@ -1,4 +1,5 @@
-use std::ops::{Add, Mul, Sub};
+use std::ops::{Add, Index, IndexMut, Mul, Sub};
+use zeroize::Zeroize;
 
 use shake::{
     Shake128,
@@ -41,7 +42,7 @@ impl Polynomial {
     }
 
     pub fn sample_cbd(eta: usize, bytes: &[u8]) -> Self {
-        debug_assert_eq!(bytes.len(), 64 * eta);
+        assert_eq!(bytes.len(), 64 * eta);
         let mut r = Self::new(PolynomialRepresentation::STANDARD);
 
         for i in 0..N {
@@ -53,18 +54,20 @@ impl Polynomial {
                 y += test_bit(bytes, k + eta) as i16;
             }
 
-            r.f[i] = x - y;
+            r[i] = x - y;
         }
 
         r
     }
 
-    pub fn sample_ntt(bytes: &[u8]) -> Self {
+    pub fn sample_ntt(rho: &[u8; 32], x: u8, y: u8) -> Self {
         let mut r = Polynomial::new(PolynomialRepresentation::NTT);
         let mut j: usize = 0;
 
         let mut xof = Shake128::default();
-        xof.update(bytes);
+        xof.update(rho);
+        xof.update(&[x]);
+        xof.update(&[y]);
         let mut xof_reader = xof.finalize_xof();
 
         while j < N {
@@ -75,11 +78,11 @@ impl Polynomial {
             let d2: i16 = ((c[1] as i16) >> 4) + ((c[2] as i16) << 4);
 
             if d1 < Q {
-                r.f[j] = d1;
+                r[j] = d1;
                 j += 1;
             }
             if d2 < Q && j < N {
-                r.f[j] = d2;
+                r[j] = d2;
                 j += 1;
             }
         }
@@ -105,9 +108,9 @@ impl Polynomial {
                 i += 1;
 
                 for j in start..start + len {
-                    let t = mul_q(zeta, r.f[j + len]);
-                    r.f[j + len] = r.f[j] - t;
-                    r.f[j] = r.f[j] + t;
+                    let t = mul_q(zeta, r[j + len]);
+                    r[j + len] = r[j] - t;
+                    r[j] = r[j] + t;
                 }
 
                 start += len << 1;
@@ -137,9 +140,9 @@ impl Polynomial {
                 i -= 1;
 
                 for j in start..start + len {
-                    let t = r.f[j];
-                    r.f[j] = barr_q(t + r.f[j + len]);
-                    r.f[j + len] = mul_q(zeta, r.f[j + len] - t);
+                    let t = r[j];
+                    r[j] = barr_q(t + r[j + len]);
+                    r[j + len] = mul_q(zeta, r[j + len] - t);
                 }
 
                 start += len << 1;
@@ -149,7 +152,7 @@ impl Polynomial {
         }
 
         for j in 0..N {
-            r.f[j] = mul_q(1441, r.f[j]);
+            r[j] = mul_q(1441, r[j]);
         }
 
         r
@@ -159,7 +162,7 @@ impl Polynomial {
         let mut r = Self::new(self.t);
 
         for i in 0..N {
-            r.f[i] = mul_q(self.f[i], R2);
+            r[i] = mul_q(self[i], R2);
         }
 
         r
@@ -169,7 +172,7 @@ impl Polynomial {
         let mut r = Self::new(self.t);
 
         for i in 0..N {
-            r.f[i] = barr_q(self.f[i])
+            r[i] = barr_q(self[i])
         }
 
         r
@@ -180,20 +183,20 @@ impl Polynomial {
 
         for i in 0..N {
             let mask = 0u16.wrapping_sub(test_bit(value, i) as u16) as i16;
-            r.f[i] += HALF_Q & mask;
+            r[i] += HALF_Q & mask;
         }
 
         r
     }
 
-    pub fn to_msg(&self) -> Vec<u8> {
-        let mut r = vec![0u8; 32];
+    pub fn to_msg(&self) -> [u8; 32] {
+        let mut r = [0u8; 32];
 
         for i in 0..32 {
             let base = i << 3;
 
             for j in 0..8 {
-                let mut t = self.f[base + j] as u32;
+                let mut t = self[base + j] as u32;
                 t <<= 1;
                 t = t.wrapping_add(1665);
                 t = t.wrapping_mul(80635);
@@ -206,15 +209,7 @@ impl Polynomial {
         r
     }
 
-    pub fn compress_encode(&self, dv: usize) -> Vec<u8> {
-        match dv {
-            5 => self.compress_encode_5(),
-            4 => self.compress_encode_4(),
-            _ => vec![],
-        }
-    }
-
-    fn compress_encode_5(&self) -> Vec<u8> {
+    pub fn compress_encode_5(&self) -> [u8; 160] {
         let mut r = [0; 160];
         let mut ri = 0;
         let mut t = [0u8; 8];
@@ -223,7 +218,7 @@ impl Polynomial {
             let base = i << 3;
 
             for j in 0..8 {
-                let u = norm_q(self.f[base + j]) as u16;
+                let u = norm_q(self[base + j]) as u16;
                 let mut d0 = (u as u32) << 5;
                 d0 += 1664;
                 d0 = d0.wrapping_mul(40318);
@@ -239,10 +234,10 @@ impl Polynomial {
             ri += 5;
         }
 
-        r.to_vec()
+        r
     }
 
-    fn compress_encode_4(&self) -> Vec<u8> {
+    pub fn compress_encode_4(&self) -> [u8; 128] {
         let mut r = [0; 128];
         let mut ri = 0;
         let mut t = [0u8; 8];
@@ -251,7 +246,7 @@ impl Polynomial {
             let base = i << 3;
 
             for j in 0..8 {
-                let u = norm_q(self.f[base + j]) as u16;
+                let u = norm_q(self[base + j]) as u16;
                 let mut d0 = (u as u32) << 4;
                 d0 += 1665;
                 d0 = d0.wrapping_mul(80635);
@@ -266,7 +261,7 @@ impl Polynomial {
             ri += 4;
         }
 
-        r.to_vec()
+        r
     }
 
     pub fn decode_decompress(c: &[u8], dv: usize) -> Self {
@@ -296,7 +291,7 @@ impl Polynomial {
 
             let base = i << 3;
             for j in 0..8 {
-                r.f[base + j] = (((t[j] & 0x1f) as u32 * Q as u32 + 16) >> 5) as i16;
+                r[base + j] = (((t[j] & 0x1f) as u32 * Q as u32 + 16) >> 5) as i16;
             }
         }
 
@@ -307,8 +302,8 @@ impl Polynomial {
         let mut r = Self::new(PolynomialRepresentation::STANDARD);
 
         for i in 0..128 {
-            r.f[i << 1] = (((c[i] & 0xf) as u16 * Q as u16 + 8) >> 4) as i16;
-            r.f[(i << 1) + 1] = (((c[i] >> 4) as u16 * Q as u16 + 8) >> 4) as i16;
+            r[i << 1] = (((c[i] & 0xf) as u16 * Q as u16 + 8) >> 4) as i16;
+            r[(i << 1) + 1] = (((c[i] >> 4) as u16 * Q as u16 + 8) >> 4) as i16;
         }
 
         r
@@ -323,7 +318,7 @@ impl Add for Polynomial {
         let mut r = Polynomial::new(self.t);
 
         for i in 0..N {
-            r.f[i] = self.f[i] + rhs.f[i];
+            r[i] = self[i] + rhs[i];
         }
 
         r
@@ -361,7 +356,76 @@ impl Sub for Polynomial {
         let mut r = Polynomial::new(self.t);
 
         for i in 0..N {
-            r.f[i] = self.f[i] - rhs.f[i];
+            r[i] = self[i] - rhs[i];
+        }
+
+        r
+    }
+}
+
+impl Index<usize> for Polynomial {
+    type Output = i16;
+
+    fn index(&self, index: usize) -> &Self::Output {
+        &self.f[index]
+    }
+}
+
+impl IndexMut<usize> for Polynomial {
+    fn index_mut(&mut self, index: usize) -> &mut Self::Output {
+        &mut self.f[index]
+    }
+}
+
+impl Zeroize for Polynomial {
+    fn zeroize(&mut self) {
+        for i in 0..N {
+            self[i] = 0;
+        }
+    }
+}
+
+impl From<([u8; 384], PolynomialRepresentation)> for Polynomial {
+    fn from((value, t): ([u8; 384], PolynomialRepresentation)) -> Self {
+        let mut p = Polynomial::new(t);
+        let mut p_idx = 0;
+        let mut byte_idx = 0;
+
+        for _ in 0..128 {
+            let (a0, a1, a2) = (value[byte_idx], value[byte_idx + 1], value[byte_idx + 2]);
+            byte_idx += 3;
+
+            let b0 = (a0 as i16) | (((a1 & 0xf) as i16) << 8);
+            let b1 = ((a1 >> 4) as i16) | ((a2 as i16) << 4);
+
+            p[p_idx] = b0;
+            p[p_idx + 1] = b1;
+            p_idx += 2;
+        }
+
+        p
+    }
+}
+
+impl From<Polynomial> for [u8; 384] {
+    fn from(value: Polynomial) -> Self {
+        let mut r = [0u8; 384];
+        let mut r_idx = 0;
+        let mut v_idx = 0;
+
+        for _ in 0..128 {
+            let a0 = norm_q(value[v_idx]) as u16;
+            let a1 = norm_q(value[v_idx + 1]) as u16;
+            v_idx += 2;
+
+            let b0 = (a0 & 0xff) as u8;
+            let b1 = ((a0 >> 8) as u8) | (((a1 & 0xf) << 4) as u8);
+            let b2 = (a1 >> 4) as u8;
+
+            r[r_idx] = b0;
+            r[r_idx + 1] = b1;
+            r[r_idx + 2] = b2;
+            r_idx += 3;
         }
 
         r
