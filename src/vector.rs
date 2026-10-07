@@ -1,5 +1,3 @@
-use core::ptr::write_bytes;
-use core::sync::atomic::{Ordering::SeqCst, compiler_fence};
 use std::array::from_fn;
 use std::ops::{Add, Index, IndexMut, Mul};
 
@@ -36,11 +34,23 @@ impl<const K: usize> Vector<K> {
         self.map(Polynomial::inv_ntt)
     }
 
+    pub(crate) fn to_bytes(&self, buf: &mut [u8]) {
+        assert_eq!(buf.len(), 384 * K);
+
+        let (mut start, mut end) = (0, 384);
+
+        for i in 0..K {
+            self[i].to_bytes(&mut buf[start..end]);
+            start = end;
+            end += 384;
+        }
+    }
+
     pub fn compress_encode(&self, du: usize, r: &mut [u8]) {
         match du {
             11 => self.compress_encode_11(r),
             10 => self.compress_encode_10(r),
-            _ => (),
+            _ => unreachable!(),
         }
     }
 
@@ -118,7 +128,7 @@ impl<const K: usize> Vector<K> {
         match du {
             11 => Self::decode_decompress_11(c),
             10 => Self::decode_decompress_10(c),
-            _ => Self::new(PolynomialRepresentation::STANDARD),
+            _ => unreachable!(),
         }
     }
 
@@ -248,8 +258,9 @@ impl<const K: usize> IndexMut<usize> for Vector<K> {
 
 impl<const K: usize> Zeroize for Vector<K> {
     fn zeroize(&mut self) {
-        unsafe { write_bytes(self.coords.as_mut_ptr(), 0, K) };
-        compiler_fence(SeqCst);
+        for p in self.coords.iter_mut() {
+            p.zeroize();
+        }
     }
 }
 
@@ -257,15 +268,24 @@ impl<const K: usize> TryFrom<(&[u8], PolynomialRepresentation)> for Vector<K> {
     type Error = String;
 
     fn try_from((value, t): (&[u8], PolynomialRepresentation)) -> Result<Self, Self::Error> {
-        assert_eq!(value.len(), 384 * K);
+        if value.len() != 384 * K {
+            return Err(String::from("Invalid length for serialized vector."));
+        }
+
         let mut r = Self::new(t);
+        let (mut start, mut end) = (0, 384);
 
         for i in 0..K {
-            let (start, end) = (i * 384, (i + 1) * 384);
-            match Polynomial::try_from((value[start..end].try_into().unwrap(), t)) {
+            match Polynomial::from_bytes(&value[start..end], t) {
                 Ok(p) => r[i] = p,
-                Err(msg) => return Err(msg),
+                Err(e) => {
+                    r.zeroize();
+                    return Err(e);
+                }
             }
+
+            start = end;
+            end += 384;
         }
 
         Ok(r)

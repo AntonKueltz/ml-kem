@@ -232,7 +232,7 @@ def main() -> None:
     parser.add_argument(
         "--duration",
         type=float,
-        default=3.0,
+        default=1.0,
         help="total measured seconds per op/parameter set (default: 3)",
     )
     parser.add_argument(

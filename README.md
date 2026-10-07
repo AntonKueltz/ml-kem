@@ -241,3 +241,4 @@ RUSTFLAGS="-C force-frame-pointers=yes" cargo flamegraph --bench kem -- --bench 
 * [Kyber reference implementation](https://github.com/pq-crystals/kyber)
 * [CRYSTALS-Kyber: a CCA-secure module-lattice-based KEM](https://eprint.iacr.org/2017/634.pdf)
 * [Kyber terminates](https://cryptojedi.org/papers/terminate-20230516.pdf)
+* [KyberSlash: Exploiting secret-dependent division timings in Kyber implementations](https://kyberslash.cr.yp.to/kyberslash-20250115.pdf)

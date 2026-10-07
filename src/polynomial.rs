@@ -1,3 +1,4 @@
+use core::arch::asm;
 use core::ptr::write_bytes;
 use core::sync::atomic::{Ordering::SeqCst, compiler_fence};
 use std::ops::{Add, Index, IndexMut, Mul, Sub};
@@ -180,6 +181,55 @@ impl Polynomial {
         r
     }
 
+    pub(crate) fn from_bytes(bytes: &[u8], t: PolynomialRepresentation) -> Result<Self, String> {
+        assert_eq!(bytes.len(), 384);
+
+        let mut p = Polynomial::new(t);
+        let mut p_idx = 0;
+        let mut bi = 0;
+
+        for _ in 0..128 {
+            let b0 = (bytes[bi] as i16) | (((bytes[bi + 1] & 0xf) as i16) << 8);
+            let b1 = ((bytes[bi + 1] >> 4) as i16) | ((bytes[bi + 2] as i16) << 4);
+            bi += 3;
+
+            if b0 >= Q || b1 >= Q {
+                p.zeroize();
+                return Err(String::from(
+                    "Polynomial coefficients must be canonically encoded (in range [0, q-1]).",
+                ));
+            }
+
+            p[p_idx] = b0;
+            p[p_idx + 1] = b1;
+            p_idx += 2;
+        }
+
+        Ok(p)
+    }
+
+    pub(crate) fn to_bytes(&self, buf: &mut [u8]) {
+        assert_eq!(buf.len(), 384);
+
+        let mut s_idx = 0;
+        let mut b_idx = 0;
+
+        for _ in 0..128 {
+            let a0 = norm_q(self[s_idx]) as u16;
+            let a1 = norm_q(self[s_idx + 1]) as u16;
+            s_idx += 2;
+
+            let b0 = a0 as u8;
+            let b1 = ((a0 >> 8) | (a1 << 4)) as u8;
+            let b2 = (a1 >> 4) as u8;
+
+            buf[b_idx] = b0;
+            buf[b_idx + 1] = b1;
+            buf[b_idx + 2] = b2;
+            b_idx += 3;
+        }
+    }
+
     pub fn from_msg(value: &[u8]) -> Self {
         let mut r = Polynomial::new(PolynomialRepresentation::STANDARD);
 
@@ -215,7 +265,7 @@ impl Polynomial {
         match dv {
             5 => self.compress_encode_5(r),
             4 => self.compress_encode_4(r),
-            _ => (),
+            _ => unreachable!(),
         }
     }
 
@@ -272,7 +322,7 @@ impl Polynomial {
         match dv {
             5 => Self::decode_decompress_5(c),
             4 => Self::decode_decompress_4(c),
-            _ => Self::new(PolynomialRepresentation::STANDARD),
+            _ => unreachable!(),
         }
     }
 
@@ -386,62 +436,11 @@ impl IndexMut<usize> for Polynomial {
 
 impl Zeroize for Polynomial {
     fn zeroize(&mut self) {
-        unsafe { write_bytes(self.f.as_mut_ptr(), 0, N) };
+        unsafe {
+            write_bytes(self.f.as_mut_ptr(), 0, N);
+            asm!("/* {0} */", in(reg) self.f.as_ptr(), options(nostack, preserves_flags));
+        }
         compiler_fence(SeqCst);
-    }
-}
-
-impl TryFrom<([u8; 384], PolynomialRepresentation)> for Polynomial {
-    type Error = String;
-
-    fn try_from((value, t): ([u8; 384], PolynomialRepresentation)) -> Result<Self, Self::Error> {
-        let mut p = Polynomial::new(t);
-        let mut p_idx = 0;
-        let mut byte_idx = 0;
-
-        for _ in 0..128 {
-            let (a0, a1, a2) = (value[byte_idx], value[byte_idx + 1], value[byte_idx + 2]);
-            byte_idx += 3;
-
-            let b0 = (a0 as i16) | (((a1 & 0xf) as i16) << 8);
-            let b1 = ((a1 >> 4) as i16) | ((a2 as i16) << 4);
-            if b0 >= Q || b1 >= Q || b0 < 0 || b1 < 0 {
-                return Err(String::from(
-                    "Polynomial coefficients must be canonically encoded (in range [0, q-1]).",
-                ));
-            }
-
-            p[p_idx] = b0;
-            p[p_idx + 1] = b1;
-            p_idx += 2;
-        }
-
-        Ok(p)
-    }
-}
-
-impl From<&Polynomial> for [u8; 384] {
-    fn from(value: &Polynomial) -> Self {
-        let mut r = [0u8; 384];
-        let mut r_idx = 0;
-        let mut v_idx = 0;
-
-        for _ in 0..128 {
-            let a0 = norm_q(value[v_idx]) as u16;
-            let a1 = norm_q(value[v_idx + 1]) as u16;
-            v_idx += 2;
-
-            let b0 = (a0 & 0xff) as u8;
-            let b1 = ((a0 >> 8) as u8) | (((a1 & 0xf) << 4) as u8);
-            let b2 = (a1 >> 4) as u8;
-
-            r[r_idx] = b0;
-            r[r_idx + 1] = b1;
-            r[r_idx + 2] = b2;
-            r_idx += 3;
-        }
-
-        r
     }
 }
 
@@ -452,10 +451,10 @@ fn base_case_multiply(r: &mut [i16], a: &[i16], b: &[i16], zeta: i16, i: usize) 
 }
 
 #[inline]
-fn test_bit(bytes: &[u8], i: usize) -> bool {
+fn test_bit(bytes: &[u8], i: usize) -> u8 {
     let byte = i >> 3;
     let bit = i & 0b111;
-    (bytes[byte] >> bit) & 1 == 1
+    (bytes[byte] >> bit) & 1
 }
 
 #[cfg(test)]

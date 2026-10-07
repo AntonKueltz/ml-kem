@@ -186,7 +186,7 @@ fn test_key_gen_internal_512_01() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -375,7 +375,7 @@ fn test_key_gen_internal_512_02() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -564,7 +564,7 @@ fn test_key_gen_internal_512_03() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -753,7 +753,7 @@ fn test_key_gen_internal_512_04() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -942,7 +942,7 @@ fn test_key_gen_internal_512_05() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -1131,7 +1131,7 @@ fn test_key_gen_internal_512_06() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -1320,7 +1320,7 @@ fn test_key_gen_internal_512_07() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -1509,7 +1509,7 @@ fn test_key_gen_internal_512_08() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -1698,7 +1698,7 @@ fn test_key_gen_internal_512_09() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -1887,7 +1887,7 @@ fn test_key_gen_internal_512_10() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -2076,7 +2076,7 @@ fn test_key_gen_internal_512_11() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -2265,7 +2265,7 @@ fn test_key_gen_internal_512_12() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -2454,7 +2454,7 @@ fn test_key_gen_internal_512_13() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -2643,7 +2643,7 @@ fn test_key_gen_internal_512_14() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -2832,7 +2832,7 @@ fn test_key_gen_internal_512_15() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -3021,7 +3021,7 @@ fn test_key_gen_internal_512_16() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -3210,7 +3210,7 @@ fn test_key_gen_internal_512_17() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -3399,7 +3399,7 @@ fn test_key_gen_internal_512_18() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -3588,7 +3588,7 @@ fn test_key_gen_internal_512_19() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -3777,7 +3777,7 @@ fn test_key_gen_internal_512_20() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -3966,7 +3966,7 @@ fn test_key_gen_internal_512_21() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -4155,7 +4155,7 @@ fn test_key_gen_internal_512_22() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -4344,7 +4344,7 @@ fn test_key_gen_internal_512_23() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -4533,7 +4533,7 @@ fn test_key_gen_internal_512_24() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -4722,7 +4722,7 @@ fn test_key_gen_internal_512_25() {
     let dk_bytes = MlKem512::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -4987,7 +4987,7 @@ fn test_key_gen_internal_768_01() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -5252,7 +5252,7 @@ fn test_key_gen_internal_768_02() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -5517,7 +5517,7 @@ fn test_key_gen_internal_768_03() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -5782,7 +5782,7 @@ fn test_key_gen_internal_768_04() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -6047,7 +6047,7 @@ fn test_key_gen_internal_768_05() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -6312,7 +6312,7 @@ fn test_key_gen_internal_768_06() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -6577,7 +6577,7 @@ fn test_key_gen_internal_768_07() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -6842,7 +6842,7 @@ fn test_key_gen_internal_768_08() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -7107,7 +7107,7 @@ fn test_key_gen_internal_768_09() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -7372,7 +7372,7 @@ fn test_key_gen_internal_768_10() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -7637,7 +7637,7 @@ fn test_key_gen_internal_768_11() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -7902,7 +7902,7 @@ fn test_key_gen_internal_768_12() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -8167,7 +8167,7 @@ fn test_key_gen_internal_768_13() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -8432,7 +8432,7 @@ fn test_key_gen_internal_768_14() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -8697,7 +8697,7 @@ fn test_key_gen_internal_768_15() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -8962,7 +8962,7 @@ fn test_key_gen_internal_768_16() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -9227,7 +9227,7 @@ fn test_key_gen_internal_768_17() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -9492,7 +9492,7 @@ fn test_key_gen_internal_768_18() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -9757,7 +9757,7 @@ fn test_key_gen_internal_768_19() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -10022,7 +10022,7 @@ fn test_key_gen_internal_768_20() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -10287,7 +10287,7 @@ fn test_key_gen_internal_768_21() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -10552,7 +10552,7 @@ fn test_key_gen_internal_768_22() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -10817,7 +10817,7 @@ fn test_key_gen_internal_768_23() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -11082,7 +11082,7 @@ fn test_key_gen_internal_768_24() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -11347,7 +11347,7 @@ fn test_key_gen_internal_768_25() {
     let dk_bytes = MlKem768::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -11690,7 +11690,7 @@ fn test_key_gen_internal_1024_01() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -12033,7 +12033,7 @@ fn test_key_gen_internal_1024_02() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -12376,7 +12376,7 @@ fn test_key_gen_internal_1024_03() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -12719,7 +12719,7 @@ fn test_key_gen_internal_1024_04() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -13062,7 +13062,7 @@ fn test_key_gen_internal_1024_05() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -13405,7 +13405,7 @@ fn test_key_gen_internal_1024_06() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -13748,7 +13748,7 @@ fn test_key_gen_internal_1024_07() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -14091,7 +14091,7 @@ fn test_key_gen_internal_1024_08() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -14434,7 +14434,7 @@ fn test_key_gen_internal_1024_09() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -14777,7 +14777,7 @@ fn test_key_gen_internal_1024_10() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -15120,7 +15120,7 @@ fn test_key_gen_internal_1024_11() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -15463,7 +15463,7 @@ fn test_key_gen_internal_1024_12() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -15806,7 +15806,7 @@ fn test_key_gen_internal_1024_13() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -16149,7 +16149,7 @@ fn test_key_gen_internal_1024_14() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -16492,7 +16492,7 @@ fn test_key_gen_internal_1024_15() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -16835,7 +16835,7 @@ fn test_key_gen_internal_1024_16() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -17178,7 +17178,7 @@ fn test_key_gen_internal_1024_17() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -17521,7 +17521,7 @@ fn test_key_gen_internal_1024_18() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -17864,7 +17864,7 @@ fn test_key_gen_internal_1024_19() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -18207,7 +18207,7 @@ fn test_key_gen_internal_1024_20() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -18550,7 +18550,7 @@ fn test_key_gen_internal_1024_21() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -18893,7 +18893,7 @@ fn test_key_gen_internal_1024_22() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -19236,7 +19236,7 @@ fn test_key_gen_internal_1024_23() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -19579,7 +19579,7 @@ fn test_key_gen_internal_1024_24() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }
 
 #[test]
@@ -19922,5 +19922,5 @@ fn test_key_gen_internal_1024_25() {
     let dk_bytes = MlKem1024::serialize_dk(&dk);
 
     assert_eq!(ek_bytes, expected_ek);
-    assert_eq!(dk_bytes, expected_dk);
+    assert_eq!(*dk_bytes, expected_dk);
 }

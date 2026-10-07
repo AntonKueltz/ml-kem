@@ -31,7 +31,8 @@ impl<const K: usize> EncapsKey<K> {
         let mut hasher = Sha3_256::new();
 
         for i in 0..K {
-            let bytes: [u8; 384] = (&self.t[i]).into();
+            let mut bytes = [0u8; 384];
+            self.t[i].to_bytes(&mut bytes);
             hasher.update(&bytes);
         }
         hasher.update(&self.rho);
