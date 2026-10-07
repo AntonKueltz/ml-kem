@@ -1,3 +1,6 @@
+use core::ptr::write_bytes;
+use core::sync::atomic::{Ordering::SeqCst, compiler_fence};
+use std::array::from_fn;
 use std::ops::{Add, Index, IndexMut, Mul};
 
 use zeroize::Zeroize;
@@ -5,16 +8,16 @@ use zeroize::Zeroize;
 use crate::integer_field::norm_q;
 use crate::polynomial::{Polynomial, PolynomialRepresentation, Q};
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Vector<const K: usize> {
     coords: [Polynomial; K],
 }
 
 impl<const K: usize> Vector<K> {
     pub fn new(representation: PolynomialRepresentation) -> Self {
-        Self {
-            coords: [Polynomial::new(representation); K],
-        }
+        let coords: [Polynomial; K] = from_fn(|_| Polynomial::new(representation));
+
+        Self { coords }
     }
 
     pub fn reduce(&self) -> Self {
@@ -207,7 +210,7 @@ impl<const K: usize> Add for &Vector<K> {
         let mut r = Vector::<K>::new(PolynomialRepresentation::STANDARD);
 
         for i in 0..K {
-            r[i] = self[i] + rhs[i];
+            r[i] = &self[i] + &rhs[i];
         }
 
         r
@@ -221,8 +224,8 @@ impl<const K: usize> Mul for &Vector<K> {
         let mut c: Polynomial = Polynomial::new(PolynomialRepresentation::NTT);
 
         for i in 0..K {
-            let s: Polynomial = self[i] * rhs[i];
-            c = c + s;
+            let s: Polynomial = &self[i] * &rhs[i];
+            c = &c + &s;
         }
 
         c.reduce()
@@ -245,9 +248,8 @@ impl<const K: usize> IndexMut<usize> for Vector<K> {
 
 impl<const K: usize> Zeroize for Vector<K> {
     fn zeroize(&mut self) {
-        for i in 0..K {
-            self[i].zeroize();
-        }
+        unsafe { write_bytes(self.coords.as_mut_ptr(), 0, K) };
+        compiler_fence(SeqCst);
     }
 }
 

@@ -1,10 +1,12 @@
+use core::ptr::write_bytes;
+use core::sync::atomic::{Ordering::SeqCst, compiler_fence};
 use std::ops::{Add, Index, IndexMut, Mul, Sub};
-use zeroize::Zeroize;
 
 use shake::{
     Shake128,
     digest::{ExtendableOutput, Update, XofReader},
 };
+use zeroize::Zeroize;
 
 use crate::integer_field::{barr_q, mul_q, norm_q};
 
@@ -30,7 +32,7 @@ pub enum PolynomialRepresentation {
     NTT,
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone)]
 pub struct Polynomial {
     pub f: [i16; N],
     t: PolynomialRepresentation,
@@ -315,10 +317,10 @@ impl Polynomial {
     }
 }
 
-impl Add for Polynomial {
-    type Output = Self;
+impl Add for &Polynomial {
+    type Output = Polynomial;
 
-    fn add(self, rhs: Self) -> Self {
+    fn add(self, rhs: Self) -> Self::Output {
         debug_assert_eq!(self.t, rhs.t);
         let mut r = Polynomial::new(self.t);
 
@@ -330,10 +332,10 @@ impl Add for Polynomial {
     }
 }
 
-impl Mul for Polynomial {
-    type Output = Self;
+impl Mul for &Polynomial {
+    type Output = Polynomial;
 
-    fn mul(self, rhs: Self) -> Self {
+    fn mul(self, rhs: Self) -> Self::Output {
         debug_assert_eq!(self.t, PolynomialRepresentation::NTT);
         debug_assert_eq!(rhs.t, PolynomialRepresentation::NTT);
         let mut r = Polynomial::new(PolynomialRepresentation::NTT);
@@ -353,10 +355,10 @@ impl Mul for Polynomial {
     }
 }
 
-impl Sub for Polynomial {
-    type Output = Self;
+impl Sub for &Polynomial {
+    type Output = Polynomial;
 
-    fn sub(self, rhs: Self) -> Self {
+    fn sub(self, rhs: Self) -> Self::Output {
         debug_assert_eq!(self.t, rhs.t);
         let mut r = Polynomial::new(self.t);
 
@@ -384,9 +386,8 @@ impl IndexMut<usize> for Polynomial {
 
 impl Zeroize for Polynomial {
     fn zeroize(&mut self) {
-        for i in 0..N {
-            self[i] = 0;
-        }
+        unsafe { write_bytes(self.f.as_mut_ptr(), 0, N) };
+        compiler_fence(SeqCst);
     }
 }
 
@@ -419,8 +420,8 @@ impl TryFrom<([u8; 384], PolynomialRepresentation)> for Polynomial {
     }
 }
 
-impl From<Polynomial> for [u8; 384] {
-    fn from(value: Polynomial) -> Self {
+impl From<&Polynomial> for [u8; 384] {
+    fn from(value: &Polynomial) -> Self {
         let mut r = [0u8; 384];
         let mut r_idx = 0;
         let mut v_idx = 0;

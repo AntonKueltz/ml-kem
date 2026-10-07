@@ -1,7 +1,7 @@
 use rand::{RngExt, make_rng, rngs::StdRng};
-use sha3::{Digest, Sha3_512};
+use zeroize::Zeroizing;
 
-use crate::crypto_primitives::{ct_cmp, j, prf};
+use crate::crypto_primitives::{ct_cmp, g, j, prf};
 use crate::decaps_key::DecapsKey;
 use crate::encaps_key::EncapsKey;
 use crate::matrix::Matrix;
@@ -32,8 +32,8 @@ pub trait Kem: sealed::Sealed {
     type Ctxt: AsRef<[u8]> + AsMut<[u8]> + for<'a> TryFrom<&'a [u8]>;
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey);
-    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt);
-    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String>;
+    fn encaps(ek: &Self::EncapsKey) -> (Zeroizing<[u8; 32]>, Self::Ctxt);
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<Zeroizing<[u8; 32]>, String>;
 
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes;
     fn serialize_dk(dk: &Self::DecapsKey) -> Self::DecapsKeyBytes;
@@ -59,31 +59,20 @@ impl Kem for MlKem512 {
     type Ctxt = [u8; 768];
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
-        let mut rng: StdRng = make_rng();
-        let mut d = [0u8; 32];
-        let mut z = [0u8; 32];
-
-        rng.fill(&mut d);
-        rng.fill(&mut z);
-
-        key_gen_internal::<Self, { Self::K }>(&d, &z)
+        key_gen_random::<Self, { Self::K }>()
     }
 
-    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt) {
-        let mut rng: StdRng = make_rng();
-        let mut m = [0u8; 32];
-        rng.fill(&mut m);
-
+    fn encaps(ek: &Self::EncapsKey) -> (Zeroizing<[u8; 32]>, Self::Ctxt) {
         let mut c = [0u8; 768];
-        let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+        let k = encaps_random::<Self, { Self::K }>(ek, &mut c);
         (k, c)
     }
 
-    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String> {
-        match dk.check() {
-            Err(msg) => Err(msg),
-            Ok(()) => Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut [0u8; 768])),
-        }
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<Zeroizing<[u8; 32]>, String> {
+        dk.check()?;
+        let mut c_ = Zeroizing::new([0u8; 768]);
+
+        Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut *c_))
     }
 
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
@@ -91,9 +80,9 @@ impl Kem for MlKem512 {
         let t = ek.t();
         let rho = ek.rho();
 
-        let bytes: [u8; 384] = t[0].into();
+        let bytes: [u8; 384] = (&t[0]).into();
         serialized[..384].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = t[1].into();
+        let bytes: [u8; 384] = (&t[1]).into();
         serialized[384..768].copy_from_slice(&bytes);
 
         serialized[768..].copy_from_slice(rho);
@@ -107,9 +96,9 @@ impl Kem for MlKem512 {
         let ek_hash = dk.ek_hash();
         let z = dk.z();
 
-        let bytes: [u8; 384] = s[0].into();
+        let bytes: [u8; 384] = (&s[0]).into();
         serialized[..384].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = s[1].into();
+        let bytes: [u8; 384] = (&s[1]).into();
         serialized[384..768].copy_from_slice(&bytes);
 
         serialized[768..1568].copy_from_slice(&ek_bytes);
@@ -178,35 +167,20 @@ impl Kem for MlKem768 {
     type Ctxt = [u8; 1088];
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
-        let mut rng: StdRng = make_rng();
-        let mut d = [0u8; 32];
-        let mut z = [0u8; 32];
-
-        rng.fill(&mut d);
-        rng.fill(&mut z);
-
-        key_gen_internal::<Self, { Self::K }>(&d, &z)
+        key_gen_random::<Self, { Self::K }>()
     }
 
-    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt) {
-        let mut rng: StdRng = make_rng();
-        let mut m = [0u8; 32];
-        rng.fill(&mut m);
-
+    fn encaps(ek: &Self::EncapsKey) -> (Zeroizing<[u8; 32]>, Self::Ctxt) {
         let mut c = [0u8; 1088];
-        let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+        let k = encaps_random::<Self, { Self::K }>(ek, &mut c);
         (k, c)
     }
 
-    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String> {
-        match dk.check() {
-            Err(msg) => Err(msg),
-            Ok(()) => Ok(decaps_internal::<Self, { Self::K }>(
-                dk,
-                c,
-                &mut [0u8; 1088],
-            )),
-        }
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<Zeroizing<[u8; 32]>, String> {
+        dk.check()?;
+        let mut c_ = Zeroizing::new([0u8; 1088]);
+
+        Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut *c_))
     }
 
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
@@ -214,11 +188,11 @@ impl Kem for MlKem768 {
         let t = ek.t();
         let rho = ek.rho();
 
-        let bytes: [u8; 384] = t[0].into();
+        let bytes: [u8; 384] = (&t[0]).into();
         serialized[..384].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = t[1].into();
+        let bytes: [u8; 384] = (&t[1]).into();
         serialized[384..768].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = t[2].into();
+        let bytes: [u8; 384] = (&t[2]).into();
         serialized[768..1152].copy_from_slice(&bytes);
 
         serialized[1152..].copy_from_slice(rho);
@@ -232,11 +206,11 @@ impl Kem for MlKem768 {
         let ek_hash = dk.ek_hash();
         let z = dk.z();
 
-        let bytes: [u8; 384] = s[0].into();
+        let bytes: [u8; 384] = (&s[0]).into();
         serialized[..384].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = s[1].into();
+        let bytes: [u8; 384] = (&s[1]).into();
         serialized[384..768].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = s[2].into();
+        let bytes: [u8; 384] = (&s[2]).into();
         serialized[768..1152].copy_from_slice(&bytes);
 
         serialized[1152..2336].copy_from_slice(&ek_bytes);
@@ -305,35 +279,20 @@ impl Kem for MlKem1024 {
     type Ctxt = [u8; 1568];
 
     fn key_gen() -> (Self::EncapsKey, Self::DecapsKey) {
-        let mut rng: StdRng = make_rng();
-        let mut d = [0u8; 32];
-        let mut z = [0u8; 32];
-
-        rng.fill(&mut d);
-        rng.fill(&mut z);
-
-        key_gen_internal::<Self, { Self::K }>(&d, &z)
+        key_gen_random::<Self, { Self::K }>()
     }
 
-    fn encaps(ek: &Self::EncapsKey) -> ([u8; 32], Self::Ctxt) {
-        let mut rng: StdRng = make_rng();
-        let mut m = [0u8; 32];
-        rng.fill(&mut m);
-
+    fn encaps(ek: &Self::EncapsKey) -> (Zeroizing<[u8; 32]>, Self::Ctxt) {
         let mut c = [0u8; 1568];
-        let k = encaps_internal::<Self, { Self::K }>(&ek, &m, &mut c);
+        let k = encaps_random::<Self, { Self::K }>(ek, &mut c);
         (k, c)
     }
 
-    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<[u8; 32], String> {
-        match dk.check() {
-            Err(msg) => Err(msg),
-            Ok(()) => Ok(decaps_internal::<Self, { Self::K }>(
-                dk,
-                c,
-                &mut [0u8; 1568],
-            )),
-        }
+    fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<Zeroizing<[u8; 32]>, String> {
+        dk.check()?;
+        let mut c_ = Zeroizing::new([0u8; 1568]);
+
+        Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut *c_))
     }
 
     fn serialize_ek(ek: &Self::EncapsKey) -> Self::EncapsKeyBytes {
@@ -341,13 +300,13 @@ impl Kem for MlKem1024 {
         let t = ek.t();
         let rho = ek.rho();
 
-        let bytes: [u8; 384] = t[0].into();
+        let bytes: [u8; 384] = (&t[0]).into();
         serialized[..384].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = t[1].into();
+        let bytes: [u8; 384] = (&t[1]).into();
         serialized[384..768].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = t[2].into();
+        let bytes: [u8; 384] = (&t[2]).into();
         serialized[768..1152].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = t[3].into();
+        let bytes: [u8; 384] = (&t[3]).into();
         serialized[1152..1536].copy_from_slice(&bytes);
 
         serialized[1536..].copy_from_slice(rho);
@@ -361,13 +320,13 @@ impl Kem for MlKem1024 {
         let ek_hash = dk.ek_hash();
         let z = dk.z();
 
-        let bytes: [u8; 384] = s[0].into();
+        let bytes: [u8; 384] = (&s[0]).into();
         serialized[..384].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = s[1].into();
+        let bytes: [u8; 384] = (&s[1]).into();
         serialized[384..768].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = s[2].into();
+        let bytes: [u8; 384] = (&s[2]).into();
         serialized[768..1152].copy_from_slice(&bytes);
-        let bytes: [u8; 384] = s[3].into();
+        let bytes: [u8; 384] = (&s[3]).into();
         serialized[1152..1536].copy_from_slice(&bytes);
 
         serialized[1536..3104].copy_from_slice(&ek_bytes);
@@ -418,6 +377,22 @@ impl Kem for MlKem1024 {
     }
 }
 
+fn key_gen_random<P: Kem, const K: usize>() -> (EncapsKey<K>, DecapsKey<K>) {
+    let mut rng: StdRng = make_rng();
+    let mut d = Zeroizing::new([0u8; 32]);
+    let mut z = Zeroizing::new([0u8; 32]);
+    rng.fill(&mut *d);
+    rng.fill(&mut *z);
+    key_gen_internal::<P, K>(&d, &z)
+}
+
+fn encaps_random<P: Kem, const K: usize>(ek: &EncapsKey<K>, c: &mut [u8]) -> Zeroizing<[u8; 32]> {
+    let mut rng: StdRng = make_rng();
+    let mut m = Zeroizing::new([0u8; 32]);
+    rng.fill(&mut *m);
+    encaps_internal::<P, K>(ek, &m, c)
+}
+
 fn key_gen_internal<P: Kem, const K: usize>(
     d: &[u8; 32],
     z: &[u8; 32],
@@ -432,64 +407,38 @@ fn encaps_internal<P: Kem, const K: usize>(
     ek: &EncapsKey<K>,
     m: &[u8; 32],
     c: &mut [u8],
-) -> [u8; 32] {
-    let mut hasher = Sha3_512::new();
-    hasher.update(m);
-    hasher.update(ek.h());
-    let hashed = hasher.finalize();
-    let (x, y) = hashed.split_at(32);
-    let (k, r): ([u8; 32], [u8; 32]) = (x.try_into().unwrap(), y.try_into().unwrap());
-
+) -> Zeroizing<[u8; 32]> {
+    let (k, r) = g(&[m, &ek.h()]);
     pke_encrypt::<P, K>(ek, m, &r, c);
     k
 }
 
-fn decaps_internal<P: Kem, const K: usize>(dk: &DecapsKey<K>, c: &[u8], c_: &mut [u8]) -> [u8; 32] {
+fn decaps_internal<P: Kem, const K: usize>(
+    dk: &DecapsKey<K>,
+    c: &[u8],
+    c_: &mut [u8],
+) -> Zeroizing<[u8; 32]> {
     let m = pke_decrypt::<P, K>(dk.s(), c);
-
-    let mut sha512 = Sha3_512::default();
-    sha512.update(&m);
-    sha512.update(dk.ek_hash());
-    let hashed = sha512.finalize();
-    let (x, y) = hashed.split_at(32);
-    let (k, r): ([u8; 32], [u8; 32]) = (x.try_into().unwrap(), y.try_into().unwrap());
-
+    let (k, r) = g(&[&*m, dk.ek_hash()]);
     let kbar = j(dk.z(), c);
+
     pke_encrypt::<P, K>(dk.ek(), &m, &r, c_);
     if !ct_cmp(c, c_) { kbar } else { k }
 }
 
-fn pke_key_gen<P: Kem, const K: usize>(d: &[u8; 32]) -> (EncapsKey<K>, Vector<K>) {
-    let mut hasher = Sha3_512::new();
-    hasher.update(d);
-    hasher.update(&[K as u8]);
-    let hashed = hasher.finalize();
-    let (l, r) = hashed.split_at(32);
-    let (rho, sigma): ([u8; 32], [u8; 32]) = (l.try_into().unwrap(), r.try_into().unwrap());
+fn pke_key_gen<P: Kem, const K: usize>(d: &[u8; 32]) -> (EncapsKey<K>, Zeroizing<Vector<K>>) {
+    let (rho, sigma) = g(&[d, &[K as u8]]);
 
     let a = sample_a(&rho, false);
+
     let mut n: u8 = 0;
-    let prf_len = P::ETA1 << 6;
+    let s = sample_vec::<K>(&sigma, &mut n, P::ETA1, true);
+    let e = sample_vec::<K>(&sigma, &mut n, P::ETA1, true);
 
-    let mut s = Vector::<K>::new(PolynomialRepresentation::NTT);
-    for i in 0..K {
-        let prf_bytes = &prf(&sigma, n)[..prf_len];
-        let p = Polynomial::sample_cbd(P::ETA1, prf_bytes);
-        s[i] = p.ntt();
-        n += 1;
-    }
+    let mut t = Zeroizing::new(&a * &*s);
+    *t = &t.to_mont() + &*e;
 
-    let mut e = Vector::<K>::new(PolynomialRepresentation::NTT);
-    for i in 0..K {
-        let prf_bytes = &prf(&sigma, n)[..prf_len];
-        let p = Polynomial::sample_cbd(P::ETA1, prf_bytes);
-        e[i] = p.ntt();
-        n += 1;
-    }
-
-    let t = &(&a * &s).to_mont() + &e;
-    let ek_pke = EncapsKey::<K>::new(t.reduce(), rho, a.transpose());
-    (ek_pke, s)
+    (EncapsKey::<K>::new(t.reduce(), *rho, a.transpose()), s)
 }
 
 fn pke_encrypt<P: Kem, const K: usize>(
@@ -499,46 +448,35 @@ fn pke_encrypt<P: Kem, const K: usize>(
     c: &mut [u8],
 ) {
     let mut n: u8 = 0;
-    let prf_len1 = P::ETA1 << 6;
 
-    let mut y = Vector::<K>::new(PolynomialRepresentation::NTT);
-    for i in 0..K {
-        let prf_bytes = &prf(r, n)[..prf_len1];
-        let p = Polynomial::sample_cbd(P::ETA1, prf_bytes);
-        y[i] = p.ntt();
-        n += 1;
-    }
+    let y = sample_vec::<K>(r, &mut n, P::ETA1, true);
+    let e1 = sample_vec::<K>(r, &mut n, P::ETA2, false);
+    let e2 = Zeroizing::new(Polynomial::sample_cbd(
+        P::ETA2,
+        &prf(r, n)[..(P::ETA2 << 6)],
+    ));
 
-    let prf_len2 = P::ETA2 << 6;
-
-    let mut e1 = Vector::<K>::new(PolynomialRepresentation::STANDARD);
-    for i in 0..K {
-        let prf_bytes = &prf(r, n)[..prf_len2];
-        let p = Polynomial::sample_cbd(P::ETA2, prf_bytes);
-        e1[i] = p;
-        n += 1;
-    }
-
-    let prf_bytes = &prf(r, n)[..prf_len2];
-    let e2 = Polynomial::sample_cbd(P::ETA2, prf_bytes);
-    let u = &(ek.at() * &y).inv_ntt() + &e1;
-    let mu = Polynomial::from_msg(m);
-    let v = (ek.t() * &y).inv_ntt() + e2 + mu;
+    let mut u = Zeroizing::new(ek.at() * &*y);
+    *u = (&u.inv_ntt() + &*e1).reduce();
+    let mu = Zeroizing::new(Polynomial::from_msg(m));
+    let mut v = Zeroizing::new(ek.t() * &*y);
+    *v = (&(&v.inv_ntt() + &*e2) + &*mu).reduce();
 
     let du_len = (P::DU * K) << 5;
-    u.reduce().compress_encode(P::DU, &mut c[..du_len]);
-    v.reduce().compress_encode(P::DV, &mut c[du_len..]);
+    u.compress_encode(P::DU, &mut c[..du_len]);
+    v.compress_encode(P::DV, &mut c[du_len..]);
 }
 
-fn pke_decrypt<P: Kem, const K: usize>(s: &Vector<K>, c: &[u8]) -> [u8; 32] {
+fn pke_decrypt<P: Kem, const K: usize>(s: &Vector<K>, c: &[u8]) -> Zeroizing<[u8; 32]> {
     let du_len = (P::DU * K) << 5;
     let (c1, c2) = c.split_at(du_len);
 
     let u = Vector::decode_decompress(P::DU, c1);
     let v = Polynomial::decode_decompress(P::DV, c2);
-    let w = v - (s * &u.ntt()).inv_ntt();
+    let mut w = Zeroizing::new(s * &u.ntt());
+    *w = &v - &w.inv_ntt();
 
-    w.to_msg()
+    Zeroizing::new(w.to_msg())
 }
 
 fn sample_a<const K: usize>(rho: &[u8; 32], transposed: bool) -> Matrix<K> {
@@ -559,6 +497,34 @@ fn sample_a<const K: usize>(rho: &[u8; 32], transposed: bool) -> Matrix<K> {
     }
 
     a
+}
+
+fn sample_vec<const K: usize>(
+    seed: &[u8; 32],
+    n: &mut u8,
+    eta: usize,
+    ntt: bool,
+) -> Zeroizing<Vector<K>> {
+    let t = if ntt {
+        PolynomialRepresentation::NTT
+    } else {
+        PolynomialRepresentation::STANDARD
+    };
+    let mut v = Zeroizing::new(Vector::<K>::new(t));
+    let prf_len = eta << 6;
+
+    for i in 0..K {
+        let bytes = prf(seed, *n);
+        *n += 1;
+
+        let mut p = Zeroizing::new(Polynomial::sample_cbd(eta, &bytes[..prf_len]));
+        if ntt {
+            *p = p.ntt();
+        }
+        v[i] = (*p).clone()
+    }
+
+    v
 }
 
 #[cfg(test)]

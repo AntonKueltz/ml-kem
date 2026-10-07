@@ -174,7 +174,7 @@ fn test_decaps_512_01() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -351,7 +351,7 @@ fn test_decaps_512_02() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -528,7 +528,7 @@ fn test_decaps_512_03() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -705,7 +705,7 @@ fn test_decaps_512_04() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -882,7 +882,7 @@ fn test_decaps_512_05() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -1059,7 +1059,7 @@ fn test_decaps_512_06() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -1236,7 +1236,7 @@ fn test_decaps_512_07() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -1413,7 +1413,7 @@ fn test_decaps_512_08() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -1590,7 +1590,7 @@ fn test_decaps_512_09() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -1767,7 +1767,7 @@ fn test_decaps_512_10() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -1944,7 +1944,7 @@ fn test_decaps_512_11() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -2121,7 +2121,7 @@ fn test_decaps_512_12() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -2298,7 +2298,7 @@ fn test_decaps_512_13() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -2475,7 +2475,7 @@ fn test_decaps_512_14() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -2652,7 +2652,7 @@ fn test_decaps_512_15() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -2829,7 +2829,7 @@ fn test_decaps_512_16() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -3006,7 +3006,7 @@ fn test_decaps_512_17() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -3183,7 +3183,7 @@ fn test_decaps_512_18() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -3360,7 +3360,7 @@ fn test_decaps_512_19() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -3537,7 +3537,7 @@ fn test_decaps_512_20() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -3714,7 +3714,7 @@ fn test_decaps_512_21() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -3891,7 +3891,7 @@ fn test_decaps_512_22() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -4068,7 +4068,7 @@ fn test_decaps_512_23() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -4245,7 +4245,7 @@ fn test_decaps_512_24() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -4422,7 +4422,7 @@ fn test_decaps_512_25() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -4671,7 +4671,7 @@ fn test_decaps_768_01() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -4920,7 +4920,7 @@ fn test_decaps_768_02() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -5169,7 +5169,7 @@ fn test_decaps_768_03() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -5418,7 +5418,7 @@ fn test_decaps_768_04() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -5667,7 +5667,7 @@ fn test_decaps_768_05() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -5916,7 +5916,7 @@ fn test_decaps_768_06() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -6165,7 +6165,7 @@ fn test_decaps_768_07() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -6414,7 +6414,7 @@ fn test_decaps_768_08() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -6663,7 +6663,7 @@ fn test_decaps_768_09() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -6912,7 +6912,7 @@ fn test_decaps_768_10() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -7161,7 +7161,7 @@ fn test_decaps_768_11() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -7410,7 +7410,7 @@ fn test_decaps_768_12() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -7659,7 +7659,7 @@ fn test_decaps_768_13() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -7908,7 +7908,7 @@ fn test_decaps_768_14() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -8157,7 +8157,7 @@ fn test_decaps_768_15() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -8406,7 +8406,7 @@ fn test_decaps_768_16() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -8655,7 +8655,7 @@ fn test_decaps_768_17() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -8904,7 +8904,7 @@ fn test_decaps_768_18() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -9153,7 +9153,7 @@ fn test_decaps_768_19() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -9402,7 +9402,7 @@ fn test_decaps_768_20() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -9651,7 +9651,7 @@ fn test_decaps_768_21() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -9900,7 +9900,7 @@ fn test_decaps_768_22() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -10149,7 +10149,7 @@ fn test_decaps_768_23() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -10398,7 +10398,7 @@ fn test_decaps_768_24() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -10647,7 +10647,7 @@ fn test_decaps_768_25() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -10980,7 +10980,7 @@ fn test_decaps_1024_01() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -11313,7 +11313,7 @@ fn test_decaps_1024_02() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -11646,7 +11646,7 @@ fn test_decaps_1024_03() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -11979,7 +11979,7 @@ fn test_decaps_1024_04() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -12312,7 +12312,7 @@ fn test_decaps_1024_05() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -12645,7 +12645,7 @@ fn test_decaps_1024_06() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -12978,7 +12978,7 @@ fn test_decaps_1024_07() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -13311,7 +13311,7 @@ fn test_decaps_1024_08() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -13644,7 +13644,7 @@ fn test_decaps_1024_09() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -13977,7 +13977,7 @@ fn test_decaps_1024_10() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -14310,7 +14310,7 @@ fn test_decaps_1024_11() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -14643,7 +14643,7 @@ fn test_decaps_1024_12() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -14976,7 +14976,7 @@ fn test_decaps_1024_13() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -15309,7 +15309,7 @@ fn test_decaps_1024_14() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -15642,7 +15642,7 @@ fn test_decaps_1024_15() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -15975,7 +15975,7 @@ fn test_decaps_1024_16() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -16308,7 +16308,7 @@ fn test_decaps_1024_17() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -16641,7 +16641,7 @@ fn test_decaps_1024_18() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -16974,7 +16974,7 @@ fn test_decaps_1024_19() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -17307,7 +17307,7 @@ fn test_decaps_1024_20() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -17640,7 +17640,7 @@ fn test_decaps_1024_21() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -17973,7 +17973,7 @@ fn test_decaps_1024_22() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -18306,7 +18306,7 @@ fn test_decaps_1024_23() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -18639,7 +18639,7 @@ fn test_decaps_1024_24() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -18972,7 +18972,7 @@ fn test_decaps_1024_25() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -19149,7 +19149,7 @@ fn test_decaps_512_26() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -19326,7 +19326,7 @@ fn test_decaps_512_27() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -19503,7 +19503,7 @@ fn test_decaps_512_28() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -19680,7 +19680,7 @@ fn test_decaps_512_29() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -19857,7 +19857,7 @@ fn test_decaps_512_30() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -20034,7 +20034,7 @@ fn test_decaps_512_31() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -20211,7 +20211,7 @@ fn test_decaps_512_32() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -20388,7 +20388,7 @@ fn test_decaps_512_33() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -20565,7 +20565,7 @@ fn test_decaps_512_34() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -20742,7 +20742,7 @@ fn test_decaps_512_35() {
     ];
     let dk = MlKem512::deserialize_dk(&dk).unwrap();
     let k = MlKem512::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -20991,7 +20991,7 @@ fn test_decaps_768_26() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -21240,7 +21240,7 @@ fn test_decaps_768_27() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -21489,7 +21489,7 @@ fn test_decaps_768_28() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -21738,7 +21738,7 @@ fn test_decaps_768_29() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -21987,7 +21987,7 @@ fn test_decaps_768_30() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -22236,7 +22236,7 @@ fn test_decaps_768_31() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -22485,7 +22485,7 @@ fn test_decaps_768_32() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -22734,7 +22734,7 @@ fn test_decaps_768_33() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -22983,7 +22983,7 @@ fn test_decaps_768_34() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -23232,7 +23232,7 @@ fn test_decaps_768_35() {
     ];
     let dk = MlKem768::deserialize_dk(&dk).unwrap();
     let k = MlKem768::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -23565,7 +23565,7 @@ fn test_decaps_1024_26() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -23898,7 +23898,7 @@ fn test_decaps_1024_27() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -24231,7 +24231,7 @@ fn test_decaps_1024_28() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -24564,7 +24564,7 @@ fn test_decaps_1024_29() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -24897,7 +24897,7 @@ fn test_decaps_1024_30() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -25230,7 +25230,7 @@ fn test_decaps_1024_31() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -25563,7 +25563,7 @@ fn test_decaps_1024_32() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -25896,7 +25896,7 @@ fn test_decaps_1024_33() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -26229,7 +26229,7 @@ fn test_decaps_1024_34() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }
 
 #[test]
@@ -26562,5 +26562,5 @@ fn test_decaps_1024_35() {
     ];
     let dk = MlKem1024::deserialize_dk(&dk).unwrap();
     let k = MlKem1024::decaps(&dk, &c).unwrap();
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
 }

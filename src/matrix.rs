@@ -1,3 +1,4 @@
+use std::array::from_fn;
 use std::ops::{Index, IndexMut, Mul};
 
 use crate::polynomial::PolynomialRepresentation;
@@ -10,9 +11,9 @@ pub struct Matrix<const K: usize> {
 
 impl<const K: usize> Matrix<K> {
     pub fn new() -> Self {
-        Self {
-            rows: [Vector::<K>::new(PolynomialRepresentation::NTT); K],
-        }
+        let rows: [Vector<K>; K] = from_fn(|_| Vector::<K>::new(PolynomialRepresentation::NTT));
+
+        Self { rows }
     }
 
     pub fn transpose(&self) -> Self {
@@ -20,7 +21,7 @@ impl<const K: usize> Matrix<K> {
 
         for i in 0..K {
             for j in 0..K {
-                r[i][j] = self[j][i];
+                r[i][j] = self[j][i].clone();
             }
         }
 

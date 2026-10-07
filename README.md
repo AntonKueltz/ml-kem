@@ -110,6 +110,7 @@ reduced values that are less than zero.
 
 ## Memory
 
+All secrets and sensitive values in the rust code are zeroized as soon as they go out of scope.
 Memory inside the rust core logic is entirely stack allocated and does not use any dynamically
 allocated memory. Since the source of variance in memory sizes throughout MLKEM is the parameter
 set each parameter set is a specialized implementation of the `Kem` trait that allows that impl
@@ -161,15 +162,15 @@ ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
 
 op             param set      ops/sec (med)     µs/op           min           max       stdev
 ---------------------------------------------------------------------------------------------
-keygen         ML_KEM_512            40,869      24.5        40,194        41,058         394
-keygen         ML_KEM_768            23,880      41.9        23,429        23,976         217
-keygen         ML_KEM_1024           15,568      64.2        15,525        15,600          28
-encaps         ML_KEM_512            55,187      18.1        54,941        55,460         213
-encaps         ML_KEM_768            37,985      26.3        37,699        38,046         141
-encaps         ML_KEM_1024           27,606      36.2        27,336        27,797         198
-decaps         ML_KEM_512            41,995      23.8        41,163        42,162         429
-decaps         ML_KEM_768            29,103      34.4        28,676        29,113         202
-decaps         ML_KEM_1024           21,448      46.6        21,022        21,482         192
+keygen         ML_KEM_512            37,682      26.5        37,340        37,884         197
+encaps         ML_KEM_512            51,044      19.6        48,785        51,625       1,378
+decaps         ML_KEM_512            39,242      25.5        38,953        39,433         187
+keygen         ML_KEM_768            23,389      42.8        23,251        23,459          79
+encaps         ML_KEM_768            38,051      26.3        37,607        38,221         236
+decaps         ML_KEM_768            28,865      34.6        28,441        29,093         238
+keygen         ML_KEM_1024           14,862      67.3        14,542        15,093         254
+encaps         ML_KEM_1024           28,033      35.7        27,863        28,229         157
+decaps         ML_KEM_1024           21,342      46.9        21,247        21,390          66
 ```
 
 You can also run the benchmark yourself as well
@@ -179,7 +180,7 @@ uv run benchmark           # for local development
 python -m mlkem.benchmark  # for pip installed package
 ```
 
-Compared to openSSL below you can see that performance is a bit slower, but is on the same
+Compared to OpenSSL below you can see that performance is a bit slower, but is on the same
 order of magnitude.
 
 ```
@@ -197,7 +198,7 @@ Doing ML-KEM-1024 decaps ops for 1s: 24031 ML-KEM-1024 KEM decaps ops in 1.00s
 Depending on your specific CPU architecture, you may be able to see significant performance
 improvements compiling the rust source specifically for your instruction set. For example,
 compiling with `RUSTFLAGS='-C target-cpu=native'` yields the following performance gains
-on the same i9-9900k. With this change we see performance a bit faster than openSSL.
+on the same i9-9900k. With this change we see performance a bit faster than OpenSSL.
 
 ```
 $ RUSTFLAGS='-C target-cpu=native' uv run maturin develop -r
@@ -207,15 +208,15 @@ ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
 
 op             param set      ops/sec (med)     µs/op           min           max       stdev
 ---------------------------------------------------------------------------------------------
-keygen         ML_KEM_512            50,375      19.9        49,953        50,494         216
-keygen         ML_KEM_768            30,963      32.3        30,804        31,090         111
-keygen         ML_KEM_1024           20,057      49.9        19,913        20,198         109
-encaps         ML_KEM_512            81,164      12.3        80,100        81,423         619
-encaps         ML_KEM_768            57,887      17.3        56,710        58,348         688
-encaps         ML_KEM_1024           42,111      23.7        40,901        42,176         537
-decaps         ML_KEM_512            61,733      16.2        61,535        62,081         202
-decaps         ML_KEM_768            44,770      22.3        44,527        44,817         117
-decaps         ML_KEM_1024           31,901      31.3        31,479        32,407         381
+keygen         ML_KEM_512            46,707      21.4        46,169        46,913         291
+encaps         ML_KEM_512            70,186      14.2        66,056        70,378       1,835
+decaps         ML_KEM_512            54,587      18.3        54,033        54,688         267
+keygen         ML_KEM_768            30,481      32.8        30,057        30,525         196
+encaps         ML_KEM_768            57,913      17.3        56,916        58,017         456
+decaps         ML_KEM_768            43,660      22.9        42,439        43,704         545
+keygen         ML_KEM_1024           19,431      51.5        19,081        19,520         170
+encaps         ML_KEM_1024           42,444      23.6        42,293        42,529          90
+decaps         ML_KEM_1024           31,716      31.5        31,225        31,757         220
 ```
 
 ## Rust

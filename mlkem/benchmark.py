@@ -266,8 +266,8 @@ def main() -> None:
     )
 
     results: list[Result] = []
-    for op in selected:
-        for case in CASES:
+    for case in CASES:
+        for op in selected:
             fn = OPS[op](case)  # includes sanity check
             results.append(
                 bench(op, case.name, fn, args.duration, args.repeats, args.warmup)

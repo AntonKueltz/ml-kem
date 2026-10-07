@@ -128,7 +128,7 @@ fn test_encaps_internal_512_01() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -260,7 +260,7 @@ fn test_encaps_internal_512_02() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -392,7 +392,7 @@ fn test_encaps_internal_512_03() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -524,7 +524,7 @@ fn test_encaps_internal_512_04() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -656,7 +656,7 @@ fn test_encaps_internal_512_05() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -788,7 +788,7 @@ fn test_encaps_internal_512_06() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -920,7 +920,7 @@ fn test_encaps_internal_512_07() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1052,7 +1052,7 @@ fn test_encaps_internal_512_08() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1184,7 +1184,7 @@ fn test_encaps_internal_512_09() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1316,7 +1316,7 @@ fn test_encaps_internal_512_10() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1448,7 +1448,7 @@ fn test_encaps_internal_512_11() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1580,7 +1580,7 @@ fn test_encaps_internal_512_12() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1712,7 +1712,7 @@ fn test_encaps_internal_512_13() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1844,7 +1844,7 @@ fn test_encaps_internal_512_14() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -1976,7 +1976,7 @@ fn test_encaps_internal_512_15() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -2108,7 +2108,7 @@ fn test_encaps_internal_512_16() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -2240,7 +2240,7 @@ fn test_encaps_internal_512_17() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -2372,7 +2372,7 @@ fn test_encaps_internal_512_18() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -2504,7 +2504,7 @@ fn test_encaps_internal_512_19() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -2636,7 +2636,7 @@ fn test_encaps_internal_512_20() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -2768,7 +2768,7 @@ fn test_encaps_internal_512_21() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -2900,7 +2900,7 @@ fn test_encaps_internal_512_22() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -3032,7 +3032,7 @@ fn test_encaps_internal_512_23() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -3164,7 +3164,7 @@ fn test_encaps_internal_512_24() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -3296,7 +3296,7 @@ fn test_encaps_internal_512_25() {
     let mut c = [0u8; 768];
     let k = encaps_internal::<MlKem512, 2>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -3474,7 +3474,7 @@ fn test_encaps_internal_768_01() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -3652,7 +3652,7 @@ fn test_encaps_internal_768_02() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -3830,7 +3830,7 @@ fn test_encaps_internal_768_03() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -4008,7 +4008,7 @@ fn test_encaps_internal_768_04() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -4186,7 +4186,7 @@ fn test_encaps_internal_768_05() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -4364,7 +4364,7 @@ fn test_encaps_internal_768_06() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -4542,7 +4542,7 @@ fn test_encaps_internal_768_07() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -4720,7 +4720,7 @@ fn test_encaps_internal_768_08() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -4898,7 +4898,7 @@ fn test_encaps_internal_768_09() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -5076,7 +5076,7 @@ fn test_encaps_internal_768_10() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -5254,7 +5254,7 @@ fn test_encaps_internal_768_11() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -5432,7 +5432,7 @@ fn test_encaps_internal_768_12() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -5610,7 +5610,7 @@ fn test_encaps_internal_768_13() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -5788,7 +5788,7 @@ fn test_encaps_internal_768_14() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -5966,7 +5966,7 @@ fn test_encaps_internal_768_15() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -6144,7 +6144,7 @@ fn test_encaps_internal_768_16() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -6322,7 +6322,7 @@ fn test_encaps_internal_768_17() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -6500,7 +6500,7 @@ fn test_encaps_internal_768_18() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -6678,7 +6678,7 @@ fn test_encaps_internal_768_19() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -6856,7 +6856,7 @@ fn test_encaps_internal_768_20() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -7034,7 +7034,7 @@ fn test_encaps_internal_768_21() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -7212,7 +7212,7 @@ fn test_encaps_internal_768_22() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -7390,7 +7390,7 @@ fn test_encaps_internal_768_23() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -7568,7 +7568,7 @@ fn test_encaps_internal_768_24() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -7746,7 +7746,7 @@ fn test_encaps_internal_768_25() {
     let mut c = [0u8; 1088];
     let k = encaps_internal::<MlKem768, 3>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -7982,7 +7982,7 @@ fn test_encaps_internal_1024_01() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -8218,7 +8218,7 @@ fn test_encaps_internal_1024_02() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -8454,7 +8454,7 @@ fn test_encaps_internal_1024_03() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -8690,7 +8690,7 @@ fn test_encaps_internal_1024_04() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -8926,7 +8926,7 @@ fn test_encaps_internal_1024_05() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -9162,7 +9162,7 @@ fn test_encaps_internal_1024_06() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -9398,7 +9398,7 @@ fn test_encaps_internal_1024_07() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -9634,7 +9634,7 @@ fn test_encaps_internal_1024_08() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -9870,7 +9870,7 @@ fn test_encaps_internal_1024_09() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -10106,7 +10106,7 @@ fn test_encaps_internal_1024_10() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -10342,7 +10342,7 @@ fn test_encaps_internal_1024_11() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -10578,7 +10578,7 @@ fn test_encaps_internal_1024_12() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -10814,7 +10814,7 @@ fn test_encaps_internal_1024_13() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -11050,7 +11050,7 @@ fn test_encaps_internal_1024_14() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -11286,7 +11286,7 @@ fn test_encaps_internal_1024_15() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -11522,7 +11522,7 @@ fn test_encaps_internal_1024_16() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -11758,7 +11758,7 @@ fn test_encaps_internal_1024_17() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -11994,7 +11994,7 @@ fn test_encaps_internal_1024_18() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -12230,7 +12230,7 @@ fn test_encaps_internal_1024_19() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -12466,7 +12466,7 @@ fn test_encaps_internal_1024_20() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -12702,7 +12702,7 @@ fn test_encaps_internal_1024_21() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -12938,7 +12938,7 @@ fn test_encaps_internal_1024_22() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -13174,7 +13174,7 @@ fn test_encaps_internal_1024_23() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -13410,7 +13410,7 @@ fn test_encaps_internal_1024_24() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
 
@@ -13646,6 +13646,6 @@ fn test_encaps_internal_1024_25() {
     let mut c = [0u8; 1568];
     let k = encaps_internal::<MlKem1024, 4>(&ek, &m, &mut c);
 
-    assert_eq!(k, expected_k);
+    assert_eq!(*k, expected_k);
     assert_eq!(c, expected_c);
 }
