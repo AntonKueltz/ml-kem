@@ -1,3 +1,4 @@
+use subtle::ConstantTimeEq;
 use zeroize::{Zeroize, ZeroizeOnDrop};
 
 use crate::encaps_key::EncapsKey;
@@ -35,9 +36,10 @@ impl<const K: usize> DecapsKey<K> {
     }
 
     pub fn check(&self) -> Result<(), String> {
-        match self.ek_hash == self.ek.h() {
-            true => Ok(()),
-            false => Err(String::from("Invalid encaps key hash.")),
+        if bool::from(self.ek_hash.ct_eq(&self.ek.h())) {
+            Ok(())
+        } else {
+            Err(String::from("Invalid encaps key hash."))
         }
     }
 }

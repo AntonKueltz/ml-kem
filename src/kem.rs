@@ -69,7 +69,6 @@ impl Kem for MlKem512 {
     }
 
     fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<Zeroizing<[u8; 32]>, String> {
-        dk.check()?;
         let mut c_ = Zeroizing::new([0u8; 768]);
 
         Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut *c_))
@@ -124,7 +123,6 @@ impl Kem for MlKem768 {
     }
 
     fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<Zeroizing<[u8; 32]>, String> {
-        dk.check()?;
         let mut c_ = Zeroizing::new([0u8; 1088]);
 
         Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut *c_))
@@ -179,7 +177,6 @@ impl Kem for MlKem1024 {
     }
 
     fn decaps(dk: &Self::DecapsKey, c: &Self::Ctxt) -> Result<Zeroizing<[u8; 32]>, String> {
-        dk.check()?;
         let mut c_ = Zeroizing::new([0u8; 1568]);
 
         Ok(decaps_internal::<Self, { Self::K }>(dk, c, &mut *c_))
@@ -421,12 +418,15 @@ fn deserialize_dk<const K: usize>(bytes: &[u8]) -> Result<DecapsKey<K>, String> 
     let s = Vector::<K>::try_from((s_bytes, PolynomialRepresentation::NTT))?;
     let ek = deserialize_ek::<K>(ek_bytes)?;
 
-    Ok(DecapsKey::<K>::new(
+    let dk = DecapsKey::<K>::new(
         s,
         ek,
         ek_hash_bytes.try_into().unwrap(),
         z_bytes.try_into().unwrap(),
-    ))
+    );
+    dk.check()?;
+
+    Ok(dk)
 }
 
 #[cfg(test)]

@@ -4,8 +4,9 @@
 # Module-Lattice-Based Key-Encapsulation Mechanism (ML-KEM)
 An implementation of the module-lattice-based key encapsulation mechanism (ML-KEM)
 as described in [FIPS-203](https://nvlpubs.nist.gov/nistpubs/FIPS/NIST.FIPS.203.pdf).
-At this time the package is in beta and _SHOULD NOT_ be considered for real-world
-cryptographic applications.
+The implementation aims to be both performant and secure. For more details on security
+see the "Security" section of this README. This package has not been audited by a third
+party. For security critical use cases I recommend more established libraries.
 
 # Usage
 
@@ -85,6 +86,64 @@ ek512.parameter_set  # => ParameterSet.ML_KEM_512
 kem768.encaps(ek512)  # => ValueError: Key does not match this ML_KEM parameter set
 ```
 
+# Security
+
+The implementation does not use any conditional branching and aims to be constant time
+for all operations involving secret material and considers timing side channels as part
+of its threat model. The threat model assumes that all inputs to this package's interface
+are attacker controlled. Memory management aims to be compliant with the FIPS spec, which
+states
+
+> Data used in intermediate computation steps of KEM algorithms could be used by an
+> adversary to compromise security. Therefore, implementers shall ensure that intermediate
+> data is destroyed as soon as it is no longer needed.
+
+Memory management on the python side is not as straightforward. Once secret material like
+the decaps key passes onto the python side (by being put on the heap in the PyO3 bindings)
+it is harder to enforce (by this package) that the value is properly zero-ed out in memory
+once it is no longer needed. This means that once the secret material is generated in python
+by the consumer of this package, it is up to them to ensure proper zero-ing / garbage
+collection of the secret material commensurate with the threat model of the consumer.
+
+With regard to timing side channels, while the rust code underpinning this implementation
+does no branching on secret material, it cannot be guaranteed that all compilers and all
+target architectures have assembly produced for them where this assumption holds. The
+easiest way to check if a particular compiler / architecture combination produce constant
+time code is to run the [example](./examples), which are a suite of constant time tests
+using the [rust port of the dudect tool](https://docs.rs/dudect-bencher/latest/dudect_bencher).
+A constant time implementation will show a stable `max t`.
+
+```bash
+$ cargo run --release --example ct -- --continuous decaps_valid_vs_invalid_ctxt
+    Finished `release` profile [optimized] target(s) in 0.06s
+     Running `target/release/examples/ct --continuous decaps_valid_vs_invalid_ctxt`
+running 1 benchmark continuously
+bench decaps_valid_vs_invalid_ctxt seeded with 0xb9cf8dcf1467007c
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.091M, max t = +1.13915, max tau = +0.00377, (5/tau)^2 = 1762447
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.129M, max t = +1.54041, max tau = +0.00428, (5/tau)^2 = 1362416
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.192M, max t = +1.21802, max tau = +0.00278, (5/tau)^2 = 3241852
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.356M, max t = +1.39719, max tau = +0.00234, (5/tau)^2 = 4558998
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.454M, max t = +1.33999, max tau = +0.00199, (5/tau)^2 = 6315576
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.568M, max t = -1.45313, max tau = -0.00193, (5/tau)^2 = 6719253
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.440M, max t = +1.75852, max tau = +0.00265, (5/tau)^2 = 3559450
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.504M, max t = +2.09895, max tau = +0.00296, (5/tau)^2 = 2862346
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.571M, max t = +2.09054, max tau = +0.00277, (5/tau)^2 = 3268192
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.637M, max t = +1.62036, max tau = +0.00203, (5/tau)^2 = 6066478
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.694M, max t = +1.91953, max tau = +0.00230, (5/tau)^2 = 4709694
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.757M, max t = +1.79421, max tau = +0.00206, (5/tau)^2 = 5882404
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.819M, max t = +2.22930, max tau = +0.00246, (5/tau)^2 = 4119858
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.881M, max t = +2.21609, max tau = +0.00236, (5/tau)^2 = 4485546
+bench decaps_valid_vs_invalid_ctxt ... : n == +0.944M, max t = +2.07783, max tau = +0.00214, (5/tau)^2 = 5468792
+bench decaps_valid_vs_invalid_ctxt ... : n == +1.010M, max t = +2.42622, max tau = +0.00241, (5/tau)^2 = 4288152
+```
+
+The current approach of these tests is to compare the timing of unmodified inputs to the
+various interfaces in this package against inputs that have been modified in ways that would
+potentially be useful for the attacker to learn secret material. As an example,
+`decaps_valid_vs_invalid_ctxt` runs `decaps` against both a valid and a randomized ciphertext.
+See [`examples/ct.rs`](./examples/ct.rs) for the full selection of supported constant time
+tests.
+
 # Implementation
 
 The implementation follows the spec and the reference implementation closely. Many of the
@@ -99,9 +158,9 @@ This implementation makes use of the `i16` type to represent integers mod Q = 33
 can be represented in 12 bits this allows addition and subtraction to be done without reductions
 (to save cycles) and only applies reductions when e.g. multiplication is done. There are several
 reduced forms that exist throughout the implementation.
-* *Canonical*: represented as a value in [0, Q).
-* *Montgomery reduced*: represented as a value _x*R mod Q_ where R = 2^16.
-* *Barrett reduced*: represented as a value centered at 0 i.e. in ~[-Q/2, Q/2].
+* *Canonical*: represented as a value in `[0, Q)`.
+* *Montgomery reduced*: represented as a value `x * R^-1 mod Q` where `R = 2^16`.
+* *Barrett reduced*: representation centered at 0 i.e. in `~[-Q/2, Q/2]`.
 
 The core arithmetic is generally done in the NTT domain using a montgomery represenation. When
 data needs to be serialized back to bytes it is then usually canonicalized via the process of
@@ -120,13 +179,12 @@ at the border between python and rust code. I do not know of a way to avoid this
 considered secret if they are copied across the language boundary and if they are not promptly
 garbage collected and zeroizeed by python.
 
-## Randomness
+## Testing
 
-NIST requires that an approved RBG (random bit generator) be used as the source of randomness
-for all operations requiring randomness. The current implementation uses `rand::rngs::StdRng`.
-You can read more about the RNG [here](https://rust-random.github.io/book/guide-rngs.html). While
-it is a cryptographically secure pseudorandom number generator (CSPRNG), it is not one that is
-NIST approved, so this implementation is currently not entirely NIST / FIPS compliant.
+Test vectors currently include the NIST
+[Automated Cryptographic Validation Test System](https://github.com/usnistgov/ACVP-Server/tree/master)
+cases, several cases from the [Wycheproof project](https://github.com/C2SP/wycheproof/tree/main)
+and also a thousand rounds of randomized testing for each parameter set on each test run.
 
 # Development
 
@@ -162,15 +220,15 @@ ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
 
 op             param set      ops/sec (med)     µs/op           min           max       stdev
 ---------------------------------------------------------------------------------------------
-keygen         ML_KEM_512            43,032      23.2        42,401        43,044         280
-encaps         ML_KEM_512            65,413      15.3        65,349        65,805         187
-decaps         ML_KEM_512            45,999      21.7        45,727        46,085         139
-keygen         ML_KEM_768            25,365      39.4        24,333        25,441         489
-encaps         ML_KEM_768            46,256      21.6        46,205        46,514         142
-decaps         ML_KEM_768            32,067      31.2        31,776        32,176         188
-keygen         ML_KEM_1024           16,165      61.9        15,909        16,237         126
-encaps         ML_KEM_1024           33,469      29.9        33,396        33,502          42
-decaps         ML_KEM_1024           23,364      42.8        23,293        23,399          45
+keygen         ML_KEM_512            41,944      23.8        40,828        42,558         699
+encaps         ML_KEM_512            65,717      15.2        64,260        65,727         650
+decaps         ML_KEM_512            52,241      19.1        52,010        52,525         199
+keygen         ML_KEM_768            25,251      39.6        24,922        25,385         200
+encaps         ML_KEM_768            46,171      21.7        45,035        46,186         496
+decaps         ML_KEM_768            37,259      26.8        36,735        37,417         262
+keygen         ML_KEM_1024           16,262      61.5        16,181        16,298          43
+encaps         ML_KEM_1024           33,433      29.9        33,218        33,651         163
+decaps         ML_KEM_1024           27,121      36.9        27,032        27,257          94
 ```
 
 You can also run the benchmark yourself as well
@@ -208,15 +266,15 @@ ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
 
 op             param set      ops/sec (med)     µs/op           min           max       stdev
 ---------------------------------------------------------------------------------------------
-keygen         ML_KEM_512            54,207      18.4        54,015        54,676         279
-encaps         ML_KEM_512            99,366      10.1        91,765        99,779       3,442
-decaps         ML_KEM_512            68,537      14.6        68,065        68,648         230
-keygen         ML_KEM_768            32,597      30.7        32,334        32,801         195
-encaps         ML_KEM_768            72,002      13.9        69,828        72,053       1,014
-decaps         ML_KEM_768            48,413      20.7        47,370        48,759         616
-keygen         ML_KEM_1024           20,804      48.1        20,432        20,853         171
-encaps         ML_KEM_1024           51,859      19.3        50,452        51,927         636
-decaps         ML_KEM_1024           34,723      28.8        34,711        34,778          30
+keygen         ML_KEM_512            51,656      19.4        51,198        53,992       1,216
+encaps         ML_KEM_512            98,699      10.1        98,523        98,903         144
+decaps         ML_KEM_512            77,929      12.8        77,819        78,900         452
+keygen         ML_KEM_768            32,329      30.9        31,807        32,493         303
+encaps         ML_KEM_768            72,446      13.8        71,064        72,978         827
+decaps         ML_KEM_768            56,300      17.8        56,162        56,640         199
+keygen         ML_KEM_1024           20,577      48.6        20,125        20,764         238
+encaps         ML_KEM_1024           52,144      19.2        51,324        52,241         374
+decaps         ML_KEM_1024           40,489      24.7        39,998        41,075         399
 ```
 
 ## Rust
@@ -242,3 +300,4 @@ RUSTFLAGS="-C force-frame-pointers=yes" cargo flamegraph --bench kem -- --bench 
 * [CRYSTALS-Kyber: a CCA-secure module-lattice-based KEM](https://eprint.iacr.org/2017/634.pdf)
 * [Kyber terminates](https://cryptojedi.org/papers/terminate-20230516.pdf)
 * [KyberSlash: Exploiting secret-dependent division timings in Kyber implementations](https://kyberslash.cr.yp.to/kyberslash-20250115.pdf)
+* [Dude, is my code constant time?](https://eprint.iacr.org/2016/1123.pdf)
