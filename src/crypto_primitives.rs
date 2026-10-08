@@ -5,14 +5,11 @@ use shake::{
 };
 use zeroize::{Zeroize, Zeroizing};
 
-pub fn prf(s: &[u8; 32], b: u8) -> Zeroizing<[u8; 192]> {
+pub fn prf(s: &[u8; 32], b: u8, buf: &mut [u8]) {
     let mut xof = Shake256::default();
     xof.update(s);
     xof.update(&[b]);
-
-    let mut output = Zeroizing::new([0u8; 192]);
-    xof.finalize_xof().read(&mut *output);
-    output
+    xof.finalize_xof().read(buf);
 }
 
 pub fn g(chunks: &[&[u8]]) -> (Zeroizing<[u8; 32]>, Zeroizing<[u8; 32]>) {
@@ -23,7 +20,7 @@ pub fn g(chunks: &[&[u8]]) -> (Zeroizing<[u8; 32]>, Zeroizing<[u8; 32]>) {
     }
 
     let mut hashed = Output::<Sha3_512>::default();
-    hasher.finalize_into(&mut hashed); // adjust to your digest version
+    hasher.finalize_into(&mut hashed);
 
     let (mut l, mut r) = (Zeroizing::new([0u8; 32]), Zeroizing::new([0u8; 32]));
     l.copy_from_slice(&hashed[..32]);

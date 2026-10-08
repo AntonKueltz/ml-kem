@@ -285,10 +285,10 @@ fn pke_encrypt<P: Kem, const K: usize>(
 
     let y = sample_vec::<K>(r, &mut n, P::ETA1, true);
     let e1 = sample_vec::<K>(r, &mut n, P::ETA2, false);
-    let e2 = Zeroizing::new(Polynomial::sample_cbd(
-        P::ETA2,
-        &prf(r, n)[..(P::ETA2 << 6)],
-    ));
+
+    let mut prf_buf = Zeroizing::new([0u8; 192]);
+    prf(r, n, &mut prf_buf[..(P::ETA2 << 6)]);
+    let e2 = Zeroizing::new(Polynomial::sample_cbd(P::ETA2, &prf_buf[..(P::ETA2 << 6)]));
 
     let mut u = Zeroizing::new(ek.at() * &*y);
     *u = (&u.inv_ntt() + &*e1).reduce();
@@ -346,12 +346,13 @@ fn sample_vec<const K: usize>(
     };
     let mut v = Zeroizing::new(Vector::<K>::new(t));
     let prf_len = eta << 6;
+    let mut prf_buf = Zeroizing::new([0u8; 192]);
 
     for i in 0..K {
-        let bytes = prf(seed, *n);
+        prf(seed, *n, &mut prf_buf[..prf_len]);
         *n += 1;
 
-        let mut p = Zeroizing::new(Polynomial::sample_cbd(eta, &bytes[..prf_len]));
+        let mut p = Zeroizing::new(Polynomial::sample_cbd(eta, &prf_buf[..prf_len]));
         if ntt {
             *p = p.ntt();
         }
