@@ -162,15 +162,15 @@ ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
 
 op             param set      ops/sec (med)     µs/op           min           max       stdev
 ---------------------------------------------------------------------------------------------
-keygen         ML_KEM_512            37,682      26.5        37,340        37,884         197
-encaps         ML_KEM_512            51,044      19.6        48,785        51,625       1,378
-decaps         ML_KEM_512            39,242      25.5        38,953        39,433         187
-keygen         ML_KEM_768            23,389      42.8        23,251        23,459          79
-encaps         ML_KEM_768            38,051      26.3        37,607        38,221         236
-decaps         ML_KEM_768            28,865      34.6        28,441        29,093         238
-keygen         ML_KEM_1024           14,862      67.3        14,542        15,093         254
-encaps         ML_KEM_1024           28,033      35.7        27,863        28,229         157
-decaps         ML_KEM_1024           21,342      46.9        21,247        21,390          66
+keygen         ML_KEM_512            43,032      23.2        42,401        43,044         280
+encaps         ML_KEM_512            65,413      15.3        65,349        65,805         187
+decaps         ML_KEM_512            45,999      21.7        45,727        46,085         139
+keygen         ML_KEM_768            25,365      39.4        24,333        25,441         489
+encaps         ML_KEM_768            46,256      21.6        46,205        46,514         142
+decaps         ML_KEM_768            32,067      31.2        31,776        32,176         188
+keygen         ML_KEM_1024           16,165      61.9        15,909        16,237         126
+encaps         ML_KEM_1024           33,469      29.9        33,396        33,502          42
+decaps         ML_KEM_1024           23,364      42.8        23,293        23,399          45
 ```
 
 You can also run the benchmark yourself as well
@@ -180,8 +180,8 @@ uv run benchmark           # for local development
 python -m mlkem.benchmark  # for pip installed package
 ```
 
-Compared to OpenSSL below you can see that performance is a bit slower, but is on the same
-order of magnitude.
+Compared to OpenSSL below you can see that performance is about on par, perhaps slightly slower
+for some param set / op combinations on this particular architecture.
 
 ```
 Doing ML-KEM-512 keygen ops for 1s: 43784 ML-KEM-512 KEM keygen ops in 1.00s
@@ -198,25 +198,25 @@ Doing ML-KEM-1024 decaps ops for 1s: 24031 ML-KEM-1024 KEM decaps ops in 1.00s
 Depending on your specific CPU architecture, you may be able to see significant performance
 improvements compiling the rust source specifically for your instruction set. For example,
 compiling with `RUSTFLAGS='-C target-cpu=native'` yields the following performance gains
-on the same i9-9900k. With this change we see performance a bit faster than OpenSSL.
+on the same i9-9900k. With this change we see performance faster than OpenSSL.
 
 ```
 $ RUSTFLAGS='-C target-cpu=native' uv run maturin develop -r
-$ uv run benchmark --duration 1
+$ uv run benchmark
 
 ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
 
 op             param set      ops/sec (med)     µs/op           min           max       stdev
 ---------------------------------------------------------------------------------------------
-keygen         ML_KEM_512            46,707      21.4        46,169        46,913         291
-encaps         ML_KEM_512            70,186      14.2        66,056        70,378       1,835
-decaps         ML_KEM_512            54,587      18.3        54,033        54,688         267
-keygen         ML_KEM_768            30,481      32.8        30,057        30,525         196
-encaps         ML_KEM_768            57,913      17.3        56,916        58,017         456
-decaps         ML_KEM_768            43,660      22.9        42,439        43,704         545
-keygen         ML_KEM_1024           19,431      51.5        19,081        19,520         170
-encaps         ML_KEM_1024           42,444      23.6        42,293        42,529          90
-decaps         ML_KEM_1024           31,716      31.5        31,225        31,757         220
+keygen         ML_KEM_512            54,207      18.4        54,015        54,676         279
+encaps         ML_KEM_512            99,366      10.1        91,765        99,779       3,442
+decaps         ML_KEM_512            68,537      14.6        68,065        68,648         230
+keygen         ML_KEM_768            32,597      30.7        32,334        32,801         195
+encaps         ML_KEM_768            72,002      13.9        69,828        72,053       1,014
+decaps         ML_KEM_768            48,413      20.7        47,370        48,759         616
+keygen         ML_KEM_1024           20,804      48.1        20,432        20,853         171
+encaps         ML_KEM_1024           51,859      19.3        50,452        51,927         636
+decaps         ML_KEM_1024           34,723      28.8        34,711        34,778          30
 ```
 
 ## Rust

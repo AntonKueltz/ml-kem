@@ -48,16 +48,39 @@ impl Polynomial {
         assert_eq!(bytes.len(), 64 * eta);
         let mut r = Self::new(PolynomialRepresentation::STANDARD);
 
-        for i in 0..N {
-            let (mut x, mut y): (i16, i16) = (0, 0);
+        if eta == 2 {
+            const MASK: u32 = 0b01010101_01010101_01010101_01010101;
 
-            for j in 0..eta {
-                let k = ((i * eta) << 1) + j;
-                x += test_bit(bytes, k) as i16;
-                y += test_bit(bytes, k + eta) as i16;
+            for i in (0..128).step_by(4) {
+                let n = u32::from_le_bytes(bytes[i..(i + 4)].try_into().unwrap());
+                let two_bit_sums = (n & MASK) + ((n >> 1) & MASK);
+
+                for j in 0..8 {
+                    let base = j << 2;
+                    let x = ((two_bit_sums >> base) & 0b11) as i16;
+                    let y = ((two_bit_sums >> (base + 2)) & 0b11) as i16;
+                    r[(i << 1) + j] = x - y;
+                }
             }
+        } else {
+            const MASK: u32 = 0b00100100_10010010_01001001;
+            let mut ri = 0;
 
-            r[i] = x - y;
+            for i in (0..192).step_by(3) {
+                let n = u32::from(bytes[i])
+                    | u32::from(bytes[i + 1]) << 8
+                    | u32::from(bytes[i + 2]) << 16;
+                let three_bit_sums = (n & MASK) + ((n >> 1) & MASK) + ((n >> 2) & MASK);
+
+                for j in 0..4 {
+                    let base = j * 6;
+                    let x = ((three_bit_sums >> base) & 0b111) as i16;
+                    let y = ((three_bit_sums >> (base + 3)) & 0b11) as i16;
+                    r[ri + j] = x - y;
+                }
+
+                ri += 4;
+            }
         }
 
         r
