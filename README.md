@@ -8,6 +8,14 @@ The implementation aims to be both performant and secure. For more details on se
 see the "Security" section of this README. This package has not been audited by a third
 party. For security critical use cases I recommend more established libraries.
 
+- [Usage](#usage)
+- [Installation](#installation)
+- [Security](#security)
+- [Implementation](#implementation)
+- [Development](#development)
+- [Performance](#performance)
+- [References](#references)
+
 # Usage
 
 The interface follows the one defined in section 7 of the standard for the functions KeyGen,
@@ -84,6 +92,25 @@ ek512, _ = kem512.key_gen()
 
 ek512.parameter_set  # => ParameterSet.ML_KEM_512
 kem768.encaps(ek512)  # => ValueError: Key does not match this ML_KEM parameter set
+```
+
+# Installation
+
+You can use the usual package managers to install. Wheels are available for most
+operating systems and architectures.
+
+```bash
+$ pip install mlkem
+$ uv add mlkem
+# etc
+```
+
+You can also build from source, which has the advantage of e.g. compiling the rust code
+for your specific target architecture. See the "Performance" section for some analysis
+of potential performance gains using this approach.
+
+```bash
+$ RUSTFLAGS="-C target-cpu=native" pip install --no-binary mlkem mlkem
 ```
 
 # Security
