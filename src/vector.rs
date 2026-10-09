@@ -1,5 +1,5 @@
 use std::array::from_fn;
-use std::ops::{Add, Index, IndexMut, Mul};
+use std::ops::{Index, IndexMut, Mul};
 
 use zeroize::Zeroize;
 
@@ -18,20 +18,34 @@ impl<const K: usize> Vector<K> {
         Self { coords }
     }
 
-    pub fn reduce(&self) -> Self {
-        self.map(Polynomial::reduce)
+    pub fn reduce(&mut self) {
+        for p in self.coords.each_mut() {
+            p.reduce();
+        }
     }
 
-    pub fn to_mont(&self) -> Self {
-        self.map(Polynomial::to_mont)
+    pub fn to_mont(&mut self) {
+        for p in self.coords.each_mut() {
+            p.to_mont();
+        }
     }
 
-    pub fn ntt(&self) -> Self {
-        self.map(Polynomial::ntt)
+    pub fn ntt(&mut self) {
+        for p in self.coords.each_mut() {
+            p.ntt();
+        }
     }
 
-    pub fn inv_ntt(&self) -> Self {
-        self.map(Polynomial::inv_ntt)
+    pub fn inv_ntt(&mut self) {
+        for p in self.coords.each_mut() {
+            p.inv_ntt();
+        }
+    }
+
+    pub fn add_acc(&mut self, other: &Self) {
+        for i in 0..K {
+            self[i].add_acc(&other[i]);
+        }
     }
 
     pub(crate) fn to_bytes(&self, buf: &mut [u8]) {
@@ -199,32 +213,6 @@ impl<const K: usize> Vector<K> {
 
         r
     }
-
-    fn from_fn(f: impl FnMut(usize) -> Polynomial) -> Self {
-        Self {
-            coords: core::array::from_fn(f),
-        }
-    }
-
-    fn map(&self, f: impl Fn(&Polynomial) -> Polynomial) -> Self {
-        Self::from_fn(|i| f(&self[i]))
-    }
-}
-
-impl<const K: usize> Add for &Vector<K> {
-    type Output = Vector<K>;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        // TODO - allocates k polynomials that get thrown away
-        // representation doesn't matter here as polynomial addition will produce the correct representation
-        let mut r = Vector::<K>::new(PolynomialRepresentation::STANDARD);
-
-        for i in 0..K {
-            r[i] = &self[i] + &rhs[i];
-        }
-
-        r
-    }
 }
 
 impl<const K: usize> Mul for &Vector<K> {
@@ -234,11 +222,11 @@ impl<const K: usize> Mul for &Vector<K> {
         let mut c: Polynomial = Polynomial::new(PolynomialRepresentation::NTT);
 
         for i in 0..K {
-            let s: Polynomial = &self[i] * &rhs[i];
-            c = &c + &s;
+            c.mul_acc(&self[i], &rhs[i]);
         }
 
-        c.reduce()
+        c.reduce();
+        c
     }
 }
 

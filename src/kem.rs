@@ -221,9 +221,10 @@ fn key_gen_internal<P: Kem, const K: usize>(
     d: &[u8; 32],
     z: &[u8; 32],
 ) -> (EncapsKey<K>, DecapsKey<K>) {
-    let (ek, s) = pke_key_gen::<P, K>(d);
+    let (ek, mut s) = pke_key_gen::<P, K>(d);
     let ek_hash = ek.h();
-    let dk = DecapsKey::<K>::new(s.reduce(), ek.clone(), ek_hash, *z);
+    s.reduce();
+    let dk = DecapsKey::<K>::new((*s).clone(), ek.clone(), ek_hash, *z);
     (ek, dk)
 }
 
@@ -266,10 +267,12 @@ fn pke_key_gen<P: Kem, const K: usize>(d: &[u8; 32]) -> (EncapsKey<K>, Zeroizing
     let s = sample_vec::<K>(&sigma, &mut n, P::ETA1, true);
     let e = sample_vec::<K>(&sigma, &mut n, P::ETA1, true);
 
-    let mut t = Zeroizing::new(&a * &*s);
-    *t = &t.to_mont() + &*e;
+    let mut t = Zeroizing::new(&a * &s);
+    t.to_mont();
+    t.add_acc(&e);
+    t.reduce();
 
-    (EncapsKey::<K>::new(t.reduce(), *rho, a.transpose()), s)
+    (EncapsKey::<K>::new((*t).clone(), *rho, a.transpose()), s)
 }
 
 fn pke_encrypt<P: Kem, const K: usize>(
@@ -287,11 +290,16 @@ fn pke_encrypt<P: Kem, const K: usize>(
     prf(r, n, &mut prf_buf[..(P::ETA2 << 6)]);
     let e2 = Zeroizing::new(Polynomial::sample_cbd(P::ETA2, &prf_buf[..(P::ETA2 << 6)]));
 
-    let mut u = Zeroizing::new(ek.at() * &*y);
-    *u = (&u.inv_ntt() + &*e1).reduce();
+    let mut u = Zeroizing::new(ek.at() * &y);
+    u.inv_ntt();
+    u.add_acc(&e1);
+    u.reduce();
     let mu = Zeroizing::new(Polynomial::from_msg(m));
-    let mut v = Zeroizing::new(ek.t() * &*y);
-    *v = (&(&v.inv_ntt() + &*e2) + &*mu).reduce();
+    let mut v = Zeroizing::new(ek.t() * &y);
+    v.inv_ntt();
+    v.add_acc(&e2);
+    v.add_acc(&mu);
+    v.reduce();
 
     let du_len = (P::DU * K) << 5;
     u.compress_encode(P::DU, &mut c[..du_len]);
@@ -302,12 +310,14 @@ fn pke_decrypt<P: Kem, const K: usize>(s: &Vector<K>, c: &[u8]) -> Zeroizing<[u8
     let du_len = (P::DU * K) << 5;
     let (c1, c2) = c.split_at(du_len);
 
-    let u = Vector::decode_decompress(P::DU, c1);
-    let v = Polynomial::decode_decompress(P::DV, c2);
-    let mut w = Zeroizing::new(s * &u.ntt());
-    *w = &v - &w.inv_ntt();
+    let mut u = Vector::decode_decompress(P::DU, c1);
+    u.ntt();
+    let mut v = Zeroizing::new(Polynomial::decode_decompress(P::DV, c2));
+    let mut w = Zeroizing::new(s * &u);
+    w.inv_ntt();
+    v.sub_acc(&*w);
 
-    Zeroizing::new(w.to_msg())
+    Zeroizing::new(v.to_msg())
 }
 
 fn sample_a<const K: usize>(rho: &[u8; 32], transposed: bool) -> Matrix<K> {
@@ -348,14 +358,12 @@ fn sample_vec<const K: usize>(
     for i in 0..K {
         prf(seed, *n, &mut prf_buf[..prf_len]);
         *n += 1;
-
-        let mut p = Zeroizing::new(Polynomial::sample_cbd(eta, &prf_buf[..prf_len]));
-        if ntt {
-            *p = p.ntt();
-        }
-        v[i] = (*p).clone()
+        v[i] = Polynomial::sample_cbd(eta, &prf_buf[..prf_len])
     }
 
+    if ntt {
+        v.ntt()
+    }
     v
 }
 
@@ -415,8 +423,8 @@ fn deserialize_dk<const K: usize>(bytes: &[u8]) -> Result<DecapsKey<K>, String> 
     let (ek_bytes, rest) = rest.split_at(vec_bytes + 32);
     let (ek_hash_bytes, z_bytes) = rest.split_at(32);
 
-    let s = Vector::<K>::try_from((s_bytes, PolynomialRepresentation::NTT))?;
     let ek = deserialize_ek::<K>(ek_bytes)?;
+    let s = Vector::<K>::try_from((s_bytes, PolynomialRepresentation::NTT))?;
 
     let dk = DecapsKey::<K>::new(
         s,

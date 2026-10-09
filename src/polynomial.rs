@@ -1,7 +1,7 @@
 use core::arch::asm;
 use core::ptr::write_bytes;
 use core::sync::atomic::{Ordering::SeqCst, compiler_fence};
-use std::ops::{Add, Index, IndexMut, Mul, Sub};
+use std::ops::{Index, IndexMut};
 
 use shake::{
     Shake128,
@@ -116,12 +116,8 @@ impl Polynomial {
         r
     }
 
-    pub fn ntt(&self) -> Self {
+    pub fn ntt(&mut self) {
         debug_assert_eq!(self.t, PolynomialRepresentation::STANDARD);
-        let mut r = Self {
-            f: self.f,
-            t: PolynomialRepresentation::NTT,
-        };
 
         let mut i = 1;
         let mut len = 128;
@@ -134,9 +130,9 @@ impl Polynomial {
                 i += 1;
 
                 for j in start..start + len {
-                    let t = mul_q(zeta, r[j + len]);
-                    r[j + len] = r[j] - t;
-                    r[j] = r[j] + t;
+                    let t = mul_q(zeta, self[j + len]);
+                    self[j + len] = self[j] - t;
+                    self[j] = self[j] + t;
                 }
 
                 start += len << 1;
@@ -145,15 +141,11 @@ impl Polynomial {
             len = len >> 1;
         }
 
-        r
+        self.t = PolynomialRepresentation::NTT;
     }
 
-    pub fn inv_ntt(&self) -> Self {
+    pub fn inv_ntt(&mut self) {
         debug_assert_eq!(self.t, PolynomialRepresentation::NTT);
-        let mut r = Self {
-            f: self.f,
-            t: PolynomialRepresentation::STANDARD,
-        };
 
         let mut i = 127;
         let mut len = 2;
@@ -166,9 +158,9 @@ impl Polynomial {
                 i -= 1;
 
                 for j in start..start + len {
-                    let t = r[j];
-                    r[j] = barr_q(t + r[j + len]);
-                    r[j + len] = mul_q(zeta, r[j + len] - t);
+                    let t = self[j];
+                    self[j] = barr_q(t + self[j + len]);
+                    self[j + len] = mul_q(zeta, self[j + len] - t);
                 }
 
                 start += len << 1;
@@ -178,30 +170,55 @@ impl Polynomial {
         }
 
         for j in 0..N {
-            r[j] = mul_q(1441, r[j]);
+            self[j] = mul_q(1441, self[j]);
         }
 
-        r
+        self.t = PolynomialRepresentation::STANDARD;
     }
 
-    pub fn to_mont(&self) -> Self {
-        let mut r = Self::new(self.t);
+    pub fn add_acc(&mut self, other: &Self) {
+        debug_assert_eq!(self.t, other.t);
 
         for i in 0..N {
-            r[i] = mul_q(self[i], R2);
+            self[i] += other[i];
         }
-
-        r
     }
 
-    pub fn reduce(&self) -> Self {
-        let mut r = Self::new(self.t);
+    pub fn sub_acc(&mut self, other: &Self) {
+        debug_assert_eq!(self.t, other.t);
 
         for i in 0..N {
-            r[i] = barr_q(self[i])
+            self[i] -= other[i];
         }
+    }
 
-        r
+    pub fn mul_acc(&mut self, lhs: &Self, rhs: &Self) {
+        debug_assert_eq!(self.t, PolynomialRepresentation::NTT);
+        debug_assert_eq!(lhs.t, PolynomialRepresentation::NTT);
+        debug_assert_eq!(rhs.t, PolynomialRepresentation::NTT);
+
+        for i in 0..(N >> 2) {
+            base_case_multiply_acc(&mut self.f, &lhs.f, &rhs.f, ZETAS_MONT_FORM[64 + i], i << 2);
+            base_case_multiply_acc(
+                &mut self.f,
+                &lhs.f,
+                &rhs.f,
+                -ZETAS_MONT_FORM[64 + i],
+                (i << 2) + 2,
+            );
+        }
+    }
+
+    pub fn to_mont(&mut self) {
+        for i in 0..N {
+            self[i] = mul_q(self[i], R2);
+        }
+    }
+
+    pub fn reduce(&mut self) {
+        for i in 0..N {
+            self[i] = barr_q(self[i])
+        }
     }
 
     pub(crate) fn from_bytes(bytes: &[u8], t: PolynomialRepresentation) -> Result<Self, String> {
@@ -390,59 +407,6 @@ impl Polynomial {
     }
 }
 
-impl Add for &Polynomial {
-    type Output = Polynomial;
-
-    fn add(self, rhs: Self) -> Self::Output {
-        debug_assert_eq!(self.t, rhs.t);
-        let mut r = Polynomial::new(self.t);
-
-        for i in 0..N {
-            r[i] = self[i] + rhs[i];
-        }
-
-        r
-    }
-}
-
-impl Mul for &Polynomial {
-    type Output = Polynomial;
-
-    fn mul(self, rhs: Self) -> Self::Output {
-        debug_assert_eq!(self.t, PolynomialRepresentation::NTT);
-        debug_assert_eq!(rhs.t, PolynomialRepresentation::NTT);
-        let mut r = Polynomial::new(PolynomialRepresentation::NTT);
-
-        for i in 0..(N >> 2) {
-            base_case_multiply(&mut r.f, &self.f, &rhs.f, ZETAS_MONT_FORM[64 + i], i << 2);
-            base_case_multiply(
-                &mut r.f,
-                &self.f,
-                &rhs.f,
-                -ZETAS_MONT_FORM[64 + i],
-                (i << 2) + 2,
-            );
-        }
-
-        r
-    }
-}
-
-impl Sub for &Polynomial {
-    type Output = Polynomial;
-
-    fn sub(self, rhs: Self) -> Self::Output {
-        debug_assert_eq!(self.t, rhs.t);
-        let mut r = Polynomial::new(self.t);
-
-        for i in 0..N {
-            r[i] = self[i] - rhs[i];
-        }
-
-        r
-    }
-}
-
 impl Index<usize> for Polynomial {
     type Output = i16;
 
@@ -468,9 +432,9 @@ impl Zeroize for Polynomial {
 }
 
 #[inline]
-fn base_case_multiply(r: &mut [i16], a: &[i16], b: &[i16], zeta: i16, i: usize) {
-    r[i] = mul_q(a[i], b[i]) + mul_q(mul_q(a[i + 1], b[i + 1]), zeta);
-    r[i + 1] = mul_q(a[i], b[i + 1]) + mul_q(a[i + 1], b[i]);
+fn base_case_multiply_acc(r: &mut [i16], a: &[i16], b: &[i16], zeta: i16, i: usize) {
+    r[i] += mul_q(a[i], b[i]) + mul_q(mul_q(a[i + 1], b[i + 1]), zeta);
+    r[i + 1] += mul_q(a[i], b[i + 1]) + mul_q(a[i + 1], b[i]);
 }
 
 #[inline]

@@ -36,7 +36,11 @@ impl<const K: usize> Mul<&Vector<K>> for &Matrix<K> {
         let mut r = Vector::<K>::new(PolynomialRepresentation::NTT);
 
         for i in 0..K {
-            r[i] = &self.rows[i] * rhs;
+            for j in 0..K {
+                r[i].mul_acc(&self[i][j], &rhs[j]);
+            }
+
+            r[i].reduce()
         }
 
         r
