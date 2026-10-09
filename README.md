@@ -173,11 +173,7 @@ All secrets and sensitive values in the rust code are zeroized as soon as they g
 Memory inside the rust core logic is entirely stack allocated and does not use any dynamically
 allocated memory. Since the source of variance in memory sizes throughout MLKEM is the parameter
 set each parameter set is a specialized implementation of the `Kem` trait that allows that impl
-to use constants for its array sizes. `Vec<u8>` _is_ used in the pyo3 bindings to represent bytes
-at the border between python and rust code. I do not know of a way to avoid this and use a rust
-`u8` array reference or slice to represent python `bytes` in a way that plays nice with PyO3. The performance penalty is negligible, the main consideration is management of values that are
-considered secret if they are copied across the language boundary and if they are not promptly
-garbage collected and zeroizeed by python.
+to use constants for its array sizes.
 
 ## Testing
 
@@ -251,6 +247,23 @@ Doing ML-KEM-768 decaps ops for 1s: 31662 ML-KEM-768 KEM decaps ops in 1.00s
 Doing ML-KEM-1024 keygen ops for 1s: 19272 ML-KEM-1024 KEM keygen ops in 1.00s
 Doing ML-KEM-1024 encaps ops for 1s: 36791 ML-KEM-1024 KEM encaps ops in 1.00s
 Doing ML-KEM-1024 decaps ops for 1s: 24031 ML-KEM-1024 KEM decaps ops in 1.00s
+```
+
+The widely-used `cryptography` package also implements the 768 and 1024 param sets for MLKEM.
+Performance provided below for reference.
+
+```
+cryptography 50.0.1
+ops=['keygen', 'encaps', 'decaps'] duration=1.0s repeats=5 warmup=0.5s
+
+op        param set      ops/sec (med)     µs/op           min           max       stdev
+----------------------------------------------------------------------------------------
+keygen    ML_KEM_768            11,365      88.0        11,286        11,425          55
+keygen    ML_KEM_1024            8,105     123.4         7,985         8,195          87
+encaps    ML_KEM_768            46,580      21.5        43,977        46,944       1,210
+encaps    ML_KEM_1024           35,255      28.4        34,493        35,285         382
+decaps    ML_KEM_768            30,989      32.3        30,833        31,005          72
+decaps    ML_KEM_1024           23,818      42.0        23,612        24,057         201
 ```
 
 Depending on your specific CPU architecture, you may be able to see significant performance

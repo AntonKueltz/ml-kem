@@ -1,4 +1,4 @@
-use pyo3::{exceptions::PyValueError, prelude::*};
+use pyo3::{exceptions::PyValueError, prelude::*, types::PyBytes};
 
 use crate::decaps_key::DecapsKey;
 use crate::encaps_key::EncapsKey;
@@ -51,12 +51,12 @@ struct MlKem {
     params: ParameterSet,
 }
 
-fn ek_to_bytes<P: Kem>(ek: &P::EncapsKey) -> Vec<u8> {
-    P::serialize_ek(ek).as_ref().to_vec()
+fn ek_to_bytes<'py, P: Kem>(py: Python<'py>, ek: &P::EncapsKey) -> PyResult<Bound<'py, PyBytes>> {
+    Ok(PyBytes::new(py, P::serialize_ek(ek).as_ref()))
 }
 
-fn dk_to_bytes<P: Kem>(dk: &P::DecapsKey) -> Vec<u8> {
-    P::serialize_dk(dk).as_ref().to_vec()
+fn dk_to_bytes<'py, P: Kem>(py: Python<'py>, dk: &P::DecapsKey) -> PyResult<Bound<'py, PyBytes>> {
+    Ok(PyBytes::new(py, P::serialize_dk(dk).as_ref()))
 }
 
 fn mismatch() -> PyErr {
@@ -67,12 +67,19 @@ fn key_gen_impl<P: Kem>() -> (P::EncapsKey, P::DecapsKey) {
     P::key_gen()
 }
 
-fn encaps_impl<P: Kem>(ek: &P::EncapsKey) -> (Vec<u8>, Vec<u8>) {
+fn encaps_impl<'py, P: Kem>(
+    py: Python<'py>,
+    ek: &P::EncapsKey,
+) -> PyResult<(Bound<'py, PyBytes>, Bound<'py, PyBytes>)> {
     let (k, c) = P::encaps(ek);
-    (k.to_vec(), c.as_ref().to_vec())
+    Ok((PyBytes::new(py, k.as_ref()), PyBytes::new(py, c.as_ref())))
 }
 
-fn decaps_impl<P: Kem>(dk: &P::DecapsKey, c: &[u8]) -> PyResult<Vec<u8>>
+fn decaps_impl<'py, P: Kem>(
+    py: Python<'py>,
+    dk: &P::DecapsKey,
+    c: &[u8],
+) -> PyResult<Bound<'py, PyBytes>>
 where
     for<'a> P::Ctxt: TryFrom<&'a [u8]>,
 {
@@ -80,22 +87,22 @@ where
         .try_into()
         .map_err(|_| PyValueError::new_err("Invalid ciphertext"))?;
     P::decaps(dk, &c)
-        .map(|k| k.to_vec())
+        .map(|k| PyBytes::new(py, k.as_ref()))
         .map_err(PyValueError::new_err)
 }
 
 #[pymethods]
 impl PyEncapsKey {
-    fn to_bytes(&self) -> Vec<u8> {
+    fn to_bytes<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
         match &self.inner {
-            EkInner::P512(k) => ek_to_bytes::<MlKem512>(k),
-            EkInner::P768(k) => ek_to_bytes::<MlKem768>(k),
-            EkInner::P1024(k) => ek_to_bytes::<MlKem1024>(k),
+            EkInner::P512(k) => ek_to_bytes::<MlKem512>(py, k),
+            EkInner::P768(k) => ek_to_bytes::<MlKem768>(py, k),
+            EkInner::P1024(k) => ek_to_bytes::<MlKem1024>(py, k),
         }
     }
 
-    fn __bytes__(&self) -> Vec<u8> {
-        self.to_bytes()
+    fn __bytes__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        self.to_bytes(py)
     }
 
     #[getter]
@@ -125,16 +132,16 @@ impl PyEncapsKey {
 
 #[pymethods]
 impl PyDecapsKey {
-    fn to_bytes(&self) -> Vec<u8> {
+    fn to_bytes<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
         match &self.inner {
-            DkInner::P512(k) => dk_to_bytes::<MlKem512>(k),
-            DkInner::P768(k) => dk_to_bytes::<MlKem768>(k),
-            DkInner::P1024(k) => dk_to_bytes::<MlKem1024>(k),
+            DkInner::P512(k) => dk_to_bytes::<MlKem512>(py, k),
+            DkInner::P768(k) => dk_to_bytes::<MlKem768>(py, k),
+            DkInner::P1024(k) => dk_to_bytes::<MlKem1024>(py, k),
         }
     }
 
-    fn __bytes__(&self) -> Vec<u8> {
-        self.to_bytes()
+    fn __bytes__<'py>(&self, py: Python<'py>) -> PyResult<Bound<'py, PyBytes>> {
+        self.to_bytes(py)
     }
 
     #[getter]
@@ -210,20 +217,29 @@ impl MlKem {
         }
     }
 
-    fn encaps(&self, ek: &PyEncapsKey) -> PyResult<(Vec<u8>, Vec<u8>)> {
+    fn encaps<'py>(
+        &self,
+        py: Python<'py>,
+        ek: &PyEncapsKey,
+    ) -> PyResult<(Bound<'py, PyBytes>, Bound<'py, PyBytes>)> {
         match (self.params, &ek.inner) {
-            (ParameterSet::MlKem512, EkInner::P512(k)) => Ok(encaps_impl::<MlKem512>(k)),
-            (ParameterSet::MlKem768, EkInner::P768(k)) => Ok(encaps_impl::<MlKem768>(k)),
-            (ParameterSet::MlKem1024, EkInner::P1024(k)) => Ok(encaps_impl::<MlKem1024>(k)),
+            (ParameterSet::MlKem512, EkInner::P512(k)) => encaps_impl::<MlKem512>(py, k),
+            (ParameterSet::MlKem768, EkInner::P768(k)) => encaps_impl::<MlKem768>(py, k),
+            (ParameterSet::MlKem1024, EkInner::P1024(k)) => encaps_impl::<MlKem1024>(py, k),
             _ => Err(mismatch()),
         }
     }
 
-    fn decaps(&self, dk: &PyDecapsKey, c: &[u8]) -> PyResult<Vec<u8>> {
+    fn decaps<'py>(
+        &self,
+        py: Python<'py>,
+        dk: &PyDecapsKey,
+        c: &[u8],
+    ) -> PyResult<Bound<'py, PyBytes>> {
         match (self.params, &dk.inner) {
-            (ParameterSet::MlKem512, DkInner::P512(k)) => decaps_impl::<MlKem512>(k, &c),
-            (ParameterSet::MlKem768, DkInner::P768(k)) => decaps_impl::<MlKem768>(k, &c),
-            (ParameterSet::MlKem1024, DkInner::P1024(k)) => decaps_impl::<MlKem1024>(k, &c),
+            (ParameterSet::MlKem512, DkInner::P512(k)) => decaps_impl::<MlKem512>(py, k, &c),
+            (ParameterSet::MlKem768, DkInner::P768(k)) => decaps_impl::<MlKem768>(py, k, &c),
+            (ParameterSet::MlKem1024, DkInner::P1024(k)) => decaps_impl::<MlKem1024>(py, k, &c),
             _ => Err(mismatch()),
         }
     }
