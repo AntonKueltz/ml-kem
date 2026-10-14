@@ -18,9 +18,6 @@ party. For security critical use cases I recommend more established libraries.
 
 # Usage
 
-The interface follows the one defined in section 7 of the standard for the functions KeyGen,
-Encaps and Decaps. All functions operate on, and return, `bytes`.
-
 ```python
 from mlkem import ML_KEM
 
